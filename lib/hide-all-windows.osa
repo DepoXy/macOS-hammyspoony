@@ -1,0 +1,26 @@
+#!/usr/bin/osascript
+# vim:tw=0:ts=2:sw=2:et:norl:ft=applescript
+# Author: Landon Bouma <https://tallybark.com/>
+# Project: https://github.com/DepoXy/macOS-Hammyspoony#🥄
+# License: MIT
+
+# Copyright (c) © 2024 Landon Bouma. All Rights Reserved.
+
+# USAGE: E.g.,
+#
+#   osascript ~/.kit/mOS/macOS-Hammyspoony/lib/hide-all-windows.osa
+
+# THANX: https://superuser.com/a/404087
+
+# USYNC/COPYD:
+#   meld ~/.kit/mOS/macOS-Hammyspoony/lib/hide-all-windows.osa \
+#        ~/.kit/mOS/macOS-skhibidirc/lib/hide-all-windows.osa &
+
+activate application "Finder"
+
+tell application "System Events"
+  set visible of processes where name is not "Finder" to false
+end tell
+
+tell application "Finder" to set collapsed of windows to true
+
