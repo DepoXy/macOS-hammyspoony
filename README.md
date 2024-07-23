@@ -39,7 +39,7 @@ You call that a knife? This is a Hammerspoon config
 ## USAGE
 
   Make a symlink at `~/.hammerspoon/init.lua` to this project's
-  `init.lua`, and it'll be wired (see instructions below).
+  `init.lua`, and it'll be wired (see `ln` snippet, below).
 
   You can also add your own `client-hs.lua` file to add
   your own bindings (or just fork this repo and make it
@@ -109,7 +109,7 @@ You call that a knife? This is a Hammerspoon config
   `<Cmd-Alt-C>`: Briefly show a digital clock in the center of the screen
   (using the [AClock](https://www.hammerspoon.org/Spoons/AClock.html) Spoon)
 
-### Private config
+## PRIVATE CONFIG
 
   The config finishes by loading an optional "private" config
   from your DepoXy Client (see the [DepoXy](https://github.com/DepoXy/depoxy)
@@ -119,21 +119,21 @@ You call that a knife? This is a Hammerspoon config
 
 ## DEPENDENCIES
 
-  As mentioned above, this project assumes it's cloned to a particular path:
+  - As mentioned above, this project assumes it's cloned to a particular path:
 
       ~/.kit/mOS/macOS-Hammyspoony
 
-  The Browser foregrounders specifically call `/Applications/Google Chrome.app`
-  with the "Default" user profile.
+  - The Browser foregrounders specifically call `/Applications/Google Chrome.app`
+    with the "Default" user profile.
 
-  - Though see notes inline how you might use the powerful
-    [URLDispatcher](https://www.hammerspoon.org/Spoons/URLDispatcher.html)
-    Spoon to chose the profile or even browser app depending on the URL.
+    - Though see notes inline how you might use the powerful
+      [URLDispatcher](https://www.hammerspoon.org/Spoons/URLDispatcher.html)
+      Spoon to chose the profile or even browser app depending on the URL.
 
 ## SEE ALSO
 
   This project complements a collection of Karabiner-Elements
-  modifications that add bindings beyond the reach of Hammerspoon
+  modifications that does keyboard trickery beyond the reach of Hammerspoon
 
   https://github.com/DepoXy/Karabiner-Elephants#🐘
 
