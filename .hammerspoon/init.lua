@@ -28,6 +28,18 @@
 --   - It also shows you the power of Emacs Org mode, and gives you a
 --     peek at zzamboni's other dev environment infrastructure.
 
+-- - Most of these bindings started out in a `skhdrc` file:
+--
+--     https://github.com/DepoXy/macOS-skhibidirc#👤
+--
+--   But it's easier to front a single window in Hammerspoon without
+--   also bringing all the other app windows forward, too.
+--
+--   CXREF: You can see the original `skhd` bindings (and comments)
+--   in the `skhdrc.OFF`, on path in a DepoXy environment at:
+--
+--     ~/.kit/mOS/macOS-skhibidirc/.config/skhd/skhdrc.OFF
+
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- Update `hs.loadSpoon()` search path to include Spoons repo.
@@ -289,6 +301,14 @@ end)
 
 -- ***
 
+hs.hotkey.bind({"shift", "ctrl", "alt"}, "W", function()
+  hide_osa = os.getenv("HOME") .. "/.kit/mOS/macOS-Hammyspoony/lib/hide-all-windows.osa"
+
+  hs.osascript.applescriptFromFile(hide_osa)
+end)
+
+-- ***
+
 -- Unminimize all Alacritty windows.
 -- - DUNNO: When I first tested this, it was fast, like, it would
 --   instantaneously unminimize all windows. But now it's slow, like
@@ -317,6 +337,332 @@ hs.hotkey.bind({"shift", "ctrl", "cmd"}, "T", function()
   alacritty_app:activate()
   -- Also works:
   --   alacritty_app:setFrontmost()
+end)
+
+-------
+
+-- Alacritty (terminal) window fronters.
+-- - DPNDS: Requires that the terminal window titles starts with a unique number,
+--   e.g., suppose the current directory is user home, the title might be "1. ~".
+--   - CXREF: Homefries has a terminal window titler that numbers windows
+--     for Alacritty, mate-terminal, and iTerm2:
+--       https://github.com/landonb/home-fries#🍟
+--         https://github.com/landonb/home-fries/blob/release/lib/term/show-command-name-in-window-title.sh
+--           ~/.kit/sh/home-fries/lib/term/show-command-name-in-window-title.sh
+
+-- SAVVY: Alacritty windows don't always behave properly
+--
+-- - Alacritty is technically "not scriptable", i.e., you cannot use AppleScript
+--   to loop over it's window with the familiar tell-application, e.g.,
+--
+--     tell application "Alacritty"
+--       repeat with w in windows
+--         ...
+--
+--   doesn't work.
+--
+--   - But alternative approaches work, e.g.,
+--
+--       tell application "System Events"
+--         tell processes whose name is "Alacritty"
+--           repeat with w in windows
+--             ...
+--
+-- - Furthermore — and unsure if this is related, but seems like it is —
+--   AppleScript and hs.window.filter will sometimes not see all of the
+--   Alacritty windows.
+--
+--   - E.g., consider you have a "1. foo" window visible.
+--
+--     - Two of the functions below won't always find it
+--       (they normally do, but occasionally Alacritty
+--       windows will stop being findable by these functions).
+--
+--       - `terminal_by_number_using_filter`, which uses hs.window.filter,
+--         might not see all the Alacritty windows.
+--
+--       - `alacritty_by_number_using_osascript`, which calls an AppleScript
+--         script, also might not see all the Alacritty windows.
+--
+--     - Fortunately, `terminal_by_number_using_post_filter` does always
+--       seem to work. It calls hs.window.find and then inspects the
+--       application object associated with each window to identify a
+--       term window (to weed out other apps, e.g., in case a Chrome
+--       window has a matching number prefix, for whatever reason).
+--
+--   - I don't know enough about macOS Apps and Windows to have
+--     a good clue as to why Alacritty windows are sometimes less
+--     findable. And I'm also not positive that the selected function,
+--     `terminal_by_number_using_post_filter` won't fail in the future.
+
+-- TRACE: I've left log code commented so it's easier to add
+--        again if you need it.
+--        - Also some hs.alert.show trace.
+--
+-- hs.logger.defaultLogLevel = "verbose"
+
+-- The following (commented) function uses hs.window.filter(),
+-- which is a powerful tool, and probably overkill for our purposes.
+--
+-- - Oddly, hs.window.filter() will sometimes not pick up all
+--   Alacritty windows (hence it's commented, and not used).
+--
+-- - Also, hs.window.find() (aka hs.window()) can be used similarly
+--   to hs.window.filter(), if we examine the application object
+--   attached to each window object (which seems to be more reliable
+--   than hs.window.filter(), at least for finding Alacritty windows;
+--   see the function below, `terminal_by_number_using_post_filter`).
+--
+--
+--   local terminal_by_number_using_filter = function(win_num)
+--     -- local log = hs.logger.new('term_num_raise')
+--     -- log:d("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/0")
+--
+--     -- Filter terminal windows for matching title pattern
+--     local name_filter = { allowTitles = "^" .. win_num .. ". ", }
+--
+--     -- Note that we pass a complete filter table, and not just app names.
+--     -- - A close, but not equivalent call, is
+--     --     hs.window.filter.new({'Alacritty', 'iTerm2', 'Terminal'}):setOverrideFilter(name_filter)
+--     --   but when passing a list of app names (without the filter table),
+--     --   hs.window.filter will only look for visible windows.
+--     --   - But we want to find minimized or hidden windows, too.
+--     local wf_terminals = hs.window.filter.new({
+--       ["Alacritty"] = name_filter,
+--       ["iTerm2"] = name_filter,
+--       ["Terminal"] = name_filter,
+--     })
+--
+--     -- local app_filters = wf_terminals:getFilters()["Alacritty"]
+--     -- for k,v in pairs(app_filters) do
+--     --   -- Shows "k — allowTitles"
+--     --   hs.alert.show("k — " .. k)
+--     --   -- WRONG: "attempt to concatenate a table value":
+--     --   --   hs.alert.show("k — " .. k .. " / v — " .. v)
+--     --   -- - Because v is a list, and in Lua, lists are indexed tables.
+--     --   -- Shows, e.g., "^1 ."
+--     --   hs.alert.show("k — " .. k .. " / v — " .. v[1])
+--     --   -- This also works, shows same, e.g., "^1 ."
+--     --   hs.alert.show("k — " .. k .. " / v — " .. table.concat(v, "/"))
+--     -- end
+--     -- log:d("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/2")
+--
+--     local wins = wf_terminals:getWindows()
+--
+--     -- for k,v in pairs(wins) do
+--     --   hs.alert.show("k — " .. k .. " / title — " .. v:title())
+--     -- end
+--     -- log:d("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/3")
+--
+--     if #wins > 0 then
+--       wins[1]:raise():focus()
+--
+--       return true
+--     end
+--
+--     return false
+--   end
+
+-- This AppleScript behaves similar to `terminal_by_number_using_filter`
+-- and won't always find all Alacritty windows, if any of them have
+-- "disassociated".
+--
+-- - CXREF: ~/.kit/mOS/macOS-Hammyspoony/lib/alacritty-front-window-number.osa
+--
+--
+--   local alacritty_by_number_using_osascript = function(win_num)
+--     local task = hs.task.new(
+--       "/usr/bin/osascript",
+--       nil,
+--       {
+--         os.getenv("HOME") .. "/.kit/mOS/macOS-Hammyspoony/lib/alacritty-front-window-number.osa",
+--         tostring(win_num),
+--       }
+--     )
+--     task:start()
+--   end
+
+-- This always seems to work with Alacritty windows, even when they're
+-- not found by hs.window.filter or AppleScript (see the two previous
+-- (commented) functions).
+--
+local terminal_by_number_using_post_filter = function(win_num)
+  prefix_pattern = "^" .. win_num .. ". "
+  -- SAVVY: hs.window.find returns zero, one, or more windows,
+  -- but you'll only capture one window with this basic call:
+  --   local win = hs.window.find(prefix_pattern)
+  -- To capture all windows, convert return values to a table:
+  local wins = { hs.window.find(prefix_pattern) }
+  -- table.pack also works:
+  --   local win = table.pack(hs.window.find(prefix_pattern))
+  -- What's happening is illustrated by this call (but don't do this):
+  --   local win1, win2, win3 = hs.window.find(prefix_pattern)
+
+  local term_apps = { Alacritty = true, iTerm2 = true, Terminal = true, }
+
+  for _, win in pairs(wins) do
+    local app_title = win:application():title()
+    -- hs.alert.show("win — " .. win:title() .. " / app — " .. app_title)
+    if term_apps[app_title] then
+      win:raise():focus()
+
+      return true
+    end
+  end
+
+  -- If no terminal window matched, use any application window that matches.
+  if wins then
+    wins[1]:raise():focus()
+
+    return true
+  end
+
+  return false
+end
+
+local alacritty_by_window_number_prefix = function(win_num)
+  terminal_by_number_using_post_filter(win_num)
+end
+
+hs.hotkey.bind({"cmd"}, "1", function()
+  alacritty_by_window_number_prefix(1)
+end)
+
+hs.hotkey.bind({"cmd"}, "2", function()
+  alacritty_by_window_number_prefix(2)
+end)
+
+hs.hotkey.bind({"cmd"}, "3", function()
+  alacritty_by_window_number_prefix(3)
+end)
+
+hs.hotkey.bind({"cmd"}, "4", function()
+  alacritty_by_window_number_prefix(4)
+end)
+
+hs.hotkey.bind({"cmd"}, "5", function()
+  alacritty_by_window_number_prefix(5)
+end)
+
+hs.hotkey.bind({"cmd"}, "6", function()
+  alacritty_by_window_number_prefix(6)
+end)
+
+hs.hotkey.bind({"cmd"}, "7", function()
+  alacritty_by_window_number_prefix(7)
+end)
+
+hs.hotkey.bind({"cmd"}, "8", function()
+  alacritty_by_window_number_prefix(8)
+end)
+
+hs.hotkey.bind({"cmd"}, "9", function()
+  alacritty_by_window_number_prefix(9)
+end)
+
+-------
+
+-- Alacritty — New Window
+
+hs.hotkey.bind({"cmd"}, "0", function()
+  local task = hs.task.new(
+    "/usr/bin/open",
+    nil,
+    function() return false end,
+    { "-na", "alacritty" }
+  )
+  task:start()
+end)
+
+-- Alacritty foregrounder/opener
+
+hs.hotkey.bind({"shift", "cmd"}, "0", function()
+  hs.application.launchOrFocus("Alacritty")
+end)
+
+-- Terminal.app — New Window
+-- - For the rare time you want to test Apple Terminal.app
+
+hs.hotkey.bind({"ctrl", "cmd"}, "0", function()
+  local task = hs.task.new(
+    "/usr/bin/osascript",
+    nil,
+    function() return false end,
+    {
+      '-e', 'tell app "Terminal"',
+        '-e', 'do script ""',
+        '-e', 'activate',
+      '-e', 'end tell',
+    }
+  )
+  task:start()
+end)
+
+-------
+
+-- Opens a new Google Chrome window.
+--
+-- SAVVY:
+-- - If Chrome is visible, the `make new window` AppleScript
+--   will create a new window in front of the current window
+--   without also brinding all other Chrome windows in front
+--   of the current window.
+-- - If Chrome is hidden, unhide it, which won't front the
+--   newly visible windows in front of the current window.
+-- - Avoid using `open`, e.g.,:
+--     open -na "Google Chrome" --args --new-window
+--   - If you haven't called that command in a while, it'll literally
+--     take ~5s to run. Which is very disruptive to one's flow!
+--   - It also fronts all the other Chrome windows on top of your
+--     other windows — even though Alt-Tab will still take you
+--     back to whatever app you were just on.
+-- - Note that closing the new Chrome window will nonetheless
+--   bring another Chrome window to the front (if one is visible),
+--   rather than returning you to whatever window you were using
+--   before opening the new Chrome window.
+
+hs.hotkey.bind({"cmd"}, "T", function()
+  local chrome_app = hs.application.get("Google Chrome")
+
+  if not chrome_app then
+    hs.application.launchOrFocus("Google Chrome")
+  else
+    if chrome_app:isHidden() then
+      chrome_app:unhide()
+    end
+
+    local task = hs.task.new(
+      "/usr/bin/osascript",
+      function() chrome_app:setFrontmost() end,
+      function() return false end,
+      {
+        '-e', 'tell application "Google Chrome"',
+          '-e', 'make new window',
+        '-e', 'end tell',
+      }
+    )
+    task:start()
+  end
+end)
+
+-------
+
+-- Bring MRU Chrome window to the front, or start Chrome.
+-- - If all Chrome windows are minimized, this activates Chrome
+--   app but won't actually show any window.
+
+hs.hotkey.bind({"shift", "cmd"}, "T", function()
+  local chrome_app = hs.application.get("Google Chrome")
+
+  if not chrome_app then
+    hs.application.launchOrFocus("Google Chrome")
+  else
+    if chrome_app:isHidden() then
+      chrome_app:unhide()
+    end
+
+    chrome_app:setFrontmost()
+  end
 end)
 
 -------
@@ -504,6 +850,148 @@ hs.hotkey.bind({"shift", "ctrl", "cmd"}, "R", function()
       "devtools://",
     }
   )
+end)
+
+-------
+
+-- Create Meld window filter to disable certain hotkeys.
+--
+-- - Because Meld doesn't let us remap its menu keys, and we don't
+--   want to block certain menu bindings, like <Cmd-F> Find.
+--   (Otherwise I would've liked to change <Cmd-F> to <Ctrl-F>.)
+--
+-- - The author doesn't use Meld very often, so disabling certain
+--   hotkeys while it runs is not a big deal.
+--
+-- - Note that checking the active app doesn't work, because hotkey
+--   is still bound, e.g., <Cmd-F> won't run Meld Edit > Find if we
+--   did the following:
+--
+--     hs.hotkey.bind({"cmd"}, "F", function()
+--       local fmost_app = hs.application.frontmostApplication()
+--
+--       if fmost_app:title() ~= "Meld" then
+--         hs.application.launchOrFocus("Finder")
+--       end
+--     end)
+--
+-- - So we'll use a window.filter instead. Note that application.watcher
+--   might also work.
+--
+--     https://www.hammerspoon.org/docs/hs.window.filter.html
+--     https://www.hammerspoon.org/docs/hs.application.watcher.html
+--
+-- - THANX: https://stackoverflow.com/a/64095788
+
+-- Toggle hotkey enablement when window is focused and unfocused.
+local filter_ignore_hotkey = function(win_filter, hotkey)
+  -- DUNNO: Hotkey doesn't seem to work at first, unless
+  -- explicitly enabled.
+  hotkey:enable()
+
+  win_filter
+    :subscribe(hs.window.filter.windowFocused, function()
+      -- Disable hotkey in app
+      hotkey:disable()
+    end)
+    :subscribe(hs.window.filter.windowUnfocused, function()
+      -- Enable hotkey when focusing out of app
+      hotkey:enable()
+    end)
+end
+
+-- Prepare a Meld window filter and hotkey subscriber
+local meld_filter = hs.window.filter.new("Meld")
+
+ignore_hotkey_meld = function(hotkey)
+  filter_ignore_hotkey(meld_filter, hotkey)
+end
+
+-- Prepare a similar LibreOffice window filter (not used herein
+-- but used by some client-hs.lua, so defined here).
+local libreoffice_filter = hs.window.filter.new("LibreOffice")
+
+ignore_hotkey_libreoffice = function(hotkey)
+  filter_ignore_hotkey(libreoffice_filter, hotkey)
+end
+
+-------
+
+-- Finder foregrounder/opener
+
+local cmd_f = hs.hotkey.new({"cmd"}, "F", function()
+  hs.application.launchOrFocus("Finder")
+end)
+
+ignore_hotkey_meld(cmd_f)
+
+-------
+
+-- MacVim foregrounder/opener
+
+hs.hotkey.bind({"cmd"}, "`", function()
+  hs.application.launchOrFocus("MacVim")
+end)
+
+-------
+
+-- Slack foregrounder/opener
+
+hs.hotkey.bind({"shift", "ctrl", "cmd"}, "F", function()
+  hs.application.launchOrFocus("Slack")
+end)
+
+-------
+
+-- Spotify foregrounder/๏קєภer
+
+hs.hotkey.bind({"shift", "ctrl", "cmd"}, "X", function()
+  hs.application.launchOrFocus("Spotify")
+end)
+
+-------
+
+-- <Cmd-Minus> — Put YYYY-MM-DD into clipboard.
+-- - Note the printf avoids newline injection.
+--   - Though below we also use `tr -d`...
+-- - CALSO: Homefries `$(TTT)` function, and Dubs-Vim 'TTT' alias, etc.
+--    https://github.com/landonb/home-fries/blob/release/lib/datetime_now_TTT.sh#L45
+--    https://github.com/landonb/dubs_edit_juice/blob/release/plugin/dubs_edit_juice.vim#L1513
+
+hs.hotkey.bind({"cmd"}, "-", function()
+  local task = hs.task.new(
+    "/bin/dash",
+    nil,
+    function() return false end,
+    { "-c", 'printf "%s" "$(date "+%Y-%m-%d")" | pbcopy' }
+  )
+  task:start()
+end)
+
+-- <Ctrl-Cmd-Semicolon> — Put normal date plus:time into clipboard.
+-- - HSTRY: Named after erstwhile Homefries $(TTTtt:) command.
+
+hs.hotkey.bind({"ctrl", "cmd"}, ";", function()
+  local task = hs.task.new(
+    "/bin/dash",
+    nil,
+    function() return false end,
+    { "-c", 'printf "%s" "$(date "+%Y-%m-%d %H:%M")" | tr -d "\n" | pbcopy' }
+  )
+  task:start()
+end)
+
+-- <Ctrl-Cmd-Apostrophe(Quote)> — Put dashed date-plus-time into clipboard.
+-- - CALSO: Homefries $(TTTtt-) command.
+
+hs.hotkey.bind({"ctrl", "cmd"}, "'", function()
+  local task = hs.task.new(
+    "/bin/dash",
+    nil,
+    function() return false end,
+    { "-c", 'printf "%s" "$(date "+%Y-%m-%d-%H-%M")" | tr -d "\n" | pbcopy' }
+  )
+  task:start()
 end)
 
 -------

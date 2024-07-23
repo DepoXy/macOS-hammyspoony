@@ -1,0 +1,98 @@
+# vim:tw=0:ts=2:sw=2:et:norl:ft=applescript
+# Author: Landon Bouma <https://tallybark.com/>
+# Project: https://github.com/DepoXy/macOS-Hammyspoony#🥄
+# License: MIT
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
+# ISOFF/2024-07-23: The <Cmd-1>, <Cmd-2>, etc. bindings are now wired
+# using hs.window.find() — See `terminal_by_number_using_post_filter`:
+#
+#   ~/.kit/mOS/macOS-Hammyspoony/.hammerspoon/init.lua
+#
+# So this file is no longer used.
+#
+# - But it's being kept for posterity, to illustrate an alternative (and
+#   less responsive) approach to native Hammerspoon.
+#
+# - Also to mention that everything I've ever tried to do in AppleScript
+#   can more easily and quickly be done in Hammerspoon, and with faster
+#   results. Like, I don't expect I'll need AppleScript ever again...
+#   I think Hammerspoon does everything I'd ever need from AppleScript.
+#   (What a relief! =)
+#
+# LATER: Retire (remove) this file someday.
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
+# SAVVY: Alacritty is not scriptable.
+#
+# - I.e., cannot `tell application "Alacritty"`, so tell "System Events".
+#
+# - CXREF: See comment in a related project for more notes:
+# 
+#     https://github.com/landonb/home-fries/blob/release/lib/term/window-title--alacritty-number.osa
+#
+#       ~/.kit/sh/home-fries/lib/term/window-title--alacritty-number.osa
+#
+# - HSTRY: Original approach `activate`d Alacritty to get its process object:
+#
+#     tell application "Alacritty"
+#       activate
+#     end tell
+#
+#     tell application "System Events"
+#       -- Get the frontmost app's *process* object.
+#       set frontAppProcess to first application process whose frontmost is true
+#     end tell
+#
+#     tell application "System Events"
+#       tell frontAppProcess
+#         ...
+#           if NAME of w starts with (item 1 of argv) & ". " then
+#             tell frontAppProcess
+#             ...
+#
+#   But the `activate` raises *all* Alacritty windows above the current
+#   window. (Which is very annoying, IMO. I want to raise *a single
+#   window*, I don't want to bury the current window under all the
+#   other Alacritty windows.)
+#
+#   Fortunately, `tell processes whose name is <foo>` also works,
+#   and then we don't have to mess up your visible window stack.
+#
+#   - DUNNO: Interestingly, `open -a "Google Chrome"` raises *all* its
+#     windows above the current window. Not sure why `open -a Alacritty`
+#     only raises its topmost (frontmost?) window.
+
+on run argv
+  # Tell the *process* to iterate its windows.
+  tell application "System Events"
+    tell processes whose name is "Alacritty"
+      repeat with w in windows
+        tell w
+          -- E.g.,
+          --   if NAME of w starts with "2. " then
+          -- Doesn't work:
+          --   if NAME of w starts with quoted form of (item 1 of argv) & ". " then
+          if NAME of w starts with (item 1 of argv) & ". " then
+            tell application "System Events"
+              tell processes whose name is "Alacritty"
+                -- Raise Alacritty window above other Alacritty
+                -- windows, but not above currently active window:
+                perform action "AXRaise" of w
+                -- WRONG: Raises all Alacritty windows above current window:
+                --  set frontmost to true
+                -- RIGHT: Raises *only* topmost Alacritty window above
+                --        current window:
+                do shell script "open -a Alacritty"
+                return
+              end tell
+            end tell
+          end if
+        end tell
+      end repeat
+    end tell
+  end tell
+end run
+

@@ -26,15 +26,8 @@ You call that a knife? This is a Hammerspoon config
       their macOS behaves more like Linux Mint MATE (the author's
       other main development environment).
 
-  See also a related [`skhd`](https://github.com/koekeishiya/skhd) config
-  that I still use for simpler bindings:
-
-  https://github.com/DepoXy/macOS-skhibidirc#👤
-
-  - (Had I learned Hammerspoon first, I'm not sure I would have
-    created that project. While I appreciate that `skhdrc` bindings
-    are generally more concise than Hammerspoon bindings, Hammerspoon
-    is definitely more feature-rich.)
+    - In that vein, most `<Ctrl-key>` bindings are mapped to application
+      menu items, and most `<Cmd-key>` bindings are free for us to use.
 
 ## USAGE
 
@@ -87,7 +80,36 @@ You call that a knife? This is a Hammerspoon config
 
   `<Shift-Ctrl-Cmd-T>`: Unminimize all Alacritty windows
 
+  `<Shift-Ctrl-Alt-W>`: Hide or minimize all windows
+
+### Terminal window foregrounders
+
+  `<Cmd-1>`: Bring to front any terminal window whose title starts with "1. "
+
+  `<Cmd-2>`: Bring to front any terminal window whose title starts with "2. "
+
+  ...
+
+  `<Cmd-9>`: Bring to front any terminal window whose title starts with "9. "
+
+  - The [Homefries](https://github.com/landonb/home-fries) project
+    includes a `PS1` setup that numbers new terminal windows when
+    they're opened. It works for Alacritty, mate-terminal, and iTerm2
+    terminal windows. See:
+
+    https://github.com/landonb/home-fries/blob/release/lib/term/show-command-name-in-window-title.sh
+
+  `<Cmd-0>`: Open a new Alacritty window
+
+  `<Shift-Cmd-0>`: Bring Alacritty to front
+
+  `<Ctrl-Cmd-0>`: Open a new Terminal.app window
+
 ### Browser foregrounders
+
+  `<Cmd-T>`: Open a new Chrome window
+
+  `<Shift-Cmd-T>`: Bring Chrome to the front
 
   `<Shift-Ctrl-Cmd-A>`: Bring the Email or Calendar browser window to
   the front, or open Gmail
@@ -106,6 +128,26 @@ You call that a knife? This is a Hammerspoon config
 
 ### Application foregrounder-openers
 
+  `<Cmd-F>`: Bring any Finder window to front, or open Finder
+
+  `<Cmd-Grave(Backtick)>` (``<Cmd-`>``): Bring MacVim to the front
+
+  `<Shift-Ctrl-Cmd-F>`: Bring Slack to the front, or open it
+
+  `<Shift-Ctrl-Cmd-X>`: Bring Spotify to the front, or open it
+
+### Time and date clipboard fillers
+
+  `<Cmd-Minus>` (`<Cmd-->`): Put YYYY-MM-DD into clipboard, e.g., "2024-07-08"
+
+  `<Ctrl-Cmd-Semicolon>` (`<Ctrl-Cmd-;>`): Put dashed date and normal time
+  into clipboard, e.g., "2024-07-08 17:14"
+
+  `<Ctrl-Cmd-Apostrophe(Quote)>` (`<Ctrl-Cmd-'>`): Put dashed date-plus-time
+  into clipboard, e.g., "2024-07-08-17-14"
+
+### Hammerspoon Spoons bindings
+
   `<Cmd-Alt-C>`: Briefly show a digital clock in the center of the screen
   (using the [AClock](https://www.hammerspoon.org/Spoons/AClock.html) Spoon)
 
@@ -115,13 +157,22 @@ You call that a knife? This is a Hammerspoon config
   from your DepoXy Client (see the [DepoXy](https://github.com/DepoXy/depoxy)
   project):
 
-      ~/.depoxy/running/home/.hammerspoon/client-hs.lua
+  `~/.depoxy/running/home/.hammerspoon/client-hs.lua`
 
 ## DEPENDENCIES
 
   - As mentioned above, this project assumes it's cloned to a particular path:
 
-      ~/.kit/mOS/macOS-Hammyspoony
+    `~/.kit/mOS/macOS-Hammyspoony`
+
+  - The `<Cmd-1>` through `<Cmd-9>` bindings expect terminal window titles
+    to be numbered.
+
+    - See [Homefries](https://github.com/landonb/home-fries) for a
+      `PS1` prompt that titles window, specifically:
+
+      https://github.com/landonb/home-fries/blob/release/lib/term/set-shell-prompt-and-window-title.sh
+      https://github.com/landonb/home-fries/blob/release/lib/term/show-command-name-in-window-title.sh
 
   - The Browser foregrounders specifically call `/Applications/Google Chrome.app`
     with the "Default" user profile.
@@ -137,8 +188,9 @@ You call that a knife? This is a Hammerspoon config
 
   https://github.com/DepoXy/Karabiner-Elephants#🐘
 
-  This project complements a collection of simpler `skhd` bindings
-  that don't rely upon the Hammerspoon API for more advanced features
+  This project subsumed a collection of simpler `skhd` bindings
+  that the author originally developed before learning about the
+  more feature-rich Hammerspoon project
 
   https://github.com/DepoXy/macOS-skhibidirc#👤
 
