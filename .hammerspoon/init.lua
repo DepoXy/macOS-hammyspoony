@@ -267,6 +267,8 @@ reloadConfig:start()
 --        manner, maybe I wouldn't have to write such long-winded
 --        comments! =)
 
+-- ALTLY: See also macOS <Cmd-Alt-h>, which hides all *other* app windows.
+
 hs.hotkey.bind({"shift", "ctrl", "cmd"}, "W", function()
   local front_win = hs.window.frontmostWindow()
 
