@@ -378,7 +378,16 @@ end
 --
 --   https://github.com/zzamboni/dot-hammerspoon/blob/master/init.org#url-dispatching-to-site-specific-browsers
 
-function browser_window_front_or_open(url, matches)
+-- SPIKE: Do we need to keep function reference so doesn't get
+-- garbage-collected?
+--
+-- - I.e., not this?:
+-- 
+--     function browser_window_front_or_open(url, matches)
+--       ...
+--     end
+
+browser_window_front_or_open = function(url, matches)
   local win
 
   for i = 1, #matches do
@@ -645,7 +654,7 @@ end)
 --         end
 --       end
 
-function file_exists(path)
+file_exists = function(path)
   if type(path) ~= "string" then return false end
 
   local file = io.open(path, "r")
@@ -653,7 +662,7 @@ function file_exists(path)
   return file ~= nil and io.close(file)
 end
 
-function load_config(dir, base)
+load_config = function(dir, base)
   local sep = sep or package.config:sub(1,1)
 
   local path = dir..sep..base..".lua"
@@ -665,7 +674,7 @@ function load_config(dir, base)
   end
 end
 
-function load_configs(sep)
+load_configs = function(sep)
   local sep = sep or package.config:sub(1,1)
 
   -- CXREF: ~/.depoxy/ambers/home/.hammerspoon/depoxy-hs.lua
