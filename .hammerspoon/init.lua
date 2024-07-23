@@ -137,7 +137,7 @@ reloadConfig:start()
 --
 -- - This function minimizes Alacritty windows,
 --   then it hides all other windows, and then
---   finally it brings the original window back.
+--   finally it brings back the original window.
 --
 -- - We minimize Alacritty windows so that bringing one back into
 --   focus doesn't make them all visible.
@@ -193,11 +193,23 @@ reloadConfig:start()
 --      slightly faster than the Genie Effect), the minimize operation
 --      is somewhat slow.
 --
---      - You'll notice each Alacritty window get minimized one-by-one!
+--      - You'll watch as each Alacritty window is minimized one-by-one!
 --
 --    - (I also tried variations of `set miniaturized of windows to true`,
 --      but I couldn't get `set miniaturized` to work.)
 --
+-- - Note there's a Hammerspoon animation duration setting, e.g.,
+--
+--     -- Defaults to 0.2.
+--     hs.window.animationDuration = 0
+--
+--   - But this is for Hammerspoon animations only (like move, setFrame).
+--   - Unfortunately, macOS controls minimize/unminimize animations,
+--     which cannot be disabled.
+--     - Although during testing, every once in a while, minimizing or
+--       unminimized all Alacritty windows happens instantaneously,
+--       but this rarely happens and seems unpredictable.
+
 -- - We don't similarly minimize browser windows because of a particular
 --   workflow the author uses: I like to minimize long-running Chrome
 --   windows (one for Gmail and Calendar tabs, one for chat tabs, one
@@ -242,16 +254,6 @@ reloadConfig:start()
 --      - (If macOS window management just behaved in a predicatable
 --        manner, maybe I wouldn't have to write such long-winded
 --        comments! =)
-
--- Animation duration defaults to 0.2.
--- - Note this is for Hammerspoon animations only (like move, setFrame).
--- - Unfortunately, macOS controls minimize/unminimize animations,
---   which cannot be disabled.
---   - Although during testing, every once in a while, minimizing or
---     unminimized all Alacritty windows happens instantaneously,
---     but this rarely happens and seems unpredictable.
---
--- hs.window.animationDuration = 0
 
 hs.hotkey.bind({"shift", "ctrl", "cmd"}, "W", function()
   local front_win = hs.window.frontmostWindow()
@@ -337,17 +339,19 @@ function chromeWithProfile(profile, url)
   task:start()
 end
 
--- How we might trigger Hammerspoon tasks from the command line.
+-------
+
+-- We can trigger Hammerspoon tasks from the command line.
 --
 -- - E.g.,
 --
 --     open -g hammerspoon://sensible-open?url=https://google.com
 --
--- Though currently we don't have a use for this.
+--   Using:
 --
---   hs.urlevent.bind("sensible-open", function(eventName, params)
---     chromeWithProfile("Default", params['url'])
---   end)
+--     hs.urlevent.bind("sensible-open", function(eventName, params)
+--       chromeWithProfile("Default", params['url'])
+--     end)
 
 -------
 
