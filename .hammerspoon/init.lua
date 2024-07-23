@@ -699,6 +699,44 @@ end
 --       chromeWithProfile("Default", params['url'])
 --     end)
 
+-- Wire a Hammerspoon URI action to setFrontmost the specified app.
+--
+-- - One user of this function is `sensible-open`:
+--
+--   https://github.com/landonb/sh-sensible-open#☔
+--
+-- `sensible-open` is used to open URLs from the command line, and by some
+-- shell apps (like git-open). But that call might not always front Chrome
+-- (i.e., it'll open a new Chrome window behind the active window; and
+-- once that starts happening, only quitting and restarting Chrome seems
+-- to make it work again).
+-- 
+-- - `sensible-open` relies on the `open` command, e.g.,
+--
+--     open -na 'Google Chrome' --args --new-window <URL>
+--
+--   but that function will sometimes open the new window *behind* the
+--   active window, as described above.
+--
+-- - So here we offer the Hammerspoon setFrontmost function, which will
+--   always bring the new window (and only the new window) to the front.
+--
+--   - Now `sensible-open` can check if Hammerspoon and this config is
+--     installed, and can hook this function to fix the problem.
+--
+-- - MAYBE: We could eventually wire URLDispatcher and offer that to
+--   sensible-open, for an even more powerful and customizable user
+--   experience.
+
+hs.urlevent.bind("setFrontmost", function(eventName, params)
+  local app = hs.application(params['app'])
+
+  if app then
+    -- DUNNO: Is this similar to `front_win:raise():focus()`?
+    app:setFrontmost()
+  end
+end)
+
 -------
 
 -- Bring front and focus specific Chrome window,
