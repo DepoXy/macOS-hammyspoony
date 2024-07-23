@@ -264,7 +264,7 @@ hs.hotkey.bind({"shift", "ctrl", "cmd"}, "W", function()
   --   hidden windows so user didn't have to see all the animation
   --   happening. Oh, well.
   app_wins = hs.application.get("Alacritty"):allWindows()
-  for key in pairs(app_wins) do
+  for key, _ in pairs(app_wins) do
     local app_win = app_wins[key]
     app_win:minimize()
   end
