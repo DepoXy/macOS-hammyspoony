@@ -1036,6 +1036,266 @@ end)
 
 -------
 
+-- <Cmd-Space> opens an FZF-style browser window switcher.
+--
+-- - This menu is inspired by Contexts.
+--
+--     https://contexts.co/
+--
+--   - Contexts' <Cmd-Space> menu shows a similar FZF switcher.
+--
+--   - (Though I'm sure Contexts was inspired by something else;
+--      in fact, its <Cmd-Space> menu looks surprisingly similar
+--      to the Hammerspoon hs.chooser menu! It's even positioned
+--      similarly and has the same background color.)
+--
+-- - See comments below re: hs.window.switcher
+--
+--   - I demoed hs.window.switcher first before landing on
+--     hs.chooser for this feature.
+--
+--   - And I left lots of comments below, too.
+--
+-- - When I think of a window switcher, I often think of Linux
+--   (or Windows) <Alt-Tab>, or the elegant macOS AltTab app.
+--
+--   - AltTab is great. It shows window thumbnails organized
+--     horizontally.
+--
+--   - But if you have dozens of browser windows open, you
+--     might find it quicker to find the window you're after
+--     using its title, rather than hunting for its thumbnail
+--     (or trying to read the small window title text above
+--     each icon).
+--
+--     - That is, AltTab is great for switching between the
+--       active window and a recently used window.
+--
+--       And it can work well for finding other windows in
+--       certain circumstances.
+--
+--       But it becomes more difficult (or at least slower)
+--       to use as the number of open windows increases.
+--
+--     - So if you have dozens of browser windows open and
+--       visible (as this author sometimes does), AltTab
+--       is not necessarily the best tool for finding the
+--       window you want.
+--
+-- - So this binding offers an alternative window switcher
+--   approach, using a top-down (vertical) window title
+--   list.
+--
+--   - You can click the title of the window you want to
+--     front;
+--
+--   - Or you can <Up>/<Down> and <Enter> to front it;
+--
+--   - Or you can enter its title into the query input.
+--
+-- - Most importantly, this widget is title-centric, and
+--   not icon- (or MRU-) centric like AltTab.
+--
+--   - You're basically looking at an alphabetized list
+--     of window titles and picking the one you want.
+--
+--     And not hunting visually through a list of window
+--     icons trying to find what looks like what you want.
+--
+-- REFER: See the hs.window.switcher demo below, which is
+--        what I demoed first before discovering hs.chooser
+--
+-- BOOYA: I've been using Hammerspoon for five days, and it
+-- continues to amaze me! I thought about this feature over
+-- dinner, and then it took me 1-1/2 hours to (a) scan the
+-- Hammerspoon API to find an appropriate library to use, and
+-- (b) to code the solution! (And then it's taken me another
+-- 1-1/2 hours to comment about it, but that's normal for me!)
+--
+-- REFER: https://www.hammerspoon.org/docs/hs.chooser.html
+--
+--    https://evantravers.com/articles/2020/06/12/hammerspoon-handling-windows-and-layouts/
+--
+--    - It was inspired by https://github.com/chipsenkbeil/choose
+--
+-- - An example 'choices' table generator, if you need something
+--   to test with your next hs.chooser feature idea:
+--
+--     local refresh_choices = function()
+--       return {
+--         {
+--          ["text"] = "First Choice",
+--          ["subText"] = "This is the subtext of the first choice",
+--          -- "uuid" shows how you can use arbitrary keys in the table
+--          ["uuid"] = "0001",
+--         },
+--         { ["text"] = "Second Option",
+--           ["subText"] = "I wonder what I should type here?",
+--           ["uuid"] = "Bbbb",
+--         },
+--         -- This example shows how you can stylize text
+--         { ["text"] = hs.styledtext.new("Third Possibility", {
+--             font = {size = 18},
+--             color = hs.drawing.color.definedCollections.hammerspoon.green}
+--           ),
+--           ["subText"] = "What a lot of choosing there is going on here!",
+--           ["uuid"] = "III3",
+--         },
+--       }
+--     end
+
+-- local log = hs.logger.new('refresh_choices')
+-- log:w("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/0")
+
+-- Sort table by object attribute.
+-- - Use comp_fcn to compare objects (or leave nil and
+--   sorts by object comparison).
+-- - We use this function to sort by hs.window:title(),
+--   though this really is a generic library function.
+--
+-- THANX: https://www.lua.org/pil/19.3.html
+function pairsByKeys(list, comp_fcn)
+  local sorted = {}
+
+  for index, _ in pairs(list) do
+    table.insert(sorted, index)
+  end
+
+  table.sort(sorted, comp_fcn)
+
+  -- Create an iterator
+  local index = 0
+
+  local iter = function()
+    index = index + 1
+    if sorted[index] == nil then
+      return nil
+    else
+      return sorted[index], list[sorted[index]]
+    end
+  end
+
+  return iter
+end
+
+-- REFER: https://www.hammerspoon.org/docs/hs.chooser.html#choices
+local refresh_choices = function(app_name)
+  local choices = {}
+
+  -- FIXME: See comment below: Unsure how to let user pick app.
+  -- - For now defaults Chrome, because that's app author cares about.
+  app_name = app_name or "Google Chrome"
+
+  local app = hs.application.get(app_name)
+
+  -- SAVVY: Use empty filter with hs.window.filter.new() so that
+  -- it includes minimized and hidden windows, and doesn't restrict
+  -- itself to only visible windows.
+  local empty_filter = {}
+  local win_filter = hs.window.filter.new({[app_name] = empty_filter,})
+
+  -- REFER: getWindows([sortOrder]) allows hs.window.filter constants:
+  --   .sortByCreated|.sortByCreatedLast|.sortByFocused|.sortByFocusedLast
+  -- But we want to sort by window title!
+  -- - [I guess this is a good excuse to learn Lua table.sort (because
+  --    author is very new to Lua, despite some toe-dipping in 2017,
+  --    Hammerspoon 2024 is my new gateway drug).]
+  local app_windows = win_filter:getWindows()
+  local sorted_wins = pairsByKeys(app_windows,
+    function(lhs, rhs)
+      return app_windows[lhs]:title():lower() < app_windows[rhs]:title():lower()
+    end
+  )
+
+  for _, win in sorted_wins do
+    local choice = {
+      -- ["text"] = win:title(),
+      ["text"] = hs.styledtext.new(win:title(), {
+        -- font = { size = 18, },
+        font = { size = 14, },
+        -- REFER: https://github.com/Hammerspoon/hammerspoon/blob/master/extensions/drawing/color/drawing_color.lua#L170
+        -- color = hs.drawing.color.definedCollections.hammerspoon.white,
+        -- color = hs.drawing.color.definedCollections.x11.whitesmoke,
+        -- color = hs.drawing.color.definedCollections.x11.oldlace,
+        color = hs.drawing.color.definedCollections.x11.linen,
+      }),
+      -- ["subText"] = "This is the subtext",
+      -- It could be fragile to attach the win object, but works in practice
+      ["win"] = win,
+      ["image"] = hs.image.imageFromAppBundle(app:bundleID()),
+    }
+    table.insert(choices, choice)
+  end
+
+  return choices
+end
+
+local ctrlSpaceCompletionFn = function(chosen)
+  if chosen then
+    chosen.win:raise():focus()
+  end
+end
+
+local win_chooser = hs.chooser.new(ctrlSpaceCompletionFn)
+
+-- The placeholderText is what's shown in the query text field
+-- until the user types a query. So there's not really any reason
+-- to have it say anything; it should be obvious to user what to do.
+--
+--   win_chooser:placeholderText('bruh')
+
+-- Modal width defaults to '40.0' [%]:
+--   log:w("win_chooser:width(): " .. win_chooser:width())
+-- which feels a little too wide (at least on author's 2560x1440
+-- display).
+-- - MAYBE: Adjust this based on user's display size.
+win_chooser:width(27.0)
+
+-- OWELL: The first 9 choices are assigned a <Cmd-1>..<Cmd-9>
+-- binding, but there's no option to disable those bindings.
+-- - And they don't work, anyway, because of the Terminal window
+--   bindings defined above.
+
+-- <Ctrl-Space>, as inspired by Contexts.
+hs.hotkey.bind({"ctrl"}, "Space", function()
+  if not win_chooser:isVisible() then
+    -- Note that hs.chooser:choices() can be passed a table or a function,
+    -- but when passed a function, the fcn is only called once. So it's up
+    -- to us to refresh as necessary, which we must do before every :show().
+    -- So we'll call the choices fcn. ourselves each time and pass the table.
+    -- - We also want to adjust rows() each time to size the popup
+    --   appropriately (otherwise it'll have too much empty space,
+    --   or the user might have to scroll), which is another reason
+    --   to pre-process choices.
+    --
+    -- FIXME/2024-07-24: How should we choose the app?
+    -- - For now I've hardcoded Chrome, because that's my main browser.
+    local app_name = "Google Chrome"
+    local choices = refresh_choices(app_name)
+
+    -- Without measuring *your* screen, 30 or more is generally too many
+    -- (given a 1440-tall display, i.e., 2560x1440).
+    -- - Defaults to '10':
+    --     log:w("win_chooser:rows(): " .. win_chooser:rows())
+    if #choices < 30 then
+      -- DUNNO: Using the table(list) count adds more padding than we need,
+      -- so substract 1.
+      win_chooser:rows(#choices - 1)
+    else
+      win_chooser:rows(30)
+    end
+
+    win_chooser:choices(choices)
+
+    win_chooser:show()
+  else
+    -- <Esc> also hides. (I love when <Esc> just works how you'd expect!)
+    win_chooser:hide()
+  end
+end)
+
+-------
+
 -- Nice! 4-second (or shorter, if you hotkey again, or <Esc>) clock overlay.
 --  ~/.kit/mOS/hammerspoons/Source/AClock.spoon/init.lua
 --
@@ -1078,13 +1338,145 @@ end)
 
 -------
 
--- Interesting Alt-Tab alternative:
+-- hs.window.switcher is an interesting Alt-Tab alternative:
 --
---   switcher_space = hs.window.switcher.new(
---     hs.window.filter.new():setCurrentSpace(true):setDefaultFilter{}
---   )
---   hs.hotkey.bind('alt', 'tab', function() switcher_space:next() end)
---   hs.hotkey.bind('alt-shift', 'tab', function() switcher_space:previous() end)
+--     switcher_space = hs.window.switcher.new(
+--       hs.window.filter.new():setCurrentSpace(true):setDefaultFilter{}
+--     )
+--     hs.hotkey.bind('alt', 'tab', function() switcher_space:next() end)
+--     hs.hotkey.bind('alt-shift', 'tab', function() switcher_space:previous() end)
+--
+-- But I'm not sure how it's any better than the (free) AltTab app.
+--
+-- - I really like the AltTab app and use it daily.
+--
+--   - AltTab is very polished. It's not something I think you could
+--     easily replicate in Hammerspoon (like, not if a user's init.lua
+--     and not without a lot of custom drawing).
+--
+--     - hs.window.switcher feels like a visually less-polished AltTab.
+--
+--   - I also think both tools have similarly powerful window filtering
+--     options (though I didn't do a deep-dive to compare for differences,
+--     but I think you can equally filter by app, Space, visiblity,
+--     minimized state, hiddenness, etc.).
+--
+--   - So I'm not sure how hs.window.switcher is better. (Other than
+--     that you can easily make it your own in your Hammerspoon config.)
+--
+-- HSTRY/2024-07-23: I took another look at hs.window.switcher today
+-- because I wanted to recreate a Contexts.app feature that I really
+-- like: Seeing a vertical list of application window names.
+--
+-- - Specifically, Contexts has a <Cmd-Space> menu, and also a similar
+--   tray menu that pops-out from the side of the screen when you mouse
+--   there, that shows a vertical list of application window titles,
+--   ordered alphabetically (and in the tray, grouped by app; but not
+--   grouped by app in the <Ctrl-Space> FZF menu, though there's probably
+--   an app setting for that, but I didn't check before uninstalling it).
+--
+--   - This widget is useful to me because I often have lots (dozens or
+--     more) of browser windows open, and AltTab doesn't really make it
+--     easy to find the browser window I'm looking for.
+--
+--     - For many windows, I've created keybindings (see above) that
+--       front specific browser windows, e.g., Email, Chats, Music, etc.
+--
+--     - But when I'm coding and have lots of *temporary* browser
+--       windows open (API refs, Stack Overflow topics, etc.), I
+--       often want to return to a specific window that doesn't
+--       have a global keybinding, and that's where AltTab, Contexts,
+--       or some other solution comes in handy.
+--
+--     So what I like about the Contexts menu is that it shows me a
+--     vertical list of alphabetized window titles, and it makes it
+--     easy for me to pick the one I'm looking for.
+--
+-- - So that's what I'm looking for, basically: a list of window titles.
+--
+--   - I don't need a window thumbnail (screenshot) or anything, just
+--     a list of window titles.
+--
+--   - Because when I have dozens (and dozens) of browser windows open,
+--     using something like AltTab — or anything that shows window icons
+--     — isn't as useful as just a basic top-down list of window titles.
+--
+-- - Fortunately I found an easy solution using hs.chooser, which you'll
+--   find implemented above.
+--
+--   - See above for the <Ctrl-Space> hs.chooser feature.
+-- 
+-- - But before I toyed around with hs.chooser, I demoed hs.window.switcher,
+--   which is captured here, for reference, and so you can easily uncomment
+--   and demo for yourself.
+--
+--   - Note that the Hammerspoon docs don't use any screenshots or
+--     otherwise try to illustrate how exactly the API functions or
+--     Spoons work.
+--
+--     It's really up to you to wire and demo their API or the Spoons.
+--
+--     So I like to capture code I've used to demo Hammerspooon, so
+--     it's easy to revisit what I discovered earlier.
+--
+--   - So here's an example hs.window.switcher that shows some of the
+--     UI options you can choose (and illustrates its limitations, too).
+--
+-- - REFER: Options for hs.window.switcher.ui:
+--
+--     https://github.com/Hammerspoon/hammerspoon/blob/master/extensions/window/window_switcher.lua#L53
+--
+-- - HSTRY/2024-07-23: My goal was to make a list of Chrome window names,
+--   ordered top to bottom, but no dice with hs.window.switcher.
+--
+--   - Which is what led me to the hs.chooser implementation you'll find
+--     above (I figured if I scanned the Hammerspoon API, I might find
+--     something more appropriate for the feature I had in mind, and I
+--     did find an awesomely powerful and polished widget class, ready-
+--     made for exactly what I want!).
+--
+--   - In any case, here's what I tried in hs.window.switcher, for reference.
+--
+-- - Here's an hs.window.switcher example that shows Chrome windows.
+--
+--   - hs.window.switcher shows a left-to-right list of square icons with
+--     a truncated window title written in small font above the icon.
+--
+--     - There's no option to show icons top-to-bottom, or to increase
+--       the title text beyond the width of the icon.
+--
+--   - Showing the title with small icons isn't very useful, at least
+--     not with browser windows, because the title is truncated, and
+--     it's in a small font.
+--
+--   - Even if you increase the thumbnail size, it doesn't help much
+--     with long browser window titles.
+--
+--   - So this switcher is not what I was looking for, at least not
+--     for finding a specific Chrome window in a sea of Chrome windows.
+--
+--   - But here it is:
+--
+--     -- Use an { app_name = filter } table parameter so that
+--     -- hs.window.filter.new() includes hidden and minimized
+--     -- windows (all the other hs.window.filter.new() variants
+--     -- restrict to visible windows).
+--     local empty_filter = {}
+--     local gc_windows = hs.window.filter.new({
+--       ["Google Chrome"] = empty_filter,
+--     })
+--     switcher_space = hs.window.switcher.new(
+--       gc_windows,
+--       {                              -- Default:
+--         showTitles = true,           -- true
+--         showThumbnails = true,       -- true
+--         thumbnailSize = 32,          -- 128
+--         selectedThumbnailSize = 32,  -- 384
+--         showSelectedTitle = true,    -- true
+--       }
+--     )
+--     hs.hotkey.bind('alt', 'tab', function() switcher_space:next() end)
+--     hs.hotkey.bind({"alt"}, 'Q', function() switcher_space:previous() end)
 
 -------
 

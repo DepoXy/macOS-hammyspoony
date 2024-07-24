@@ -126,6 +126,12 @@ You call that a knife? This is a Hammerspoon config
 
   `<Shift-Ctrl-Cmd-R>`: Bring the browser DevTools window to the front
 
+  `<Ctrl-Space>`: Shows browser window picker
+
+  - Shows FZF-list of Chrome browser windows ordered alphabetically
+    by window title that you can Click, or select with Up/Down, or
+    Query to open
+
 ### Application foregrounder-openers
 
   `<Cmd-F>`: Bring any Finder window to front, or open Finder
