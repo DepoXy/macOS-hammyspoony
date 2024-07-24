@@ -730,6 +730,10 @@ end
 --   sensible-open, for an even more powerful and customizable user
 --   experience.
 
+-- USAGE:
+--
+--   $ open -g "hammerspoon://setFrontmost?app=${browser_app}"
+
 hs.urlevent.bind("setFrontmost", function(eventName, params)
   local app = hs.application(params['app'])
 
