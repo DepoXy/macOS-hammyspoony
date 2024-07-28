@@ -1314,6 +1314,130 @@ end)
 
 -------
 
+-- KLUGE: When Chrome Save dialog is open, prevent
+--        <Ctrl-Left>/<Ctrl-Right> from changing location
+--        of web page in the background.
+-- - This design choice baffles me!
+--   - Use case: I was saving a receipt and editing the filename
+--     but hit a familiar keybinding to move the cursor,
+--     <Ctrl-Left>, and I didn't notice that it moved the background
+--     page backward in history. So I hit <Ctrl-Right> again, to look
+--     for the cursor. Then I noticed the browser location had changed.
+--     And after saving the document, the browser page had lost the
+--     order confirmation, and instead it was scolding me for
+--     resubmitting the order. Ha!
+--   - I also disabled KE bindings to ensure it's not something funky
+--     in my environment (though I'd be curious to test this on stock
+--     macOS just to be sure).
+--
+-- - This watcher hooks Chrome windows and waits for
+--   <Ctrl-Left>/<Ctrl-Right> events.
+--   - If Chrome has a secondary window open, we assume it's
+--     the Save dialog, and we replace the event with an event
+--     to move the cursor, <Cmd-Left>/<Cmd-Right>.
+-- - Note that if you use KE to swap <Ctrl-Left>/<Ctrl-Right> and
+--   <Alt-Left>/<Alt-Right>, it's <Alt-Left>/<Alt-Right> wired to
+--   location back/forward, but this binding still sees the
+--   unadultered keybindings, <Ctrl-Left>/<Ctrl-Right>.
+--   - I'm unsure if this is always the case, or if there's, e.g.,
+--     a race condition between Hammerspoon and Karabiner Elements
+--     and maybe this isn't always the case. But appears to work
+--     this way so far in author's experience.
+
+-- USAGE: Uncomment this fnc. to pry table keys (see usage below):
+--
+-- local table_join = function(table, sep)
+--   local keys = ""
+--
+--   for k, _ in pairs(table) do
+--     if keys ~= "" then
+--       keys = keys .. sep
+--     end
+--     keys = keys .. k
+--   end
+--
+--   return keys
+-- end
+
+local filter_attach_eventtap = function(win_filter, get_eventtap)
+  local eventtap
+
+  win_filter
+    :subscribe(hs.window.filter.windowFocused, function()
+      -- Enable eventtap in app
+      eventtap = get_eventtap()
+      eventtap:start()
+    end)
+    :subscribe(hs.window.filter.windowUnfocused, function()
+      -- Disable eventtap when focusing out of app
+      if eventtap then
+        eventtap:stop()
+      end
+    end)
+end
+
+local chrome_rwd_fwd_get_eventtap = function()
+  return hs.eventtap.new(
+    {hs.eventtap.event.types.keyDown},
+    function(e)
+      -- USAGE: Uncomment to debug/pry:
+      --   local unmodified = false
+      --   hs.alert.show("CHARS: " .. e:getCharacters(unmodified))
+      --   hs.alert.show("FLAGS: " .. table_join(e:getFlags(), ", "))
+      -- Note that modifiers includes "fn" when arrow key pressed.
+      -- Note if you have KE swapping bindings, to you this is "alt", not "ctrl",
+      -- i.e., <Alt-Left>/<Alt-Right>
+      -- - But this still works (and problem still exists) when I disable
+      --   KE bindings.
+      -- - DUNNO: I'm not aware of any race condition here.
+      --   - BWARE: But maybe there's a case where Hammerspoon gets the
+      --     event after it's manipulated by KE, and what you see is "alt"
+      --     instead? Just be on the lookout, in case this stops working.
+      if (e:getFlags():containExactly({"ctrl", "fn"})
+        and (e:getKeyCode() == hs.keycodes.map["left"]
+          or e:getKeyCode() == hs.keycodes.map["right"])
+      ) then
+        suc, _parsed_out, _raw_out_or_error_dict = hs.osascript.applescript(
+          "tell application \"System Events\"\n" ..
+          "  tell process \"Google Chrome\"\n" ..
+          "    tell window 1\n" ..
+          "      properties of sheet 1\n" ..
+          "    end tell\n" ..
+          "  end tell\n" ..
+          "end tell\n"
+        )
+        --
+        -- ALTLY: Call via file path rather than passing AppleScript string.
+        -- - DUNNO: Is there a performance difference between the two approaches?
+        --
+        --  probe_osa = os.getenv("HOME") .. "/.kit/mOS/macOS-Hammyspoony/lib/probe-chrome-sheet-1-of-window-1.osa"
+        --  suc, _parsed_out, _raw_out_or_error_dict = hs.osascript.applescriptFromFile(probe_osa)
+
+        if suc then
+          -- Return true to delete the event
+          --  return true
+          -- Or better yet, replace with alt. keycode, <Cmd-Left>/<Cmd-Right>,
+          -- which has same effect: jump cursor to start/end of filename input.
+          if e:getKeyCode() == hs.keycodes.map["left"] then
+            return true, {hs.eventtap.event.newKeyEvent({"cmd", "fn"}, hs.keycodes.map["left"], true)}
+          elseif e:getKeyCode() == hs.keycodes.map["right"] then
+            return true, {hs.eventtap.event.newKeyEvent({"cmd", "fn"}, hs.keycodes.map["right"], true)}
+          end
+        end
+      end
+
+      -- Return false to propogate event.
+      return false
+    end
+  )
+end
+
+local chrome_filter = hs.window.filter.new("Google Chrome")
+
+filter_attach_eventtap(chrome_filter, chrome_rwd_fwd_get_eventtap)
+
+-------
+
 -- Nice! 4-second (or shorter, if you hotkey again, or <Esc>) clock overlay.
 --  ~/.kit/mOS/hammerspoons/Source/AClock.spoon/init.lua
 --
