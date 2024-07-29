@@ -623,7 +623,7 @@ end)
 --   rather than returning you to whatever window you were using
 --   before opening the new Chrome window.
 
-hs.hotkey.bind({"cmd"}, "T", function()
+local make_new_chrome_window = function()
   local chrome_app = hs.application.get("Google Chrome")
 
   if not chrome_app then
@@ -645,6 +645,10 @@ hs.hotkey.bind({"cmd"}, "T", function()
     )
     task:start()
   end
+end
+
+hs.hotkey.bind({"cmd"}, "T", function()
+  make_new_chrome_window()
 end)
 
 -------
@@ -1211,10 +1215,10 @@ local refresh_choices = function(app_name)
     end
   )
 
-  for _, win in sorted_wins do
+  function add_choice(title, win)
     local choice = {
       -- ["text"] = win:title(),
-      ["text"] = hs.styledtext.new(win:title(), {
+      ["text"] = hs.styledtext.new(title, {
         -- font = { size = 18, },
         font = { size = 14, },
         -- REFER: https://github.com/Hammerspoon/hammerspoon/blob/master/extensions/drawing/color/drawing_color.lua#L170
@@ -1231,12 +1235,22 @@ local refresh_choices = function(app_name)
     table.insert(choices, choice)
   end
 
+  add_choice("New Window", nil)
+
+  for _, win in sorted_wins do
+    add_choice(win:title(), win)
+  end
+
   return choices
 end
 
 local ctrlSpaceCompletionFn = function(chosen)
   if chosen then
-    chosen.win:raise():focus()
+    if chosen.win then
+      chosen.win:raise():focus()
+    else
+      make_new_chrome_window()
+    end
   end
 end
 
