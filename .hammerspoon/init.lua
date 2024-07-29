@@ -1219,7 +1219,40 @@ local refresh_choices = function(app_name)
     end
   )
 
+  local app_icon = hs.image.imageFromAppBundle(app:bundleID())
+
+  -- Note that setSize does nothing, e.g.,
+  --   app_icon = app_icon:setSize({w = 32, h = 32,})
+  -- is ignored by hs.chooser
+  -- - The problem is that long window titles will wrap around
+  --   the control, and the icon image will grow to match the
+  --   larger height.
+  --   - And then you see different sized images in the FZF window.
+  -- - So here we'll try to keep the window title to one line, so
+  --   it doesn't wrap. It should also be faster to read:
+  --   - Remove common window postfix.
+  --   - Truncate if longer than some length.
+  function prepare_title(title)
+    local too_long = 80
+
+    -- Strip " - Google Chrome - <User>" postfix.
+    -- REFER: Lua 20.2 — Patterns: https://www.lua.org/pil/20.2.html
+    title = title:gsub(" %- Google Chrome %- .*", "")
+
+    -- Truncate string if it's too long.
+    -- - Otherwise it'll wrap around and enlarge the item's icon image.
+    local _, title_len = title:gsub(".", "")
+
+    if title_len > too_long then
+      title = title:sub(1, too_long) .. "…"
+    end
+
+    return title
+  end
+
   function add_choice(title, win)
+    title = prepare_title(title)
+
     local choice = {
       -- ["text"] = win:title(),
       ["text"] = hs.styledtext.new(title, {
@@ -1234,7 +1267,7 @@ local refresh_choices = function(app_name)
       -- ["subText"] = "This is the subtext",
       -- It could be fragile to attach the win object, but works in practice
       ["win"] = win,
-      ["image"] = hs.image.imageFromAppBundle(app:bundleID()),
+      ["image"] = app_icon,
     }
     table.insert(choices, choice)
   end
