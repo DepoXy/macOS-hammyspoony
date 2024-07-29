@@ -1239,7 +1239,7 @@ local refresh_choices = function(app_name)
     table.insert(choices, choice)
   end
 
-  add_choice("New Window", nil)
+  add_choice("» New Window", nil)
 
   for _, win in sorted_wins do
     add_choice(win:title(), win)
