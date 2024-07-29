@@ -1215,7 +1215,25 @@ local refresh_choices = function(app_name)
   local app_windows = win_filter:getWindows()
   local sorted_wins = pairsByKeys(app_windows,
     function(lhs, rhs)
-      return app_windows[lhs]:title():lower() < app_windows[rhs]:title():lower()
+      local do_sort_emoji_before_ascii = true
+      -- REFER: https://www.charset.org/utf-8
+      local ascii_threshold = 127
+
+      local lhs_lower = app_windows[lhs]:title():lower()
+      local rhs_lower = app_windows[rhs]:title():lower()
+
+      -- REFER: UTF-8 Support
+      --   https://www.lua.org/manual/5.4/manual.html#6.5
+      local lhs_is_emoji = utf8.codepoint(lhs_lower) > ascii_threshold
+      local rhs_is_emoji = utf8.codepoint(rhs_lower) > ascii_threshold
+
+      if lhs_is_emoji and not rhs_is_emoji then
+        return do_sort_emoji_before_ascii
+      elseif rhs_is_emoji and not lhs_is_emoji then
+        return not do_sort_emoji_before_ascii
+      else
+        return lhs_lower < rhs_lower
+      end
     end
   )
 
