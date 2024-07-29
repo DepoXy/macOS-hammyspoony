@@ -39,6 +39,10 @@
 --   in the `skhdrc.OFF`, on path in a DepoXy environment at:
 --
 --     ~/.kit/mOS/macOS-skhibidirc/.config/skhd/skhdrc.OFF
+--
+-- - Lua PIL:
+--
+--     https://www.lua.org/pil/contents.html
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
