@@ -824,6 +824,7 @@ hs.hotkey.bind({"shift", "ctrl", "cmd"}, "A", function()
   browser_window_front_or_open(
     "https://mail.google.com/mail/u/0/#inbox",
     {
+      "@gmail.com",
       "Inbox ",
       "Google Calendar - ",
       "Mail - ",
