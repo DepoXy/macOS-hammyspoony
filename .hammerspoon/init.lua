@@ -492,7 +492,7 @@ end)
 -- not found by hs.window.filter or AppleScript (see the two previous
 -- (commented) functions).
 --
-local terminal_by_number_using_post_filter = function(win_num)
+local terminal_by_number_using_post_filter = function(win_num, win_hint)
   prefix_pattern = "^" .. win_num .. ". "
   -- SAVVY: hs.window.find returns zero, one, or more windows,
   -- but you'll only capture one window with this basic call:
@@ -517,8 +517,15 @@ local terminal_by_number_using_post_filter = function(win_num)
   end
 
   -- If no terminal window matched, use any application window that matches.
-  if wins then
-    wins[1]:raise():focus()
+  local found_win = wins[1]
+
+  -- Or if user provided a hint, look for a matching window
+  if win_hint then
+    found_win = hs.window.find(win_hint)
+  end
+
+  if found_win then
+    found_win:raise():focus()
 
     return true
   end
@@ -526,8 +533,10 @@ local terminal_by_number_using_post_filter = function(win_num)
   return false
 end
 
-local alacritty_by_window_number_prefix = function(win_num)
-  terminal_by_number_using_post_filter(win_num)
+-- The win_hint arg lets user override these bindings in their
+-- own private config, using a backup window title pattern.
+alacritty_by_window_number_prefix = function(win_num, win_hint)
+  return terminal_by_number_using_post_filter(win_num, win_hint)
 end
 
 hs.hotkey.bind({"cmd"}, "1", function()
