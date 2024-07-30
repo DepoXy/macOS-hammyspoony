@@ -579,12 +579,26 @@ end)
 
 -- Alacritty — New Window
 
+-- NTRST: Some caveats re: creating a new Alacritty window:
+-- - Note that using `open -a` only starts or fronts Alacritty,
+--   but doesn't create a new window unless it's the first one.
+-- - Note that using `open -na` creates a new Alacritty instance
+--   (and then you end up with multiple app icons in the Dock),
+--   e.g., avoid this: `open -na alacritty`.
+-- - This command also opens a new instance:
+--     /Applications/Alacritty.app/Contents/MacOS/alacritty
+-- - Our only sol'n (that author knows of) is to send a key stroke
+--   event to the app to run the (hidden) New Window <Cmd-N> menu item.
+
 hs.hotkey.bind({"cmd"}, "0", function()
   local task = hs.task.new(
     "/usr/bin/open",
-    nil,
+    function(exit_code, stdout, stderr)
+      -- Default timeout, opt. 3rd arg, is 200000 microsecs (200 msec).
+      hs.eventtap.keyStroke({"cmd"}, "N", hs.application.get("Alacritty"))
+    end,
     function() return false end,
-    { "-na", "alacritty" }
+    { "-a", "alacritty" }
   )
   task:start()
 end)
