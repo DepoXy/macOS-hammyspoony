@@ -273,6 +273,7 @@ reloadConfig:start()
 
 -- ALTLY: See also macOS <Cmd-Alt-h>, which hides all *other* app windows.
 
+-- BNDNG: <Shift-Ctrl-Cmd-W>
 hs.hotkey.bind({"shift", "ctrl", "cmd"}, "W", function()
   local front_win = hs.window.frontmostWindow()
 
@@ -307,6 +308,7 @@ end)
 
 -- ***
 
+-- BNDNG: <Shift-Ctrl-Alt-W>
 hs.hotkey.bind({"shift", "ctrl", "alt"}, "W", function()
   hide_osa = os.getenv("HOME") .. "/.kit/mOS/macOS-Hammyspoony/lib/hide-all-windows.osa"
 
@@ -323,6 +325,7 @@ end)
 --   Alacritty window is already front, then maybe another one comes
 --   into focus.
 
+-- BNDNG: <Shift-Ctrl-Cmd-T>
 hs.hotkey.bind({"shift", "ctrl", "cmd"}, "T", function()
   local alacritty_app = hs.application.get("Alacritty")
 
@@ -539,38 +542,47 @@ alacritty_by_window_number_prefix = function(win_num, win_hint)
   return terminal_by_number_using_post_filter(win_num, win_hint)
 end
 
+-- BNDNG: <Cmd-1>
 hs.hotkey.bind({"cmd"}, "1", function()
   alacritty_by_window_number_prefix(1)
 end)
 
+-- BNDNG: <Cmd-2>
 hs.hotkey.bind({"cmd"}, "2", function()
   alacritty_by_window_number_prefix(2)
 end)
 
+-- BNDNG: <Cmd-3>
 hs.hotkey.bind({"cmd"}, "3", function()
   alacritty_by_window_number_prefix(3)
 end)
 
+-- BNDNG: <Cmd-4>
 hs.hotkey.bind({"cmd"}, "4", function()
   alacritty_by_window_number_prefix(4)
 end)
 
+-- BNDNG: <Cmd-5>
 hs.hotkey.bind({"cmd"}, "5", function()
   alacritty_by_window_number_prefix(5)
 end)
 
+-- BNDNG: <Cmd-6>
 hs.hotkey.bind({"cmd"}, "6", function()
   alacritty_by_window_number_prefix(6)
 end)
 
+-- BNDNG: <Cmd-7>
 hs.hotkey.bind({"cmd"}, "7", function()
   alacritty_by_window_number_prefix(7)
 end)
 
+-- BNDNG: <Cmd-8>
 hs.hotkey.bind({"cmd"}, "8", function()
   alacritty_by_window_number_prefix(8)
 end)
 
+-- BNDNG: <Cmd-9>
 hs.hotkey.bind({"cmd"}, "9", function()
   alacritty_by_window_number_prefix(9)
 end)
@@ -590,6 +602,7 @@ end)
 -- - Our only sol'n (that author knows of) is to send a key stroke
 --   event to the app to run the (hidden) New Window <Cmd-N> menu item.
 
+-- BNDNG: <Cmd-0>
 hs.hotkey.bind({"cmd"}, "0", function()
   local task = hs.task.new(
     "/usr/bin/open",
@@ -605,6 +618,7 @@ end)
 
 -- Alacritty foregrounder/opener
 
+-- BNDNG: <Shift-Cmd-0>
 hs.hotkey.bind({"shift", "cmd"}, "0", function()
   hs.application.launchOrFocus("Alacritty")
 end)
@@ -612,6 +626,7 @@ end)
 -- Terminal.app — New Window
 -- - For the rare time you want to test Apple Terminal.app
 
+-- BNDNG: <Ctrl-Cmd-0>
 hs.hotkey.bind({"ctrl", "cmd"}, "0", function()
   local task = hs.task.new(
     "/usr/bin/osascript",
@@ -674,6 +689,7 @@ local make_new_chrome_window = function()
   end
 end
 
+-- BNDNG: <Cmd-T>
 hs.hotkey.bind({"cmd"}, "T", function()
   make_new_chrome_window()
 end)
@@ -684,6 +700,7 @@ end)
 -- - If all Chrome windows are minimized, this activates Chrome
 --   app but won't actually show any window.
 
+-- BNDNG: <Shift-Cmd-T>
 hs.hotkey.bind({"shift", "cmd"}, "T", function()
   local chrome_app = hs.application.get("Google Chrome")
 
@@ -843,6 +860,7 @@ end
 --   for user's email addy, e.g.,
 --     "first.last@gmail.com"
 
+-- BNDNG: <Shift-Ctrl-Cmd-A>
 hs.hotkey.bind({"shift", "ctrl", "cmd"}, "A", function()
   browser_window_front_or_open(
     "https://mail.google.com/mail/u/0/#inbox",
@@ -872,6 +890,7 @@ end)
 --   - Author's local BM index
 --       "🗨️         Chat & Social"
 
+-- BNDNG: <Shift-Ctrl-Cmd-S>
 hs.hotkey.bind({"shift", "ctrl", "cmd"}, "S", function()
   browser_window_front_or_open(
     "https://www.messenger.com/",
@@ -889,6 +908,7 @@ end)
 
 -- PowerThesaurus [browser window]
 
+-- BNDNG: <Shift-Ctrl-Cmd-P>
 hs.hotkey.bind({"shift", "ctrl", "cmd"}, "P", function()
   browser_window_front_or_open(
     "https://www.powerthesaurus.org/",
@@ -902,6 +922,7 @@ end)
 
 -- Regex Dictionary by Lou Hevly [browser window]
 
+-- BNDNG: <Shift-Ctrl-Cmd-8>
 hs.hotkey.bind({"shift", "ctrl", "cmd"}, "8", function()
   browser_window_front_or_open(
     "https://www.visca.com/regexdict/",
@@ -917,6 +938,7 @@ end)
 --
 -- - You must pop DevTools out into a separate window for this to work.
 
+-- BNDNG: <Shift-Ctrl-Cmd-R>
 hs.hotkey.bind({"shift", "ctrl", "cmd"}, "R", function()
   browser_window_front_or_open(
     "",
@@ -995,6 +1017,7 @@ end
 
 -- Finder foregrounder/opener
 
+-- BNDNG: <Cmd-F>
 local cmd_f = hs.hotkey.new({"cmd"}, "F", function()
   hs.application.launchOrFocus("Finder")
 end)
@@ -1005,6 +1028,7 @@ ignore_hotkey_meld(cmd_f)
 
 -- MacVim foregrounder/opener
 
+-- BNDNG: <Cmd-Backtick> (<Cmd-`>)
 hs.hotkey.bind({"cmd"}, "`", function()
   hs.application.launchOrFocus("MacVim")
 end)
@@ -1013,6 +1037,7 @@ end)
 
 -- Slack foregrounder/opener
 
+-- BNDNG: <Shift-Ctrl-Cmd-F>
 hs.hotkey.bind({"shift", "ctrl", "cmd"}, "F", function()
   hs.application.launchOrFocus("Slack")
 end)
@@ -1021,6 +1046,7 @@ end)
 
 -- Spotify foregrounder/๏קєภer
 
+-- BNDNG: <Shift-Ctrl-Cmd-X>
 hs.hotkey.bind({"shift", "ctrl", "cmd"}, "X", function()
   hs.application.launchOrFocus("Spotify")
 end)
@@ -1034,6 +1060,7 @@ end)
 --    https://github.com/landonb/home-fries/blob/release/lib/datetime_now_TTT.sh#L45
 --    https://github.com/landonb/dubs_edit_juice/blob/release/plugin/dubs_edit_juice.vim#L1513
 
+-- BNDNG: <Cmd-Minus> (<Cmd-->)
 hs.hotkey.bind({"cmd"}, "-", function()
   local task = hs.task.new(
     "/bin/dash",
@@ -1047,6 +1074,7 @@ end)
 -- <Ctrl-Cmd-Semicolon> — Put normal date plus:time into clipboard.
 -- - HSTRY: Named after erstwhile Homefries $(TTTtt:) command.
 
+-- BNDNG: <Ctrl-Cmd-Semicolon> (<Ctrl-Cmd-;>)
 hs.hotkey.bind({"ctrl", "cmd"}, ";", function()
   local task = hs.task.new(
     "/bin/dash",
@@ -1060,6 +1088,7 @@ end)
 -- <Ctrl-Cmd-Apostrophe(Quote)> — Put dashed date-plus-time into clipboard.
 -- - CALSO: Homefries $(TTTtt-) command.
 
+-- BNDNG: <Ctrl-Cmd-Quote> (<Ctrl-Cmd-SingleQuote>, <Ctrl-Cmd-Apostrophe>, <Ctrl-Cmd-'>)
 hs.hotkey.bind({"ctrl", "cmd"}, "'", function()
   local task = hs.task.new(
     "/bin/dash",
@@ -1354,6 +1383,7 @@ win_chooser:width(27.0)
 --   bindings defined above.
 
 -- <Ctrl-Space>, as inspired by Contexts.
+-- BNDNG: <Ctrl-Space> (<Ctrl- >)
 hs.hotkey.bind({"ctrl"}, "Space", function()
   if not win_chooser:isVisible() then
     -- Note that hs.chooser:choices() can be passed a table or a function,
@@ -1521,6 +1551,7 @@ filter_attach_eventtap(chrome_filter, chrome_rwd_fwd_get_eventtap)
 --  ~/.kit/mOS/hammerspoons/Source/AClock.spoon/init.lua
 --
 aClock = hs.loadSpoon("AClock")
+-- BNDNG: <Cmd-Alt-C>
 hs.hotkey.bind({"cmd", "alt"}, "c", function()
   aClock:toggleShow()
 end)
