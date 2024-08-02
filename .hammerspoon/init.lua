@@ -644,7 +644,7 @@ end)
 
 -------
 
--- Opens a new Google Chrome window.
+-- Opens a new Google Chrome window, using the Default Profile.
 --
 -- SAVVY:
 -- - If Chrome is visible, the `make new window` AppleScript
@@ -660,6 +660,19 @@ end)
 --   - It also fronts all the other Chrome windows on top of your
 --     other windows — even though Alt-Tab will still take you
 --     back to whatever app you were just on.
+-- - Here's an AppleScript take that runs fast, but it doesn't
+--   let us specify the profile (that I know of):
+--     local task = hs.task.new(
+--       "/usr/bin/osascript",
+--       function() chrome_app:setFrontmost() end,
+--       function() return false end,
+--       {
+--         '-e', 'tell application "Google Chrome"',
+--           '-e', 'make new window',
+--         '-e', 'end tell',
+--       }
+--     )
+--     task:start()
 -- - Note that closing the new Chrome window will nonetheless
 --   bring another Chrome window to the front (if one is visible),
 --   rather than returning you to whatever window you were using
@@ -668,30 +681,30 @@ end)
 local make_new_chrome_window = function()
   local chrome_app = hs.application.get("Google Chrome")
 
-  if not chrome_app then
-    hs.application.launchOrFocus("Google Chrome")
-  else
-    if chrome_app:isHidden() then
-      chrome_app:unhide()
-    end
-
-    local task = hs.task.new(
-      "/usr/bin/osascript",
-      function() chrome_app:setFrontmost() end,
-      function() return false end,
-      {
-        '-e', 'tell application "Google Chrome"',
-          '-e', 'make new window',
-        '-e', 'end tell',
-      }
-    )
-    task:start()
+  if chrome_app and chrome_app:isHidden() then
+    chrome_app:unhide()
   end
+
+  local profile_dir = ""
+  if profile then
+    profile_dir = "--profile-directory=" .. profile
+  end
+
+  local task = hs.task.new(
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    function() chrome_app:setFrontmost() end,
+    function() return false end,
+    {
+      "--new-window",
+      profile_dir,
+    }
+  )
+  task:start()
 end
 
 -- BNDNG: <Cmd-T>
 hs.hotkey.bind({"cmd"}, "T", function()
-  make_new_chrome_window()
+  make_new_chrome_window("Default")
 end)
 
 -------
