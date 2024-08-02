@@ -678,7 +678,7 @@ end)
 --   rather than returning you to whatever window you were using
 --   before opening the new Chrome window.
 
-local make_new_chrome_window = function()
+make_new_chrome_window = function(profile)
   local chrome_app = hs.application.get("Google Chrome")
 
   if chrome_app and chrome_app:isHidden() then
