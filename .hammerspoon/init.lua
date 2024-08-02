@@ -692,7 +692,12 @@ make_new_chrome_window = function(profile)
 
   local task = hs.task.new(
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-    function() chrome_app:setFrontmost() end,
+    function()
+      local chrome_app = hs.application.get("Google Chrome")
+      if chrome_app then
+        chrome_app:setFrontmost()
+      end
+    end,
     function() return false end,
     {
       "--new-window",
