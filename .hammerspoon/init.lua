@@ -149,6 +149,23 @@ reloadConfig:start()
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
+-- USAGE: Uncomment this fnc. to pry table keys (see usages below):
+--
+-- local table_join = function(table, sep)
+--   local keys = ""
+--
+--   for k, _ in pairs(table) do
+--     if keys ~= "" then
+--       keys = keys .. sep
+--     end
+--     keys = keys .. k
+--   end
+--
+--   return keys
+-- end
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
 -- Hide or Minimize all but the frontmost window.
 --
 -- - This function minimizes Alacritty windows,
@@ -642,7 +659,117 @@ hs.hotkey.bind({"ctrl", "cmd"}, "0", function()
   task:start()
 end)
 
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+local filter_attach_eventtap = function(win_filter, get_eventtap)
+  local eventtap
+
+  win_filter
+    :subscribe(hs.window.filter.windowFocused, function()
+      -- Enable eventtap in app
+      eventtap = get_eventtap()
+      eventtap:start()
+    end)
+    :subscribe(hs.window.filter.windowUnfocused, function()
+      -- Disable eventtap when focusing out of app
+      if eventtap then
+        eventtap:stop()
+      end
+    end)
+end
+
 -------
+
+-- SAVVY: This tedious menu shortcut remapping because
+-- GnuCash ignores the normal Keyboard Shortcuts you'd
+-- otherwise manage from System Settings, i.e.,
+--   defaults write org.gnucash.Gnucash NSUserKeyEquivalents '{ ... }'
+-- doesn't change anything.
+
+local gnucash_shortcuts_get_eventtap = function()
+  return hs.eventtap.new(
+    {hs.eventtap.event.types.keyDown},
+    function(e)
+      -- USAGE: Uncomment to debug/pry (also table_join def, above):
+      --    local unmodified = false
+      --    hs.alert.show("CHARS: " .. e:getCharacters(unmodified))
+      --    hs.alert.show("FLAGS: " .. table_join(e:getFlags(), ", "))
+
+      -- For each menu item, returns true to delete original event,
+      -- followed by the new event.
+      if e:getFlags():containExactly({"ctrl"}) then
+        if false then
+
+        -- Gnucash > Quit Gnucash
+        elseif e:getKeyCode() == hs.keycodes.map["q"] then
+          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["q"], true)}
+
+        -- File > New File
+        elseif e:getKeyCode() == hs.keycodes.map["n"] then
+          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["n"], true)}
+
+        -- File > Open...
+        elseif e:getKeyCode() == hs.keycodes.map["o"] then
+          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["o"], true)}
+
+        -- File > Save
+        elseif e:getKeyCode() == hs.keycodes.map["s"] then
+          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["s"], true)}
+
+        -- File > "Print...
+        elseif e:getKeyCode() == hs.keycodes.map["p"] then
+          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["p"], true)}
+
+        -- File > Close
+        elseif e:getKeyCode() == hs.keycodes.map["w"] then
+          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["w"], true)}
+
+        -- Edit > Edit Account
+        elseif e:getKeyCode() == hs.keycodes.map["e"] then
+          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["e"], true)}
+
+        -- Edit > Find Account
+        elseif e:getKeyCode() == hs.keycodes.map["i"] then
+          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["i"], true)}
+
+        -- Edit > Find ...
+        elseif e:getKeyCode() == hs.keycodes.map["f"] then
+          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["f"], true)}
+
+        -- View > Refresh
+        elseif e:getKeyCode() == hs.keycodes.map["r"] then
+          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["r"], true)}
+
+        -- Action > Transfer...
+        elseif e:getKeyCode() == hs.keycodes.map["t"] then
+          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["t"], true)}
+
+        end
+      elseif e:getFlags():containExactly({"shift", "ctrl"}) then
+        if false then
+
+        -- File > Save As...
+        elseif e:getKeyCode() == hs.keycodes.map["s"] then
+          return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["s"], true)}
+
+        -- File > Print Setup
+        elseif e:getKeyCode() == hs.keycodes.map["p"] then
+          return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["p"], true)}
+
+        end
+      end
+
+      -- Return false to propogate event.
+      return false
+    end
+  )
+end
+
+-- SAVVY: First arg to new() is Application name, which is
+-- "Gnucash", and not window title name, which says "GnuCash".
+local gnucash_filter = hs.window.filter.new("Gnucash")
+
+filter_attach_eventtap(gnucash_filter, gnucash_shortcuts_get_eventtap)
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
@@ -1040,6 +1167,14 @@ ignore_hotkey_libreoffice = function(hotkey)
   filter_ignore_hotkey(libreoffice_filter, hotkey)
 end
 
+-- Prepare same also for GnuCash, which doesn't use native macOS windows,
+-- or whatever the situation may be.
+local gnucash_filter = hs.window.filter.new("Gnucash")
+
+ignore_hotkey_gnucash = function(hotkey)
+  filter_ignore_hotkey(gnucash_filter, hotkey)
+end
+
 -------
 
 -- Finder foregrounder/opener
@@ -1050,6 +1185,7 @@ local cmd_f = hs.hotkey.new({"cmd"}, "F", function()
 end)
 
 ignore_hotkey_meld(cmd_f)
+ignore_hotkey_gnucash(cmd_f)
 
 -------
 
@@ -1480,43 +1616,11 @@ end)
 --     and maybe this isn't always the case. But appears to work
 --     this way so far in author's experience.
 
--- USAGE: Uncomment this fnc. to pry table keys (see usage below):
---
--- local table_join = function(table, sep)
---   local keys = ""
---
---   for k, _ in pairs(table) do
---     if keys ~= "" then
---       keys = keys .. sep
---     end
---     keys = keys .. k
---   end
---
---   return keys
--- end
-
-local filter_attach_eventtap = function(win_filter, get_eventtap)
-  local eventtap
-
-  win_filter
-    :subscribe(hs.window.filter.windowFocused, function()
-      -- Enable eventtap in app
-      eventtap = get_eventtap()
-      eventtap:start()
-    end)
-    :subscribe(hs.window.filter.windowUnfocused, function()
-      -- Disable eventtap when focusing out of app
-      if eventtap then
-        eventtap:stop()
-      end
-    end)
-end
-
 local chrome_rwd_fwd_get_eventtap = function()
   return hs.eventtap.new(
     {hs.eventtap.event.types.keyDown},
     function(e)
-      -- USAGE: Uncomment to debug/pry:
+      -- USAGE: Uncomment to debug/pry (also table_join def, above):
       --   local unmodified = false
       --   hs.alert.show("CHARS: " .. e:getCharacters(unmodified))
       --   hs.alert.show("FLAGS: " .. table_join(e:getFlags(), ", "))
