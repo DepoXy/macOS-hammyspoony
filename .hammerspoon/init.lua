@@ -843,8 +843,15 @@ end)
 --       ...
 --     end
 
-browser_window_front_or_open = function(url, matches)
+browser_window_front_or_open = function(url, profile, matches)
   local win
+
+  if not matches then
+    matches = profile
+    profile = "Default"
+  elseif not profile then
+    profile = "Default"
+  end
 
   for i = 1, #matches do
     win = hs.window(matches[i])
@@ -854,7 +861,7 @@ browser_window_front_or_open = function(url, matches)
   if win then
     win:raise():focus()
   elseif url ~= "" then
-    chromeWithProfile("Default", url)
+    chromeWithProfile(profile, url)
   end
 end
 
