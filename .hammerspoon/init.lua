@@ -115,7 +115,7 @@ reloadConfig = hs.loadSpoon("ReloadConfiguration")
 reloadConfig.watch_paths = { hs.configdir, hmy_cfg_dir, dxy_cfg_dir, dxc_cfg_dir }
 reloadConfig:start()
 
--------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- THANX: zzamboni (see above) defines meta-key combo aliases, like these.
 -- - For readability, this file chooses not to use them.
@@ -147,7 +147,7 @@ reloadConfig:start()
 -- shift_ctrl_cmd  = { "ctrl", "cmd", "shift" }
 -- shift_ctrl_alt  = { "ctrl", "alt", "shift" }
 
--------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- Hide or Minimize all but the frontmost window.
 --
@@ -348,7 +348,7 @@ hs.hotkey.bind({"shift", "ctrl", "cmd"}, "T", function()
   --   alacritty_app:setFrontmost()
 end)
 
--------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- Alacritty (terminal) window fronters.
 -- - DPNDS: Requires that the terminal window titles starts with a unique number,
@@ -644,6 +644,8 @@ end)
 
 -------
 
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
 -- Opens a new Google Chrome window, using the Default Profile.
 --
 -- SAVVY:
@@ -865,7 +867,7 @@ browser_window_front_or_open = function(url, profile, matches)
   end
 end
 
--------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- Bring front/focus browser email window.
 --
@@ -975,7 +977,7 @@ hs.hotkey.bind({"shift", "ctrl", "cmd"}, "R", function()
   )
 end)
 
--------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- Create Meld window filter to disable certain hotkeys.
 --
@@ -1076,7 +1078,7 @@ hs.hotkey.bind({"shift", "ctrl", "cmd"}, "X", function()
   hs.application.launchOrFocus("Spotify")
 end)
 
--------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- <Cmd-Minus> — Put YYYY-MM-DD into clipboard.
 -- - Note the printf avoids newline injection.
@@ -1124,7 +1126,7 @@ hs.hotkey.bind({"ctrl", "cmd"}, "'", function()
   task:start()
 end)
 
--------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- <Cmd-Space> opens an FZF-style browser window switcher.
 --
@@ -1446,7 +1448,7 @@ hs.hotkey.bind({"ctrl"}, "Space", function()
   end
 end)
 
--------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- KLUGE: When Chrome Save dialog is open, prevent
 --        <Ctrl-Left>/<Ctrl-Right> from changing location
@@ -1570,7 +1572,7 @@ local chrome_filter = hs.window.filter.new("Google Chrome")
 
 filter_attach_eventtap(chrome_filter, chrome_rwd_fwd_get_eventtap)
 
--------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- Nice! 4-second (or shorter, if you hotkey again, or <Esc>) clock overlay.
 --  ~/.kit/mOS/hammerspoons/Source/AClock.spoon/init.lua
@@ -1581,7 +1583,7 @@ hs.hotkey.bind({"cmd", "alt"}, "c", function()
   aClock:toggleShow()
 end)
 
--------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- Meh. Analog clock, absolutely positioned below notifications area.
 --  ~/.kit/mOS/hammerspoons/Source/CircleClock.spoon/init.lua
@@ -1801,7 +1803,7 @@ end)
 --  holdToQuit = hs.loadSpoon("HoldToQuit")
 --  holdToQuit:init()
 
--------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- Load optional configs.
 --
