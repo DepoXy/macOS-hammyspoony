@@ -537,7 +537,7 @@ local terminal_by_number_using_post_filter = function(win_num, win_hint)
   end
 
   -- If no terminal window matched, use any application window that matches.
-  local found_win = wins[1]
+  local found_win = wins and wins[1]
 
   -- Or if user provided a hint, look for a matching window
   if win_hint then
