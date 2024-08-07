@@ -513,35 +513,39 @@ end)
 -- (commented) functions).
 --
 local terminal_by_number_using_post_filter = function(win_num, win_hint)
-  prefix_pattern = "^" .. win_num .. ". "
-  -- SAVVY: hs.window.find returns zero, one, or more windows,
-  -- but you'll only capture one window with this basic call:
-  --   local win = hs.window.find(prefix_pattern)
-  -- To capture all windows, convert return values to a table:
-  local wins = { hs.window.find(prefix_pattern) }
-  -- table.pack also works:
-  --   local win = table.pack(hs.window.find(prefix_pattern))
-  -- What's happening is illustrated by this call (but don't do this):
-  --   local win1, win2, win3 = hs.window.find(prefix_pattern)
-
-  local term_apps = { Alacritty = true, iTerm2 = true, Terminal = true, }
-
-  for _, win in pairs(wins) do
-    local app_title = win:application():title()
-    -- hs.alert.show("win — " .. win:title() .. " / app — " .. app_title)
-    if term_apps[app_title] then
-      win:raise():focus()
-
-      return true
-    end
-  end
-
-  -- If no terminal window matched, use any application window that matches.
-  local found_win = wins and wins[1]
+  local found_win
 
   -- Or if user provided a hint, look for a matching window
   if win_hint then
     found_win = hs.window.find(win_hint)
+  end
+
+  if not found_win then
+    prefix_pattern = "^" .. win_num .. ". "
+    -- SAVVY: hs.window.find returns zero, one, or more windows,
+    -- but you'll only capture one window with this basic call:
+    --   local win = hs.window.find(prefix_pattern)
+    -- To capture all windows, convert return values to a table:
+    local wins = { hs.window.find(prefix_pattern) }
+    -- table.pack also works:
+    --   local win = table.pack(hs.window.find(prefix_pattern))
+    -- What's happening is illustrated by this call (but don't do this):
+    --   local win1, win2, win3 = hs.window.find(prefix_pattern)
+
+    local term_apps = { Alacritty = true, iTerm2 = true, Terminal = true, }
+
+    for _, win in pairs(wins) do
+      local app_title = win:application():title()
+      -- hs.alert.show("win — " .. win:title() .. " / app — " .. app_title)
+      if term_apps[app_title] then
+        win:raise():focus()
+
+        return true
+      end
+    end
+
+    -- If no terminal window matched, use any application window that matches.
+    found_win = wins and wins[1]
   end
 
   if found_win then
