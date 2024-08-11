@@ -670,17 +670,46 @@ end)
 
 local filter_attach_eventtap = function(win_filter, get_eventtap)
   local eventtap
+  local prev_app_name
 
   win_filter
-    :subscribe(hs.window.filter.windowFocused, function()
+    -- Callback receives 3 parameters:
+    --   hs.window                            [object]
+    --   window:application():name()          [string]
+    --   hs.window.filter.window(Unf|F)ocused [string]
+    :subscribe(hs.window.filter.windowFocused, function(win, app_name)
       -- Enable eventtap in app
+
+      -- - SAVVY: HMS calls windowFocused again for current app when app
+      --   opens a new window.
+      --   - E.g., when user <C-O> Opens file-finder, or opens new browser
+      --     window, etc., this event is sent.
+      --   - I.e., windowFocused and windowUnfocused events are not 1:1.
+      --   - So track current application.
+      --   - This avoids runnning multiple eventtap's, and avoids losing
+      --     track of one eventtap, which then continues to run and to
+      --     change events *for other apps.*
+      if app_name == prev_app_name then
+
+        return
+      end
+      prev_app_name = app_name
+      if eventtap then
+        -- This is unexpected
+        hs.alert.show("GAFFE: Unexpected path: filter_attach_eventtap")
+
+        return
+      end
+
       eventtap = get_eventtap()
       eventtap:start()
     end)
     :subscribe(hs.window.filter.windowUnfocused, function()
       -- Disable eventtap when focusing out of app
+      prev_app_name = nil
       if eventtap then
         eventtap:stop()
+        eventtap = nil
       end
     end)
 end
