@@ -1192,11 +1192,12 @@ local filter_ignore_hotkey = function(win_filter, hotkey)
     end)
 end
 
--- Prepare a Meld window filter and hotkey subscriber
-local meld_filter = hs.window.filter.new("Meld")
+-- Prepare same also for GnuCash, which doesn't use native macOS windows,
+-- or whatever the situation may be.
+local gnucash_filter = hs.window.filter.new("Gnucash")
 
-ignore_hotkey_meld = function(hotkey)
-  filter_ignore_hotkey(meld_filter, hotkey)
+ignore_hotkey_gnucash = function(hotkey)
+  filter_ignore_hotkey(gnucash_filter, hotkey)
 end
 
 -- Prepare a similar LibreOffice window filter (not used herein
@@ -1207,12 +1208,11 @@ ignore_hotkey_libreoffice = function(hotkey)
   filter_ignore_hotkey(libreoffice_filter, hotkey)
 end
 
--- Prepare same also for GnuCash, which doesn't use native macOS windows,
--- or whatever the situation may be.
-local gnucash_filter = hs.window.filter.new("Gnucash")
+-- Prepare a Meld window filter and hotkey subscriber
+local meld_filter = hs.window.filter.new("Meld")
 
-ignore_hotkey_gnucash = function(hotkey)
-  filter_ignore_hotkey(gnucash_filter, hotkey)
+ignore_hotkey_meld = function(hotkey)
+  filter_ignore_hotkey(meld_filter, hotkey)
 end
 
 -------
