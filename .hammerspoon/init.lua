@@ -154,7 +154,7 @@ reloadConfig:start()
 --   Whenever author uncomments trace code that calls it, and then its absense
 --   silently breaks bindings, I get annoyed. So leaving live. Live with it.
 --   ("Silently": Keybinding press no-ops, but Hammerspoon Console shows err.)
-local table_join = function(table, sep)
+table_join = function(table, sep)
   local keys = ""
 
   for k, _ in pairs(table) do
