@@ -795,7 +795,7 @@ local gnucash_shortcuts_get_eventtap = function()
         end
       end
 
-      -- Return false to propogate event.
+      -- Return false to propagate event.
       return false
     end
   )
@@ -1192,23 +1192,34 @@ local filter_ignore_hotkey = function(win_filter, hotkey)
     end)
 end
 
--- Prepare same also for GnuCash, which doesn't use native macOS windows,
--- or whatever the situation may be.
+-- Prepare app window filters and hotkey subscribers for apps that don't
+-- use native macOS windows (or whatever it is they do different; the
+-- author doesn't know Cocoa or macOS apps well enough to know exact
+-- reason why some apps ignore Keyboard Shortcuts > App Shortcuts, aka
+--     defaults write <bundle-ID> NSUserKeyEquivalents
+-- - Use case: Note that setting `NSUserKeyEquivalents` will update the
+--   shortcuts listed in the menu drop-downs, so you might want to use
+--   both NSUserKeyEquivalent and an eventtap, so the UX reflects the
+--   Hammerspoon tap.
+
+-- Prepare GnuCash window filter.
+-- - See also: gnucash_shortcuts_get_eventtap
 local gnucash_filter = hs.window.filter.new("Gnucash")
 
 ignore_hotkey_gnucash = function(hotkey)
   filter_ignore_hotkey(gnucash_filter, hotkey)
 end
 
--- Prepare a similar LibreOffice window filter (not used herein
--- but used by some client-hs.lua, so defined here).
+-- Prepare a similar LibreOffice window filter.
+-- - Not used herein but used by some client-hs.lua, so defined here.
 local libreoffice_filter = hs.window.filter.new("LibreOffice")
 
 ignore_hotkey_libreoffice = function(hotkey)
   filter_ignore_hotkey(libreoffice_filter, hotkey)
 end
 
--- Prepare a Meld window filter and hotkey subscriber
+-- Prepare a Meld window filter and hotkey subscriber.
+-- - Not used herein but used by some client-hs.lua, so defined here.
 local meld_filter = hs.window.filter.new("Meld")
 
 ignore_hotkey_meld = function(hotkey)
@@ -1706,7 +1717,7 @@ local chrome_rwd_fwd_get_eventtap = function()
         end
       end
 
-      -- Return false to propogate event.
+      -- Return false to propagate event.
       return false
     end
   )
