@@ -807,10 +807,6 @@ local gnucash_filter = hs.window.filter.new("Gnucash")
 
 filter_attach_eventtap(gnucash_filter, gnucash_shortcuts_get_eventtap)
 
-hs.hotkey.bind({"shift", "ctrl", "alt"}, "g", function()
-  hs.application.launchOrFocus("GnuCash")
-end)
-
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- Opens a new Google Chrome window, using the Default Profile.
@@ -1254,6 +1250,15 @@ end)
 -- BNDNG: <Shift-Ctrl-Cmd-F>
 hs.hotkey.bind({"shift", "ctrl", "cmd"}, "F", function()
   hs.application.launchOrFocus("Slack")
+end)
+
+-------
+
+-- GnuCash foregrounder/opener
+
+-- BNDNG: <Shift-Ctrl-Cmd-G>
+hs.hotkey.bind({"shift", "ctrl", "cmd"}, "G", function()
+  hs.application.launchOrFocus("GnuCash")
 end)
 
 -------
