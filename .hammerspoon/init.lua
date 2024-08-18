@@ -1227,7 +1227,7 @@ end
 -- Finder foregrounder/opener
 
 -- BNDNG: <Cmd-F>
-local cmd_f = hs.hotkey.new({"cmd"}, "F", function()
+local cmd_f = hs.hotkey.bind({"cmd"}, "F", function()
   hs.application.launchOrFocus("Finder")
 end)
 
