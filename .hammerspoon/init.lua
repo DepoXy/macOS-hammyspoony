@@ -627,7 +627,7 @@ end)
 --   event to the app to run the (hidden) New Window <Cmd-N> menu item.
 
 -- BNDNG: <Cmd-0>
-hs.hotkey.bind({"cmd"}, "0", function()
+local cmd_0 = hs.hotkey.bind({"cmd"}, "0", function()
   local task = hs.task.new(
     "/usr/bin/open",
     function(exit_code, stdout, stderr)
@@ -884,7 +884,7 @@ end)
 --   app but won't actually show any window.
 
 -- BNDNG: <Shift-Cmd-T>
-hs.hotkey.bind({"shift", "cmd"}, "T", function()
+shift_cmd_t = hs.hotkey.bind({"shift", "cmd"}, "T", function()
   local chrome_app = hs.application.get("Google Chrome")
 
   if not chrome_app then
