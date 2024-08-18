@@ -1235,8 +1235,8 @@ local cmd_f = hs.hotkey.new({"cmd"}, "F", function()
   hs.application.launchOrFocus("Finder")
 end)
 
-ignore_hotkey_meld(cmd_f)
 ignore_hotkey_gnucash(cmd_f)
+ignore_hotkey_meld(cmd_f)
 
 -------
 
