@@ -345,8 +345,8 @@ end)
 --   Alacritty window is already front, then maybe another one comes
 --   into focus.
 
--- BNDNG: <Shift-Ctrl-Cmd-T>
-hs.hotkey.bind({"shift", "ctrl", "cmd"}, "T", function()
+-- BNDNG: <Shift-Ctrl-Cmd-0>
+hs.hotkey.bind({"shift", "ctrl", "cmd"}, "0", function()
   local alacritty_app = hs.application.get("Alacritty")
 
   local app_wins = alacritty_app:allWindows()
