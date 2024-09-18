@@ -668,7 +668,7 @@ end)
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
-local filter_attach_eventtap = function(win_filter, get_eventtap)
+filter_attach_eventtap = function(win_filter, get_eventtap)
   local eventtap
   local prev_app_name
 
