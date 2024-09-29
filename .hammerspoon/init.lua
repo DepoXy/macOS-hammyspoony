@@ -498,7 +498,6 @@ end)
 --
 -- - CXREF: ~/.kit/mOS/macOS-Hammyspoony/lib/alacritty-front-window-number.osa
 --
---
 --   local alacritty_by_number_using_osascript = function(win_num)
 --     local task = hs.task.new(
 --       "/usr/bin/osascript",
