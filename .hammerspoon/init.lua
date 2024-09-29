@@ -112,7 +112,12 @@ dxy_cfg_dir = os.getenv("HOME") .. "/.depoxy/ambers/home/.hammerspoon"
 dxc_cfg_dir = os.getenv("HOME") .. "/.depoxy/running/home/.hammerspoon"
 
 reloadConfig = hs.loadSpoon("ReloadConfiguration")
-reloadConfig.watch_paths = { hs.configdir, hmy_cfg_dir, dxy_cfg_dir, dxc_cfg_dir }
+reloadConfig.watch_paths = {
+  hs.configdir,
+  hmy_cfg_dir,
+  dxy_cfg_dir,
+  dxc_cfg_dir,
+}
 reloadConfig:start()
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
