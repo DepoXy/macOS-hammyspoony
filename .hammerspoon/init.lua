@@ -1669,6 +1669,20 @@ function pairsByKeys(list, comp_fcn)
   return iter
 end
 
+-- SAVVY: Sometimes when all Chrome windows are minimized, the
+-- window filter returns no windows. But not always. Then you
+-- open a new Chrome window or unminimize one, and the window
+-- filter works again.
+--
+-- - So use app:allWindows(), and not a window filter like this:
+--
+--     -- SAVVY: Use empty filter with hs.window.filter.new() so that
+--     -- it includes minimized and hidden windows, and doesn't restrict
+--     -- itself to only visible windows.
+--     local empty_filter = {}
+--     local win_filter = hs.window.filter.new({[app_name] = empty_filter,})
+--     local app_windows = win_filter:getWindows()
+
 -- REFER: https://www.hammerspoon.org/docs/hs.chooser.html#choices
 local refresh_choices = function(app_name)
   local choices = {}
@@ -1682,19 +1696,8 @@ local refresh_choices = function(app_name)
 
   local app = hs.application.get(app_name)
 
-  -- SAVVY: Use empty filter with hs.window.filter.new() so that
-  -- it includes minimized and hidden windows, and doesn't restrict
-  -- itself to only visible windows.
-  local empty_filter = {}
-  local win_filter = hs.window.filter.new({[app_name] = empty_filter,})
+  local app_windows = app:allWindows()
 
-  -- REFER: getWindows([sortOrder]) allows hs.window.filter constants:
-  --   .sortByCreated|.sortByCreatedLast|.sortByFocused|.sortByFocusedLast
-  -- But we want to sort by window title!
-  -- - [I guess this is a good excuse to learn Lua table.sort (because
-  --    author is very new to Lua, despite some toe-dipping in 2017,
-  --    Hammerspoon 2024 is my new gateway drug).]
-  local app_windows = win_filter:getWindows()
   local sorted_wins = pairsByKeys(app_windows,
     function(lhs, rhs)
       local do_sort_emoji_before_ascii = true
