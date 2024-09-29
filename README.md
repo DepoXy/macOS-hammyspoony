@@ -154,6 +154,34 @@ You call that a knife? This is a Hammerspoon config
   `<Ctrl-Cmd-Apostrophe(Quote)>` (`<Ctrl-Cmd-'>`): Put dashed date-plus-time
   into clipboard, e.g., "2024-07-08-17-14"
 
+### Hammyspoony Spoons
+
+  The author hacked most of Hammyspoony together while transitioning from
+  Linux to macOS, and it all ended up in a single `init.lua` file that
+  grew from a few hundred lines to a few thousand lines of Lua.
+
+  I've since started gradually migrating separate features to their
+  individual Spoon files.
+
+  Hopefully-eventually all the features listed above will be available
+  as their own Spoons. But until then, you may need to dissect `init.lua`
+  to incorporate what you want into your own environment.
+
+### Event subscribers
+
+  `NeverLoseFocus`: This Hammyspoony Spoon ensures you're never without focus!
+
+  - Whenever you close or minimize the last visible window of a macOS
+    application, that application is still active, even though some
+    other application's window might now be the frontmost window.
+
+  - This Spoon tracks window focus and unfocus events so that when the
+    last visible window of an application is closed or minimized, this
+    Spoon will focus the next most recently used and still-visible
+    application's window.
+
+  - Download `NeverLoseFocus` Spoon: [https://github.com/DepoXy/macOS-Hammyspoony/raw/release/Spoons/NeverLoseFocus.spoon.zip](https://github.com/DepoXy/macOS-Hammyspoony/raw/release/Spoons/NeverLoseFocus.spoon.zip)
+
 ### Hammerspoon Spoons bindings
 
   `<Cmd-Alt-C>`: Briefly show a digital clock in the center of the screen

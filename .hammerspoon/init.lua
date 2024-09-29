@@ -63,6 +63,11 @@
 
 package.path = package.path .. ";" .. os.getenv("HOME") .. "/.kit/mOS/hammerspoons/Source/?.spoon/init.lua"
 
+-- CXREF: Currently just this one Spoon, but the rest of this file
+--        will ideally be promoted to their own Spoons:
+--   ~/.kit/mOS/macOS-Hammyspoony/Source/NeverLoseFocus.spoon/init.lua
+package.path = package.path .. ";" .. os.getenv("HOME") .. "/.kit/mOS/macOS-Hammyspoony/Source/?.spoon/init.lua"
+
 -------
 
 -- USAGE: Change the log level if you want more scrawl in the Hammerspoon Console, e.g.:
@@ -108,6 +113,7 @@ package.path = package.path .. ";" .. os.getenv("HOME") .. "/.kit/mOS/hammerspoo
 
 -- See the bottom of this file for where we load the DepoXy and Client configs.
 hmy_cfg_dir = os.getenv("HOME") .. "/.kit/mOS/macOS-Hammyspoony/.hammerspoon"
+hmy_spn_dir = os.getenv("HOME") .. "/.kit/mOS/macOS-Hammyspoony/Source"
 dxy_cfg_dir = os.getenv("HOME") .. "/.depoxy/ambers/home/.hammerspoon"
 dxc_cfg_dir = os.getenv("HOME") .. "/.depoxy/running/home/.hammerspoon"
 
@@ -115,6 +121,7 @@ reloadConfig = hs.loadSpoon("ReloadConfiguration")
 reloadConfig.watch_paths = {
   hs.configdir,
   hmy_cfg_dir,
+  hmy_spn_dir,
   dxy_cfg_dir,
   dxc_cfg_dir,
 }
@@ -1949,6 +1956,13 @@ end
 local chrome_filter = hs.window.filter.new("Google Chrome")
 
 filter_attach_eventtap(chrome_filter, chrome_rwd_fwd_get_eventtap)
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+-- CXREF:
+-- ~/.kit/mOS/macOS-Hammyspoony/Source/NeverLoseFocus.spoon/init.lua
+
+hs.loadSpoon("NeverLoseFocus")
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
