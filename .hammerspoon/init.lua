@@ -1673,8 +1673,11 @@ end
 local refresh_choices = function(app_name)
   local choices = {}
 
-  -- FIXME: See comment below: Unsure how to let user pick app.
+  -- FIXME: See comment below: Should let user pick app.
   -- - For now defaults Chrome, because that's app author cares about.
+  -- - If we promote this to a Spoon, we can just add a top-level Spoon
+  --   variable (and then this init.lua file is more of a config and
+  --   less of a code file).
   app_name = app_name or "Google Chrome"
 
   local app = hs.application.get(app_name)
