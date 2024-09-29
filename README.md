@@ -8,7 +8,7 @@ You call that a knife? This is a Hammerspoon config
   - You'll find a number of bindings to front or open specific apps
     or windows by using a global binding.
 
-  - E.g., &lt;`Shift-Ctrl-Cmd-A`&gt; brings forward the browser
+  - For example, &lt;`Shift-Ctrl-Cmd-A`&gt; brings forward the browser
     window with an active email tab.
 
   - This project is not really designed to be used directly,
@@ -32,7 +32,7 @@ You call that a knife? This is a Hammerspoon config
 ## USAGE
 
   Make a symlink at `~/.hammerspoon/init.lua` to this project's
-  `init.lua`, and it'll be wired (see `ln` snippet, below).
+  `init.lua`, and it'll be wired (see the `ln` snippet, below).
 
   You can also add your own `client-hs.lua` file to add
   your own bindings (or just fork this repo and make it
@@ -44,7 +44,7 @@ You call that a knife? This is a Hammerspoon config
   - Because Hammerspoon runs on its own, it won't have access to
     your local shell environment, and because this project doesn't
     "install" itself anywhere, it just assumes a particular
-    path to the AppleScript files:
+    path to the few AppleScript files it uses:
 
         ~/.kit/mOS/macOS-Hammyspoony/lib
 
@@ -64,7 +64,7 @@ You call that a knife? This is a Hammerspoon config
   from `~/.hammerspoon/init.lua`:
 
       mkdir -p ~/.hammerspoon
-      ln -sn ~/.kit/mOS/macOS-Hammyspoony/.hammerspoon/init.lua \
+      ln -s ~/.kit/mOS/macOS-Hammyspoony/.hammerspoon/init.lua \
         ~/.hammerspoon/init.lua
 
 ## COMMANDS
@@ -73,14 +73,15 @@ You call that a knife? This is a Hammerspoon config
 
   `<Shift-Ctrl-Cmd-W>`: Hide or minimize all windows except the active window
 
-  - This command minimizes [Alacritty](https://alacritty.org/) windows so you
+  - This command *minimizes* [Alacritty](https://alacritty.org/) windows so you
     can raise individual terminal windows without making them all visible again.
 
-  - And it'll hide all other apps' windows.
+  - And it'll *hide* all other apps' windows. (I.e., when you unhide on app's
+    window, you'll unhide all that app's hidden windows.)
 
   `<Shift-Ctrl-Cmd-T>`: Unminimize all Alacritty windows
 
-  `<Shift-Ctrl-Alt-W>`: Hide or minimize all windows
+  `<Shift-Ctrl-Alt-W>`: Hide or minimize all windows (including the active window)
 
 ### Terminal window foregrounders
 
@@ -103,7 +104,8 @@ You call that a knife? This is a Hammerspoon config
 
   `<Shift-Cmd-0>`: Bring Alacritty to front
 
-  `<Ctrl-Cmd-0>`: Open a new Terminal.app window
+  `<Ctrl-Cmd-0>`: Open a new Terminal.app window (for those rare instances
+  that you need to run or try something in the built-in macOS terminal)
 
 ### Browser foregrounders
 
