@@ -192,7 +192,7 @@ function obj:refreshChoices()
   local sorted_wins = self:pairsByKeys(
     app_windows,
     function(lhs, rhs)
-      self:cmpWindowTitles(lhs, rhs, app_windows)
+      return self:cmpWindowTitles(lhs, rhs, app_windows)
     end
   )
 
