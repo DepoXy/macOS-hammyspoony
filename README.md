@@ -134,6 +134,8 @@ You call that a knife? This is a Hammerspoon config
     by window title that you can Click, or select with Up/Down, or
     Query to open
 
+  - Download `AppWindowChooser` Spoon: [https://github.com/DepoXy/macOS-Hammyspoony/raw/release/Spoons/AppWindowChooser.spoon.zip](https://github.com/DepoXy/macOS-Hammyspoony/raw/release/Spoons/AppWindowChooser.spoon.zip)
+
 ### Application foregrounder-openers
 
   `<Cmd-F>`: Bring any Finder window to front, or open Finder
