@@ -1540,7 +1540,7 @@ end)
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- CXREF:
--- ~/.kit/mOS/macOS-Hammyspoony/Source/NeverLoseFocus.spoon/init.lua
+-- ~/.kit/mOS/macOS-Hammyspoony/Source/AppWindowChooser.spoon/init.lua
 
 local appWindowChooser = hs.loadSpoon("AppWindowChooser")
 
@@ -1654,7 +1654,7 @@ filter_attach_eventtap(chrome_filter, chrome_rwd_fwd_get_eventtap)
 -- CXREF:
 -- ~/.kit/mOS/macOS-Hammyspoony/Source/NeverLoseFocus.spoon/init.lua
 
-hs.loadSpoon("NeverLoseFocus")
+hs.loadSpoon("NeverLoseFocus"):start()
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
