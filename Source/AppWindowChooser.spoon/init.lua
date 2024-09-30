@@ -192,7 +192,7 @@ function obj:refreshChoices()
   local sorted_wins = self:pairsByKeys(
     app_windows,
     function(lhs, rhs)
-      self:cmpWindowTitles(app_windows, lhs, rhs)
+      self:cmpWindowTitles(lhs, rhs, app_windows)
     end
   )
 
@@ -205,7 +205,7 @@ function obj:refreshChoices()
   return choices
 end
 
-function obj:cmpWindowTitles(app_windows, lhs, rhs)
+function obj:cmpWindowTitles(lhs, rhs, app_windows)
   local do_sort_emoji_before_ascii = true
   -- REFER: https://www.charset.org/utf-8
   local ascii_threshold = 127
