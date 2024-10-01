@@ -174,7 +174,9 @@ function obj:mruAppsTrackUnfocused(win, app_name, event)
 
   self:debugReportApp("UNFOCUS", app_name, "200ms later", "")
 
-  local viz_wins = hs.application.get(app_name):visibleWindows()
+  local the_app = hs.application.get(app_name)
+
+  local viz_wins = the_app and the_app:visibleWindows() or {}
 
   -- IDGIT: Hammerspoon reports different numbers of #viz_wins after you
   -- close the Conole window. 10. 29. 25. 35. All over the place.
@@ -195,10 +197,12 @@ function obj:mruAppsTrackUnfocused(win, app_name, event)
     while mru_app do
       self:debugReportApp("PROBING", mru_app, "", "  ")
 
-      local focused_win = hs.application.get(mru_app):focusedWindow()
+      local the_app = hs.application.get(mru_app)
+
+      local focused_win = the_app and the_app:focusedWindow()
 
       -- TRACK: Just curious if visibleWindows XOR focusedWindow.
-      self:debugCompare_visibleWindows_And_focusedWindow(mru_app)
+      self:debugCompare_visibleWindows_And_focusedWindow(the_app)
 
       if ((focused_win == nil) or self:isAppExcluded(mru_app)) then
         table.remove(obj.mru_apps, obj.lua_array_first_element)
@@ -248,7 +252,7 @@ end
 --          even after closing the "Hammerspoon Console" window.
 
 function obj:debugReportApp(context, app_name, event, spacing)
-  local viz_wins = hs.application.get(app_name):visibleWindows()
+  local the_app = hs.application.get(app_name)
 
   local event_parenthetical = ""
   -- A Lua'ism: ~= is not equals (and not '!=', nor '<>').
@@ -257,19 +261,30 @@ function obj:debugReportApp(context, app_name, event, spacing)
   end
 
   self:debug(spacing .. context .. ": " .. app_name .. event_parenthetical)
-  self:debug(spacing .. "- #viz_wins:     " .. #viz_wins)
-  self:debug(spacing .. "- isFrontmost:   " .. hs.inspect(hs.application.get(app_name):isFrontmost()))
-  self:debug(spacing .. "- isHidden:      " .. hs.inspect(hs.application.get(app_name):isHidden()))
-  local focusedWindow = hs.application.get(app_name):focusedWindow()
-  self:debug(spacing .. "- focusedWindow: " .. (focusedWindow and focusedWindow:title() or "nil"))
+  if the_app then
+    local viz_wins = the_app:visibleWindows()
+    local isFrontmost = the_app:isFrontmost()
+    local isHidden = the_app:isHidden()
+    local focusedWindow = the_app:focusedWindow()
+    self:debug(spacing .. "- #viz_wins:     " .. #viz_wins)
+    self:debug(spacing .. "- isFrontmost:   " .. hs.inspect(isFrontmost))
+    self:debug(spacing .. "- isHidden:      " .. hs.inspect(isHidden))
+    self:debug(spacing .. "- focusedWindow: " .. (focusedWindow and focusedWindow:title() or "nil"))
+  else
+    self:debug(spacing .. "- App has since been closed")
+  end
 end
 
 -- TRACK: I had issues with visibleWindows() early in development, but I
 -- think that was before I added the 200ms sleep to mruAppsTrackUnfocused.
 -- - But I'm still curious if these 2 fcns. ever disagree.
-function obj:debugCompare_visibleWindows_And_focusedWindow(app_name)
-  local viz_wins = hs.application.get(app_name):visibleWindows()
-  local focused_win = hs.application.get(app_name):focusedWindow()
+function obj:debugCompare_visibleWindows_And_focusedWindow(the_app)
+  if not the_app then
+    return
+  end
+
+  local viz_wins = the_app:visibleWindows()
+  local focused_win = the_app:focusedWindow()
 
   if (
     ((#viz_wins == 0) and (focused_win ~= nil))
