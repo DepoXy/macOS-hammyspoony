@@ -182,8 +182,17 @@ function obj:mruAppsTrackUnfocused(win, app_name, event)
   self:debugReportApp("UNFOCUS", app_name, event, "")
 
   -- Not so fast! (See comment above.)
-  hs.timer.usleep(200000)
+  local delay_secs = 0.2
 
+  hs.timer.doAfter(
+    delay_secs,
+    function()
+      self:mruAppsTrackUnfocusedCallback(win, app_name, event)
+    end
+  )
+end
+
+function obj:mruAppsTrackUnfocusedCallback(win, app_name, event)
   self:debugReportApp("UNFOCUS", app_name, "200ms later", "")
 
   local the_app = hs.application.get(app_name)
