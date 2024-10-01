@@ -56,6 +56,18 @@
 ---
 --- Download: [https://github.com/DepoXy/macOS-Hammyspoony/raw/release/Spoons/NeverLoseFocus.spoon.zip](https://github.com/DepoXy/macOS-Hammyspoony/raw/release/Spoons/NeverLoseFocus.spoon.zip)
 
+--- DUNNO/2024-10-01: Sometimes when I open and close Chrome windows fastly,
+--- the events don't register, or visibleWindows() reports multiple when
+--- there are non, and focus won't switch.
+--- - I'm not quite sure how to fix this, other than maybe trying to listen on
+---   other or additional events (albeit looking at the list of subscribable
+---   events, I'm not sure what else I could hook, e.g., hiding an app (which
+---   should signal windowHidden) will also trigger windowUnfocused, which we
+---   listen on below).
+---   - Fortunately, if you actually linger on a window for a little before
+---     closing it (and don't open-close it immediately), this doesn't seem
+---     to happen.
+
 local obj = {}
 obj.__index = obj
 
