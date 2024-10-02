@@ -1649,6 +1649,11 @@ local chrome_filter = hs.window.filter.new("Google Chrome")
 
 filter_attach_eventtap(chrome_filter, chrome_rwd_fwd_get_eventtap)
 
+-- Not used herein, but defined for client usage.
+ignore_hotkey_chrome = function(hotkey)
+  filter_ignore_hotkey(chrome_filter, hotkey)
+end
+
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- CXREF:
