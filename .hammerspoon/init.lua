@@ -1406,8 +1406,8 @@ end
 --   Hammerspoon tap.
 
 -- Prepare GnuCash window filter.
--- - See also: gnucash_shortcuts_get_eventtap
-local gnucash_filter = hs.window.filter.new("Gnucash")
+--
+-- - See also above: gnucash_shortcuts_get_eventtap
 
 ignore_hotkey_gnucash = function(hotkey)
   filter_ignore_hotkey(gnucash_filter, hotkey)
