@@ -126,7 +126,7 @@ app_shortcuts_customize_gnucash_all () {
     "Refresh" = "^r";
     "Transfer..." = "^t";
   }'
-  # What `defaults read` reports:
+  # What `defaults read org.gnucash.Gnucash NSUserKeyEquivalents` reports:
   #   Close = "^w";
   #   "Edit Account" = "^e";
   #   "Find Account" = "^i";
