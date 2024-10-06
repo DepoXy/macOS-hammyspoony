@@ -747,9 +747,9 @@ local gnucash_shortcuts_get_eventtap = function()
       if e:getFlags():containExactly({"ctrl"}) then
         if false then
 
-        -- Gnucash > Quit Gnucash
-        elseif e:getKeyCode() == hs.keycodes.map["q"] then
-          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["q"], true)}
+        -- -- Gnucash > Quit Gnucash
+        -- elseif e:getKeyCode() == hs.keycodes.map["q"] then
+        --   return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["q"], true)}
 
         -- File > New File
         elseif e:getKeyCode() == hs.keycodes.map["n"] then

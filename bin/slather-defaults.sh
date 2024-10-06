@@ -42,7 +42,19 @@ app_shortcuts_customize_gnucash () {
 
 # So weird they don't spell it "GnuCash" in the menus (or the appname, Gnucash.app).
 app_shortcuts_customize_gnucash_menu_gnucash () {
-  echo "${CRUMB_APP_SHORTCUTS}: Gnucash.app: “Gnucash > Quit Gnucash”: Cmd-Q → Ctrl-Q"
+  # ISOFF/2024-10-05: <Cmd-Q> is not *that* difficult to press (it's not as
+  # annoying as, e.g., <Cmd-C>), and author is at least slowly relenting on
+  # the <Cmd-Q> -> <Ctrl-Q> remapping.
+  # - One issue is, while the author has similar cut-copy-paste remappings,
+  #   e.g., <Cmd-C> -> <Ctrl-C>, those are done using Karabiner Elements and
+  #   apply to all apps — so they never *don't* work.
+  #   - The <Cmd-Q> -> <Ctrl-Q> remapping, on the other hand, is done for
+  #     individual applications. And I don't always remember which apps
+  #     don't have it. And sometimes a built-in app, or a new app, will run
+  #     for some reason, and you'll have to press <Cmd-Q> anyway.
+  #
+  #  echo "${CRUMB_APP_SHORTCUTS}: Gnucash.app: “Gnucash > Quit Gnucash”: Cmd-Q → Ctrl-Q"
+  :
 }
 
 app_shortcuts_customize_gnucash_menu_file () {
@@ -101,7 +113,6 @@ app_shortcuts_customize_gnucash_all () {
   #   defaults in code, as opposed to adding the keys via System Settings
   #   and then copying `defaults read`.
   defaults write org.gnucash.Gnucash NSUserKeyEquivalents '{
-    "Quit Gnucash" = "^q";
     "New File" = "^n";
     "Open..." = "^o";
     "Save" = "^s";
@@ -124,7 +135,7 @@ app_shortcuts_customize_gnucash_all () {
   #   "Open..." = "^o";
   #   "Print Setup" = "^$p";
   #   "Print..." = "^p";
-  #   "Quit Gnucash" = "^q";
+  #   # "Quit Gnucash" = "^q";
   #   Refresh = "^r";
   #   Save = "^s";
   #   "Save As..." = "^$s";
