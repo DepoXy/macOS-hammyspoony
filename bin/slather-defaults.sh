@@ -17,6 +17,24 @@
 #   Which is local if you have DepoXy installed:
 #     ~/.depoxy/ambers/bin/onboarder/slather-defaults.sh
 
+# SAVVY: Note you cannot add additional bindings here; these bindings
+# only affect what macOS reports in the menu dropdowns.
+#
+# - REFER: Use 'accelerator-map' to change keyboard bindings
+#
+#     https://wiki.gnucash.org/wiki/Keyboard_Shortcuts
+#
+#   - You can add keybindings, or remap existing keybindings.
+#
+#   - MAYBE: We could port the Hammerspoon eventttap and remove
+#     this `defaults` script if we used 'accelerator-map' instead.
+#
+#   - CXREF: See DepoXy changes, as well as default map that ships with the app:
+#
+#     ~/.depoxy/ambers/home/Library/Application Support/GnuCash/accelerator-map
+#
+#     /Applications/Gnucash.app/Contents/Resources/share/gnucash/ui/accelerator-map-osx
+
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 # COPYD: From adjacent DepoXy project:
