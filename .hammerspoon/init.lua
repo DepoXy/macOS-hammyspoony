@@ -1921,6 +1921,27 @@ end)
 --  holdToQuit = hs.loadSpoon("HoldToQuit")
 --  holdToQuit:init()
 
+-------
+
+-- Map <Ctrl-Q> to app:kill().
+--
+-- - I.e., make <Ctrl-Q> like <Cmd-Q>, for my Linux-addled brain.
+--
+-- SAVVY: Note that sending key stroke doesn't seem to work, at least not in
+-- any app I've tried (incl. "System Settings", "LibreOffice", and "Meld").
+--
+-- - E.g., this doesn't have any effect:
+--
+--     hs.eventtap.keyStroke({"cmd"}, "Q")
+--
+-- So kill instead, which "tries to terminate the app gracefully".
+
+local cmd_q = hs.hotkey.bind({"ctrl"}, "Q", function()
+  local app = hs.application.frontmostApplication()
+
+  app:kill()
+end)
+
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- Load optional configs.
