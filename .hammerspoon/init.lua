@@ -1405,6 +1405,14 @@ end
 --   both NSUserKeyEquivalent and an eventtap, so the UX reflects the
 --   Hammerspoon tap.
 
+-- Prepare an Adobe Acrobat Reader window filter and hotkey subscriber.
+-- - Not used herein but used by some client-hs.lua, so defined here.
+local acrobat_reader_filter = hs.window.filter.new("Acrobat Reader")
+
+ignore_hotkey_acrobat_reader = function(hotkey)
+  filter_ignore_hotkey(acrobat_reader_filter, hotkey)
+end
+
 -- Prepare GnuCash window filter.
 --
 -- - See also above: gnucash_shortcuts_get_eventtap
