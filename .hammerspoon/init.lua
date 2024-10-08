@@ -1506,6 +1506,16 @@ hs.hotkey.bind({"shift", "ctrl", "cmd"}, "X", function()
   hs.application.launchOrFocus("Spotify")
 end)
 
+-------
+
+-- LibreOffice foregrounder/opener
+-- - Mnemonic: *Edit* (I know, "edit" could mean so many things! Esp. text "editor").
+
+-- BNDNG: <Shift-Ctrl-Cmd-E>
+hs.hotkey.bind({"shift", "ctrl", "cmd"}, "E", function()
+  hs.application.launchOrFocus("LibreOffice")
+end)
+
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- <Cmd-Minus> — Put YYYY-MM-DD into clipboard.
