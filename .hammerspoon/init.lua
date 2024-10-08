@@ -1080,7 +1080,7 @@ make_new_chrome_window = function(profile)
 end
 
 -- BNDNG: <Cmd-T>
-hs.hotkey.bind({"cmd"}, "T", function()
+local cmd_t = hs.hotkey.bind({"cmd"}, "T", function()
   make_new_chrome_window("Default")
 end)
 
@@ -1412,6 +1412,15 @@ local acrobat_reader_filter = hs.window.filter.new("Acrobat Reader")
 ignore_hotkey_acrobat_reader = function(hotkey)
   filter_ignore_hotkey(acrobat_reader_filter, hotkey)
 end
+
+-- Prepare a GIMP window filter and hotkey subscriber.
+local gimp_filter = hs.window.filter.new("GIMP")
+
+ignore_hotkey_gimp = function(hotkey)
+  filter_ignore_hotkey(gimp_filter, hotkey)
+end
+
+ignore_hotkey_gimp(cmd_t)
 
 -- Prepare GnuCash window filter.
 --
