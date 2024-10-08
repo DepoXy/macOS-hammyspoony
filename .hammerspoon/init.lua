@@ -1091,7 +1091,7 @@ end)
 --   app but won't actually show any window.
 
 -- BNDNG: <Shift-Cmd-T>
-shift_cmd_t = hs.hotkey.bind({"shift", "cmd"}, "T", function()
+local shift_cmd_t = hs.hotkey.bind({"shift", "cmd"}, "T", function()
   local chrome_app = hs.application.get("Google Chrome")
 
   if not chrome_app then
