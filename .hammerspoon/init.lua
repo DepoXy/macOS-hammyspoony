@@ -1901,7 +1901,9 @@ end)
 -------
 
 -- Hold <Cmd-Q> to quit apps.
---  ~/.kit/mOS/hammerspoons/Source/HoldToQuit.spoon/init.lua
+--
+-- - CXREF:
+--   ~/.kit/mOS/hammerspoons/Source/HoldToQuit.spoon/init.lua
 --
 -- - I did not test... but I might if I find myself quiting
 --   apps unexpectedly/accidentally.
