@@ -215,8 +215,8 @@ function obj:cmpWindowTitles(lhs, rhs, app_windows)
 
   -- REFER: UTF-8 Support
   --   https://www.lua.org/manual/5.4/manual.html#6.5
-  local lhs_is_emoji = utf8.codepoint(lhs_lower) > ascii_threshold
-  local rhs_is_emoji = utf8.codepoint(rhs_lower) > ascii_threshold
+  local lhs_is_emoji = lhs_lower ~= "" and utf8.codepoint(lhs_lower) > ascii_threshold
+  local rhs_is_emoji = rhs_lower ~= "" and utf8.codepoint(rhs_lower) > ascii_threshold
 
   if lhs_is_emoji and not rhs_is_emoji then
     return do_sort_emoji_before_ascii
