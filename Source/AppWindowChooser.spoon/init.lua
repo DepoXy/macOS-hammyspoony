@@ -187,6 +187,13 @@ function obj:refreshChoices()
 
   local app = hs.application.get(self.appName)
 
+  if not app then
+
+    return nil
+  end
+
+  self:cacheAppIcon(app)
+
   local app_windows = app:allWindows()
 
   local sorted_wins = self:pairsByKeys(
@@ -304,6 +311,12 @@ function obj:toggleChooser()
     --   to pre-process choices.
     local choices = self:refreshChoices()
 
+    if not choices then
+      hs.alert.show(self.appName .. " is not running")
+
+      return
+    end
+
     -- Without measuring *your* screen, 30 or more is generally too many
     -- (given a 1440-tall display, i.e., 2560x1440).
     -- - Defaults to '10':
@@ -349,6 +362,12 @@ function obj:bindHotkeys(mapping)
   end
 end
 
+function obj:cacheAppIcon(app)
+  if not self.appIcon and app then
+    self.appIcon = hs.image.imageFromAppBundle(app:bundleID())
+  end
+end
+
 --- AppWindowChooser:start()
 --- Method
 --- "Starts" the Spoon.
@@ -375,9 +394,7 @@ function obj:start()
   -- - MAYBE: Adjust this based on user's display size.
   self.winChooser:width(27.0)
 
-  local app = hs.application.get(self.appName)
-
-  self.appIcon = hs.image.imageFromAppBundle(app:bundleID())
+  self.appIcon = nil
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
