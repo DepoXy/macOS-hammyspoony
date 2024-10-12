@@ -67,8 +67,8 @@
 
 package.path = package.path .. ";" .. os.getenv("HOME") .. "/.kit/mOS/hammerspoons/Source/?.spoon/init.lua"
 
--- CXREF: Currently just this one Spoon, but the rest of this file
---        will ideally be promoted to their own Spoons:
+-- CXREF: Author is gradually promoting features below to their own Spoons:
+--   ~/.kit/mOS/macOS-Hammyspoony/Source/AppWindowChooser.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/NeverLoseFocus.spoon/init.lua
 package.path = package.path .. ";" .. os.getenv("HOME") .. "/.kit/mOS/macOS-Hammyspoony/Source/?.spoon/init.lua"
 
