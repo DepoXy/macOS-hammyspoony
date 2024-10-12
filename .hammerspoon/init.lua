@@ -70,6 +70,7 @@ package.path = package.path .. ";" .. os.getenv("HOME") .. "/.kit/mOS/hammerspoo
 -- CXREF: Author is gradually promoting features below to their own Spoons:
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/AppWindowChooser.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/LinuxlikeCutCopyPaste.spoon/init.lua
+--   ~/.kit/mOS/macOS-Hammyspoony/Source/MinimizeAndHideWindows.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/NeverLoseFocus.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/TableUtils.spoon/init.lua
 package.path = package.path .. ";" .. os.getenv("HOME") .. "/.kit/mOS/macOS-Hammyspoony/Source/?.spoon/init.lua"
@@ -174,173 +175,19 @@ local tableUtils = hs.loadSpoon("TableUtils")
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
--- Hide or Minimize all but the frontmost window.
---
--- - This function minimizes Alacritty windows,
---   then it hides all other windows, and then
---   finally it brings back the original window.
---
--- - We minimize Alacritty windows so that bringing one back into
---   focus doesn't make them all visible.
---
---   - When you *hide* an application's windows, bringing just one
---     of those windows back into focus will make all of its hidden
---     windows visible.
---
---   - But if we *minimize* an application's windows instead,
---     we can focus just one of those windows with unminimizing
---     them all.
---
--- - Note the odd behavior here:
---
---   - macOS supports an easy way to *hide* all windows using
---     AppleScript, e.g.,
---
---       tell application "System Events"
---         set visible of processes where name is not "Finder" to false
---       end tell
---
---   - But there is no similar mechanism to *minimize* windows.
---
---     In fact, AFAIK, you have to simulate a mouse click on the minimize
---     button, e.g.,
---
---       -- So slow! Minimizes one-by-one, waiting for animation on each.
---       tell application "System Events"
---         repeat with theProcess in processes
---           if not background only of theProcess then
---             try
---               click (first button of (every window of (theProcess)) whose role description contains "minimize")
---             end try
---           end if
---         end repeat
---       end tell
---
---     Note that using hs.window:minimize is similarly slow, e.g.,
---
---       hs.hotkey.bind({"shift", "ctrl", "cmd"}, "W", function()
---         local front_win = hs.window.frontmostWindow()
---         local visible_wins = hs.window.visibleWindows()
---         for key in pairs(visible_wins) do
---           local visible_win = visible_wins[key]
---           if visible_win ~= front_win then
---             visible_win:minimize()
---           end
---         end
---       end)
---
---    - Because of this, and because you cannot disable the minimize
---      animation (though you can choose the Scale Effect, which is
---      slightly faster than the Genie Effect), the minimize operation
---      is somewhat slow.
---
---      - You'll watch as each Alacritty window is minimized one-by-one!
---
---    - (I also tried variations of `set miniaturized of windows to true`,
---      but I couldn't get `set miniaturized` to work.)
---
--- - Note there's a Hammerspoon animation duration setting, e.g.,
---
---     -- Defaults to 0.2.
---     hs.window.animationDuration = 0
---
---   - But this is for Hammerspoon animations only (like move, setFrame).
---   - Unfortunately, macOS controls minimize/unminimize animations,
---     which cannot be disabled.
---     - Although during testing, every once in a while, minimizing or
---       unminimized all Alacritty windows happens instantaneously,
---       but this rarely happens and seems unpredictable.
+-- CXREF:
+-- ~/.kit/mOS/macOS-Hammyspoony/Source/MinimizeAndHideWindows.spoon/init.lua
 
--- - We don't similarly minimize browser windows because of a particular
---   workflow the author uses: I like to minimize long-running Chrome
---   windows (one for Gmail and Calendar tabs, one for chat tabs, one
---   for radio and music tabs, one for Sheets tabs, etc.). And I like
---   to keep short-lived windows visible (e.g., something I just
---   googled, or Stack Overflow tabs, etc.). This ensures I close
---   browser windows I no longer need. Especially because macOS will
---   front another visible browser window after closing a window (and
---   not return you the app you Alt-Tabbed from, e.g., if I Alt-Tab
---   from GVim to Chrome, and then close the Chrome window, rather
---   than returning focus to the GVim window (as you'd expect on
---   most Linux desktops, or Windows), macOS will front another
---   visible Chrome window). So here we choose to hide, not minimize,
---   Chrome windows, to keep all the short-living windows together,
---   and so that bringing one back into focus will also make the
---   other short-living windows visible.
+local minimizeAndHideWindows = hs.loadSpoon("MinimizeAndHideWindows")
 
--- Minimize each Alacritty window, then hide all other windows.
--- - The idea here is to minimize Alacritty windows so that the
---   <Cmd-1>, <Cmd-2>, etc. bindings raise and show a *single*
---   Alacritty window. Because without *minimizing* them first —
---   that is, if we just *hide* them all — then raising just one
---   window (i.e., <Cmd-1>) *shows them all*.
---   - Note that the <Cmd-1>, <Cmd-2>, etc., bindings are currently
---     managed by the `skhdrc` config:
---       https://github.com/DepoXy/macOS-skhibidirc#👤
---     Though we might someday relocate them to macOS-Hammyspoony.
--- - Note that we don't do this for Chrome windows for a specific
---   workflow, as discussed above.
---  - SAVVY: You can click an app icon in the Dock to re-raise
---    hidden (but not minimized) windows.
---    - This is useful for showing all the Chrome windows hidden
---      by this action.
---    - DUNNO: You can click the Chrome icon in the Dock to raise
---      the Chromes windows that were hidden — but it also raises
---      (almost always, but not always, like 90% of the time) *one*
---      of the minimized windows!
---      - And it's always the same window for me, regardless of
---        alphabetical title order, or which window I minimized
---        first, or last; like I don't get *why* this particular
---        minimized window is always raised and not any other!
---      - (If macOS window management just behaved in a predicatable
---        manner, maybe I wouldn't have to write such long-winded
---        comments! =)
+minimizeAndHideWindows:bindHotkeys({
+  -- BNDNG: <Shift-Ctrl-Cmd-W>
+  allButFrontmost={{"shift", "ctrl", "cmd"}, "W"},
+  -- BNDNG: <Shift-Ctrl-Alt-W>
+  allWindows={{"shift", "ctrl", "alt"}, "W"},
+})
 
--- ALTLY: See also macOS <Cmd-Alt-h>, which hides all *other* app windows.
-
--- BNDNG: <Shift-Ctrl-Cmd-W>
-hs.hotkey.bind({"shift", "ctrl", "cmd"}, "W", function()
-  local front_win = hs.window.frontmostWindow()
-
-  -- Minimize Alacritty windows first.
-  -- - Note that I tried calling minimize from the task callback,
-  --   but I couldn't get it to work. My hope was to minimize
-  --   hidden windows so user didn't have to see all the animation
-  --   happening. Oh, well.
-  app_wins = hs.application.get("Alacritty"):allWindows()
-  for key, _ in pairs(app_wins) do
-    local app_win = app_wins[key]
-    app_win:minimize()
-  end
-
-  -- ALTLY: hs.osascript.applescriptFromFile(fileName)
-  local task = hs.task.new(
-    "/usr/bin/osascript",
-    -- Wait until the script finishes, then re-raise what was the active window
-    -- Note this may unhide the frontmost window's app's other windows, too.
-    -- - E.g., if a Chrome window is active, showing it later will make
-    --   other hidden Chrome windows visible.
-    -- - But if you run this command on GVim or Alacritty, it'll hide or
-    --   minimize all other windows, and then only one window will be
-    --   visible at the end.
-    function()
-      front_win:raise():focus()
-    end,
-    { os.getenv("HOME") .. "/.kit/mOS/macOS-Hammyspoony/lib/hide-all-windows.osa" }
-  )
-  task:start()
-end)
-
--- ***
-
--- BNDNG: <Shift-Ctrl-Alt-W>
-hs.hotkey.bind({"shift", "ctrl", "alt"}, "W", function()
-  hide_osa = os.getenv("HOME") .. "/.kit/mOS/macOS-Hammyspoony/lib/hide-all-windows.osa"
-
-  hs.osascript.applescriptFromFile(hide_osa)
-end)
-
--- ***
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- Unminimize all Alacritty windows.
 -- - DUNNO: When I first tested this, it was fast, like, it would
