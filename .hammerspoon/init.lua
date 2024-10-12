@@ -116,12 +116,12 @@ package.path = package.path .. ";" .. os.getenv("HOME") .. "/.kit/mOS/macOS-Hamm
 --     git-put-wise to make a "PRIVATE" commit that modifies these paths.
 
 -- See the bottom of this file for where we load the DepoXy and Client configs.
-hmy_cfg_dir = os.getenv("HOME") .. "/.kit/mOS/macOS-Hammyspoony/.hammerspoon"
-hmy_spn_dir = os.getenv("HOME") .. "/.kit/mOS/macOS-Hammyspoony/Source"
-dxy_cfg_dir = os.getenv("HOME") .. "/.depoxy/ambers/home/.hammerspoon"
-dxc_cfg_dir = os.getenv("HOME") .. "/.depoxy/running/home/.hammerspoon"
+local hmy_cfg_dir = os.getenv("HOME") .. "/.kit/mOS/macOS-Hammyspoony/.hammerspoon"
+local hmy_spn_dir = os.getenv("HOME") .. "/.kit/mOS/macOS-Hammyspoony/Source"
+local dxy_cfg_dir = os.getenv("HOME") .. "/.depoxy/ambers/home/.hammerspoon"
+local dxc_cfg_dir = os.getenv("HOME") .. "/.depoxy/running/home/.hammerspoon"
 
-reloadConfig = hs.loadSpoon("ReloadConfiguration")
+local reloadConfig = hs.loadSpoon("ReloadConfiguration")
 reloadConfig.watch_paths = {
   hs.configdir,
   hmy_cfg_dir,
