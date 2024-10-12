@@ -1459,14 +1459,22 @@ end)
 --
 -- - I.e., make <Ctrl-Q> like <Cmd-Q>, for my Linux-addled brain.
 --
--- SAVVY: Note that sending key stroke doesn't seem to work, at least not in
--- any app I've tried (incl. "System Settings", "LibreOffice", and "Meld").
+-- SAVVY: Note that sending key stroke doesn't work without the app,
+--        e.g., this doesn't have any effect:
 --
--- - E.g., this doesn't have any effect:
+--          hs.eventtap.keyStroke({"cmd"}, "Q")
 --
---     hs.eventtap.keyStroke({"cmd"}, "Q")
+--        - But this works:
 --
--- So kill instead, which "tries to terminate the app gracefully".
+--          hs.eventtap.keyStroke({"cmd"}, "Q", app)
+--
+--        So where does Hammerspoon send the key stroke if no app
+--        is specified? (I don't know and I don't really care.)
+--
+-- In any case, we'll be pedantic and kill, which
+-- "tries to terminate the app gracefully".
+--
+-- - I.e., <Ctrl-Q> always kills the active app, regardless...
 
 local cmd_q = hs.hotkey.bind({"ctrl"}, "Q", function()
   local app = hs.application.frontmostApplication()
