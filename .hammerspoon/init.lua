@@ -1475,11 +1475,19 @@ end)
 -- "tries to terminate the app gracefully".
 --
 -- - I.e., <Ctrl-Q> always kills the active app, regardless...
+local inhibitCtrlQBinding = {
+  ["MacVim"] = true,
+}
 
 local cmd_q = hs.hotkey.bind({"ctrl"}, "Q", function()
   local app = hs.application.frontmostApplication()
 
-  app:kill()
+  if not inhibitCtrlQBinding[app:name()] then
+    -- CALSO: app:kill()
+    hs.eventtap.keyStroke({"cmd"}, "Q", app)
+  else
+    hs.eventtap.keyStroke({"ctrl"}, "Q", app)
+  end
 end)
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
