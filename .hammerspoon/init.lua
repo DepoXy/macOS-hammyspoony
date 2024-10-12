@@ -70,6 +70,7 @@ package.path = package.path .. ";" .. os.getenv("HOME") .. "/.kit/mOS/hammerspoo
 -- CXREF: Author is gradually promoting features below to their own Spoons:
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/AppWindowChooser.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/NeverLoseFocus.spoon/init.lua
+--   ~/.kit/mOS/macOS-Hammyspoony/Source/TableUtils.spoon/init.lua
 package.path = package.path .. ";" .. os.getenv("HOME") .. "/.kit/mOS/macOS-Hammyspoony/Source/?.spoon/init.lua"
 
 -------
@@ -165,23 +166,10 @@ reloadConfig:start()
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
--- USAGE: Use in debug/trace output to pry table keys (see usages below).
--- - Not used "in production" and would ideally be commented but for Devs:
---   Whenever author uncomments trace code that calls it, and then its absense
---   silently breaks bindings, I get annoyed. So leaving live. Live with it.
---   ("Silently": Keybinding press no-ops, but Hammerspoon Console shows err.)
-tableJoin = function(table, sep)
-  local keys = ""
+-- CXREF:
+-- ~/.kit/mOS/macOS-Hammyspoony/Source/TableUtils.spoon/init.lua
 
-  for k, _ in pairs(table) do
-    if keys ~= "" then
-      keys = keys .. sep
-    end
-    keys = keys .. k
-  end
-
-  return keys
-end
+local tableUtils = hs.loadSpoon("TableUtils")
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
@@ -741,10 +729,10 @@ local gnucash_shortcuts_get_eventtap = function()
   return hs.eventtap.new(
     {hs.eventtap.event.types.keyDown},
     function(e)
-      -- USAGE: Uncomment to debug/pry (also tableJoin def, above):
+      -- USAGE: Uncomment to debug/pry:
       --    local unmodified = false
       --    hs.alert.show("CHARS: " .. e:getCharacters(unmodified))
-      --    hs.alert.show("FLAGS: " .. tableJoin(e:getFlags(), ", "))
+      --    hs.alert.show("FLAGS: " .. tableUtils:tableJoin(e:getFlags(), ", "))
 
       -- For each menu item, returns true to delete original event,
       -- followed by the new event.
@@ -828,10 +816,10 @@ local slack_shortcuts_get_eventtap = function()
   return hs.eventtap.new(
     {hs.eventtap.event.types.keyDown},
     function(e)
-      -- USAGE: Uncomment to debug/pry (also tableJoin def, above):
+      -- USAGE: Uncomment to debug/pry:
          --   local unmodified = false
          --   hs.alert.show("CHARS: " .. e:getCharacters(unmodified))
-         --   hs.alert.show("FLAGS: " .. tableJoin(e:getFlags(), ", "))
+         --   hs.alert.show("FLAGS: " .. tableUtils:tableJoin(e:getFlags(), ", "))
          --   hs.alert.show("KEYCD: " .. e:getKeyCode())
       -- For each menu item, returns true to delete original event,
       -- followed by the new event.
@@ -1624,10 +1612,10 @@ local chrome_rwd_fwd_get_eventtap = function()
   return hs.eventtap.new(
     {hs.eventtap.event.types.keyDown},
     function(e)
-      -- USAGE: Uncomment to debug/pry (also tableJoin def, above):
+      -- USAGE: Uncomment to debug/pry:
       --   local unmodified = false
       --   hs.alert.show("CHARS: " .. e:getCharacters(unmodified))
-      --   hs.alert.show("FLAGS: " .. tableJoin(e:getFlags(), ", "))
+      --   hs.alert.show("FLAGS: " .. tableUtils:tableJoin(e:getFlags(), ", "))
       -- Note that modifiers includes "fn" when arrow key pressed.
       -- Note if you have KE swapping bindings, to you this is "alt", not "ctrl",
       -- i.e., <Alt-Left>/<Alt-Right>
