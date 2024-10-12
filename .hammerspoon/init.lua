@@ -43,6 +43,10 @@
 -- - Lua PIL:
 --
 --     https://www.lua.org/pil/contents.html
+--
+-- - *Understanding Lua's tables*
+--
+--    https://stackoverflow.com/a/73445264
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
