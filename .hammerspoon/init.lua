@@ -69,6 +69,7 @@ package.path = package.path .. ";" .. os.getenv("HOME") .. "/.kit/mOS/hammerspoo
 
 -- CXREF: Author is gradually promoting features below to their own Spoons:
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/AppWindowChooser.spoon/init.lua
+--   ~/.kit/mOS/macOS-Hammyspoony/Source/LinuxlikeCutCopyPaste.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/NeverLoseFocus.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/TableUtils.spoon/init.lua
 package.path = package.path .. ";" .. os.getenv("HOME") .. "/.kit/mOS/macOS-Hammyspoony/Source/?.spoon/init.lua"
@@ -1933,6 +1934,16 @@ local cmd_q = hs.hotkey.bind({"ctrl"}, "Q", function()
 
   app:kill()
 end)
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+-- Wire Cut, Copy, Paste, and Select All accelerator aliases
+-- from <Ctrl>.
+
+-- CXREF:
+-- ~/.kit/mOS/macOS-Hammyspoony/Source/LinuxlikeCutCopyPaste.spoon/init.lua
+
+hs.loadSpoon("LinuxlikeCutCopyPaste"):start()
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
