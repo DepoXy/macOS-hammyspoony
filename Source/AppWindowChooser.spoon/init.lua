@@ -134,6 +134,8 @@ obj.key_show_chooser = nil
 -- USAGE: Set the appName to what you want. Defaults Chrome.
 obj.appName = "Google Chrome"
 
+obj.maxTitleLength = 70
+
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- Sort table by object attribute.
@@ -246,8 +248,6 @@ end
 --   - Remove common window postfix.
 --   - Truncate if longer than some length.
 function obj:prepareTitle(title)
-  local too_long = 80
-
   -- Strip " - Google Chrome - <User>" postfix.
   -- REFER: Lua 20.2 — Patterns: https://www.lua.org/pil/20.2.html
   title = title:gsub(" %- Google Chrome %- .*", "")
@@ -256,8 +256,8 @@ function obj:prepareTitle(title)
   -- - Otherwise it'll wrap around and enlarge the item's icon image.
   local _, title_len = title:gsub(".", "")
 
-  if title_len > too_long then
-    title = title:sub(1, too_long) .. "…"
+  if title_len > self.maxTitleLength then
+    title = title:sub(1, self.maxTitleLength) .. "…"
   end
 
   return title
