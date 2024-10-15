@@ -98,9 +98,6 @@ package.path = package.path .. ";" .. os.getenv("HOME") .. "/.kit/mOS/macOS-Hamm
 
 -- Hot-reload config file changes using ReloadConfiguration Spoon.
 --
--- - CXREF:
---   ~/.kit/mOS/hammerspoons/Source/ReloadConfiguration.spoon/init.lua
---
 -- Note this won't reload a symlimk (which is what DepoXy creates at
 -- ~/.hammerspoon/init.lua) so we plumb all the directory paths to watch.
 --
@@ -125,6 +122,9 @@ local hmy_cfg_dir = os.getenv("HOME") .. "/.kit/mOS/macOS-Hammyspoony/.hammerspo
 local hmy_spn_dir = os.getenv("HOME") .. "/.kit/mOS/macOS-Hammyspoony/Source"
 local dxy_cfg_dir = os.getenv("HOME") .. "/.depoxy/ambers/home/.hammerspoon"
 local dxc_cfg_dir = os.getenv("HOME") .. "/.depoxy/running/home/.hammerspoon"
+
+-- CXREF:
+-- ~/.kit/mOS/hammerspoons/Source/ReloadConfiguration.spoon/init.lua
 
 local reloadConfig = hs.loadSpoon("ReloadConfiguration")
 reloadConfig.watch_paths = {
