@@ -67,14 +67,25 @@
 
 package.path = package.path .. ";" .. os.getenv("HOME") .. "/.kit/mOS/hammerspoons/Source/?.spoon/init.lua"
 
--- CXREF: Author is gradually promoting features below to their own Spoons:
---   ~/.kit/mOS/macOS-Hammyspoony/Source/AlacrittyAndTerminalConveniences.spoon/init.lua
+-- CXREF: For reusability, this core init.lua is mostly limited to defining
+-- the keybindings, while most of the relevant functionality is implemented
+-- by these individual Spoons:
+--   ~/.kit/mOS/macOS-Hammyspoony/Source/AppTapAttach.spoon/init.lua
+--   ~/.kit/mOS/macOS-Hammyspoony/Source/AppTapChrome.spoon/init.lua
+--   ~/.kit/mOS/macOS-Hammyspoony/Source/AppTapGnucash.spoon/init.lua
+--   ~/.kit/mOS/macOS-Hammyspoony/Source/AppTapLibreoffice.spoon/init.lua
+--   ~/.kit/mOS/macOS-Hammyspoony/Source/AppTapSlack.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/AppWindowChooser.spoon/init.lua
+--   ~/.kit/mOS/macOS-Hammyspoony/Source/BrowserWindowFronters.spoon/init.lua
+--   ~/.kit/mOS/macOS-Hammyspoony/Source/DateTimeSnips.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/FrillsAlacrittyAndTerminal.spoon/init.lua
+--   ~/.kit/mOS/macOS-Hammyspoony/Source/FrillsChrome.spoon/init.lua
+--   ~/.kit/mOS/macOS-Hammyspoony/Source/KillTrepidation.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/LinuxlikeCutCopyPaste.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/MinimizeAndHideWindows.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/NeverLoseFocus.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/TableUtils.spoon/init.lua
+--   ~/.kit/mOS/macOS-Hammyspoony/Source/URISetFrontmost.spoon/init.lua
 package.path = package.path .. ";" .. os.getenv("HOME") .. "/.kit/mOS/macOS-Hammyspoony/Source/?.spoon/init.lua"
 
 -------
@@ -160,6 +171,9 @@ minimizeAndHideWindows:bindHotkeys({
   allWindows={{"shift", "ctrl", "alt"}, "W"},
 })
 
+-- local shift_ctrl_cmd_w = minimizeAndHideWindows.keyAllButFrontmost
+-- local shift_ctrl_alt_w = minimizeAndHideWindows.keyAllWindows
+
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- CXREF:
@@ -180,675 +194,96 @@ frillsAlacrittyAndTerminal:bindHotkeys({
   terminalNewWindow={{"ctrl", "cmd"}, "0"},
 })
 
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-
-filter_attach_eventtap = function(win_filter, get_eventtap)
-  local eventtap
-  local prev_app_name
-
-  win_filter
-    -- Callback receives 3 parameters:
-    --   hs.window                            [object]
-    --   window:application():name()          [string]
-    --   hs.window.filter.window(Unf|F)ocused [string]
-    :subscribe(hs.window.filter.windowFocused, function(win, app_name)
-      -- Enable eventtap in app
-
-      -- - SAVVY: HMS calls windowFocused again for current app when app
-      --   opens a new window.
-      --   - E.g., when user <C-O> Opens file-finder, or opens new browser
-      --     window, etc., this event is sent.
-      --   - I.e., windowFocused and windowUnfocused events are not 1:1.
-      --   - So track current application.
-      --   - This avoids runnning multiple eventtap's, and avoids losing
-      --     track of one eventtap, which then continues to run and to
-      --     change events *for other apps.*
-      if app_name == prev_app_name then
-
-        return
-      end
-      prev_app_name = app_name
-      if eventtap then
-        -- This is unexpected
-        hs.alert.show("GAFFE: Unexpected path: filter_attach_eventtap")
-
-        return
-      end
-
-      eventtap = get_eventtap()
-      eventtap:start()
-    end)
-    :subscribe(hs.window.filter.windowUnfocused, function()
-      -- Disable eventtap when focusing out of app
-      prev_app_name = nil
-      if eventtap then
-        eventtap:stop()
-        eventtap = nil
-      end
-    end)
-end
-
--------
-
--- SAVVY: This tedious menu shortcut remapping because
--- GnuCash ignores the normal Keyboard Shortcuts you'd
--- otherwise manage from System Settings, i.e.,
---   defaults write org.gnucash.Gnucash NSUserKeyEquivalents '{ ... }'
--- doesn't change anything.
-
-local gnucash_shortcuts_get_eventtap = function()
-  return hs.eventtap.new(
-    {hs.eventtap.event.types.keyDown},
-    function(e)
-      -- USAGE: Uncomment to debug/pry:
-      --    local unmodified = false
-      --    hs.alert.show("CHARS: " .. e:getCharacters(unmodified))
-      --    hs.alert.show("FLAGS: " .. tableUtils:tableJoin(e:getFlags(), ", "))
-
-      -- For each menu item, returns true to delete original event,
-      -- followed by the new event.
-      if e:getFlags():containExactly({"ctrl"}) then
-        if false then
-
-        -- -- Gnucash > Quit Gnucash
-        -- elseif e:getKeyCode() == hs.keycodes.map["q"] then
-        --   return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["q"], true)}
-
-        -- File > New File
-        elseif e:getKeyCode() == hs.keycodes.map["n"] then
-          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["n"], true)}
-
-        -- File > Open...
-        elseif e:getKeyCode() == hs.keycodes.map["o"] then
-          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["o"], true)}
-
-        -- File > Save
-        elseif e:getKeyCode() == hs.keycodes.map["s"] then
-          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["s"], true)}
-
-        -- File > "Print...
-        elseif e:getKeyCode() == hs.keycodes.map["p"] then
-          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["p"], true)}
-
-        -- File > Close
-        elseif e:getKeyCode() == hs.keycodes.map["w"] then
-          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["w"], true)}
-
-        -- Edit > Edit Account
-        elseif e:getKeyCode() == hs.keycodes.map["e"] then
-          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["e"], true)}
-
-        -- Edit > Find Account
-        elseif e:getKeyCode() == hs.keycodes.map["i"] then
-          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["i"], true)}
-
-        -- Edit > Find ...
-        elseif e:getKeyCode() == hs.keycodes.map["f"] then
-          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["f"], true)}
-
-        -- View > Refresh
-        elseif e:getKeyCode() == hs.keycodes.map["r"] then
-          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["r"], true)}
-
-        -- Action > Transfer...
-        elseif e:getKeyCode() == hs.keycodes.map["t"] then
-          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["t"], true)}
-
-        end
-      elseif e:getFlags():containExactly({"shift", "ctrl"}) then
-        if false then
-
-        -- File > Save As...
-        elseif e:getKeyCode() == hs.keycodes.map["s"] then
-          return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["s"], true)}
-
-        -- File > Print Setup
-        elseif e:getKeyCode() == hs.keycodes.map["p"] then
-          return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["p"], true)}
-
-        end
-      end
-
-      -- Return false to propagate event.
-      return false
-    end
-  )
-end
-
--- SAVVY: First arg to new() is Application name, which is
--- "Gnucash", and not window title name, which says "GnuCash".
-local gnucash_filter = hs.window.filter.new("Gnucash")
-
-filter_attach_eventtap(gnucash_filter, gnucash_shortcuts_get_eventtap)
+-- local shift_ctrl_cmd_0 = frillsAlacrittyAndTerminal.keyUnminimzeAllAlacrittyWindows
+-- local cmd_1 = frillsAlacrittyAndTerminal.keysAlacrittyWindowFronters1Through9[1]
+-- local cmd_2 = frillsAlacrittyAndTerminal.keysAlacrittyWindowFronters1Through9[2]
+-- local cmd_3 = frillsAlacrittyAndTerminal.keysAlacrittyWindowFronters1Through9[3]
+-- local cmd_4 = frillsAlacrittyAndTerminal.keysAlacrittyWindowFronters1Through9[4]
+-- local cmd_5 = frillsAlacrittyAndTerminal.keysAlacrittyWindowFronters1Through9[5]
+-- local cmd_6 = frillsAlacrittyAndTerminal.keysAlacrittyWindowFronters1Through9[6]
+-- local cmd_7 = frillsAlacrittyAndTerminal.keysAlacrittyWindowFronters1Through9[7]
+-- local cmd_8 = frillsAlacrittyAndTerminal.keysAlacrittyWindowFronters1Through9[8]
+-- local cmd_9 = frillsAlacrittyAndTerminal.keysAlacrittyWindowFronters1Through9[9]
+local cmd_0 = frillsAlacrittyAndTerminal.keyAlacrittyNewWindow
+-- local shift_cmd_0 = frillsAlacrittyAndTerminal.keyAlacrittyForegrounderOpener
+-- local ctrl_cmd_0 = frillsAlacrittyAndTerminal.keyTerminalNewWindow
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
-local slack_shortcuts_get_eventtap = function()
-  return hs.eventtap.new(
-    {hs.eventtap.event.types.keyDown},
-    function(e)
-      -- USAGE: Uncomment to debug/pry:
-         --   local unmodified = false
-         --   hs.alert.show("CHARS: " .. e:getCharacters(unmodified))
-         --   hs.alert.show("FLAGS: " .. tableUtils:tableJoin(e:getFlags(), ", "))
-         --   hs.alert.show("KEYCD: " .. e:getKeyCode())
-      -- For each menu item, returns true to delete original event,
-      -- followed by the new event.
-      if e:getFlags():containExactly({"ctrl"}) then
-        if false then
-
-        -- *** Slack
-
-        -- Slack > Quit Slack
-        elseif e:getKeyCode() == hs.keycodes.map["q"] then
-          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["q"], true)}
-
-        -- *** File
-
-        -- File > New Message
-        elseif e:getKeyCode() == hs.keycodes.map["n"] then
-          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["n"], true)}
-
-        -- *** Edit
-
-        -- Edit > Undo
-        elseif e:getKeyCode() == hs.keycodes.map["z"] then
-          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["z"], true)}
-
-        -- CXREF: Cut/Copy/Paste/Select All done via KE:
-        --   https://github.com/DepoXy/Karabiner-Elephants#🐘
-        --     ~/.kit/mOS/Karabiner-Elephants/complex_modifications/0150-system-cmd-2-ctl-cxva.json
-        --
-        -- -- Edit > Cut
-        -- elseif e:getKeyCode() == hs.keycodes.map["x"] then
-        --   return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["x"], true)}
-        --
-        -- -- Edit > Copy
-        -- elseif e:getKeyCode() == hs.keycodes.map["c"] then
-        --   return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["c"], true)}
-        --
-        -- -- Edit > Paste
-        -- elseif e:getKeyCode() == hs.keycodes.map["v"] then
-        --   return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["v"], true)}
-        --
-        -- -- Edit > Select All
-        -- elseif e:getKeyCode() == hs.keycodes.map["a"] then
-        --   return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["a"], true)}
-
-        -- Edit > Search
-        elseif e:getKeyCode() == hs.keycodes.map["g"] then
-          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["g"], true)}
-
-        -- Edit > Find...
-        elseif e:getKeyCode() == hs.keycodes.map["f"] then
-          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["f"], true)}
-
-        -- *** View
-
-        -- View > Reload
-        elseif e:getKeyCode() == hs.keycodes.map["r"] then
-          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["r"], true)}
-
-        -- View > Actual Size
-        elseif e:getKeyCode() == hs.keycodes.map["0"] then
-          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["0"], true)}
-
-        -- View > Zoom In
-        elseif e:getKeyCode() == hs.keycodes.map["="] then
-          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["="], true)}
-
-        -- View > Zoom Out
-        -- - Note the Slack binding is Shift-Cmd-_, which we send as shift+cmd+-.
-        elseif e:getKeyCode() == hs.keycodes.map["-"] then
-          return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["-"], true)}
-
-        -- *** Go
-
-        -- Go > Switch to Channel
-        elseif e:getKeyCode() == hs.keycodes.map["k"] then
-          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["k"], true)}
-
-        -- Go > History > Back
-        elseif e:getKeyCode() == hs.keycodes.map["["] then
-          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["["], true)}
-
-        -- Go > History > Forward
-        elseif e:getKeyCode() == hs.keycodes.map["]"] then
-          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["]"], true)}
-
-        -- *** Author Special
-
-        -- "Delete Back-Word like readline" (Cmd-w)
-        elseif e:getKeyCode() == hs.keycodes.map["w"] then
-          return true, {hs.eventtap.event.newKeyEvent({"alt"}, hs.keycodes.map["delete"], true)}
-
-        end
-      elseif e:getFlags():containExactly({"alt"}) then
-        if false then
-
-        -- *** File
-
-        -- File > Close Window
-        elseif e:getKeyCode() == hs.keycodes.map["w"] then
-          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["w"], true)}
-
-        end
-      elseif e:getFlags():containExactly({"shift", "ctrl"}) then
-        if false then
-
-        -- *** File
-
-        -- File > New Canvas
-        elseif e:getKeyCode() == hs.keycodes.map["n"] then
-          return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["n"], true)}
-
-        -- File > Workspace > Select Next Workspace
-        elseif e:getKeyCode() == hs.keycodes.map["]"] then
-          return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["]"], true)}
-
-        -- File > Workspace > Select Previous Workspace
-        elseif e:getKeyCode() == hs.keycodes.map["["] then
-          return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["["], true)}
-
-        -- *** Edit
-
-        -- Edit > Redo
-        elseif e:getKeyCode() == hs.keycodes.map["z"] then
-          return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["z"], true)}
-
-        -- Edit > Paste and Match Style
-        elseif e:getKeyCode() == hs.keycodes.map["v"] then
-          return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["v"], true)}
-
-        -- *** View
-
-        -- View > Force Reload
-        elseif e:getKeyCode() == hs.keycodes.map["r"] then
-          return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["r"], true)}
-
-        -- View > Toggle Full Screen
-        elseif e:getKeyCode() == hs.keycodes.map["f"] then
-          return true, {hs.eventtap.event.newKeyEvent({"ctrl", "cmd"}, hs.keycodes.map["f"], true)}
-
-        -- View > Hide Sidebar
-        elseif e:getKeyCode() == hs.keycodes.map["d"] then
-          return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["d"], true)}
-
-        -- *** Go
-
-        -- Go > All Unreads
-        elseif e:getKeyCode() == hs.keycodes.map["a"] then
-          return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["a"], true)}
-
-        -- Go > Threads
-        elseif e:getKeyCode() == hs.keycodes.map["t"] then
-          return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["t"], true)}
-
-        -- Go > All DMs
-        elseif e:getKeyCode() == hs.keycodes.map["k"] then
-          return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["k"], true)}
-
-        -- Go > Activity
-        elseif e:getKeyCode() == hs.keycodes.map["m"] then
-          return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["m"], true)}
-
-        -- Go > Channel Browser
-        elseif e:getKeyCode() == hs.keycodes.map["l"] then
-          return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["l"], true)}
-
-        -- Go > People & User Groups
-        elseif e:getKeyCode() == hs.keycodes.map["e"] then
-          return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["e"], true)}
-
-        -- Go > Downloads
-        elseif e:getKeyCode() == hs.keycodes.map["j"] then
-          return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["j"], true)}
-
-        end
-      end
-
-      -- Return false to propagate event.
-      return false
-    end
-  )
-end
-
-local slack_filter = hs.window.filter.new("Slack")
-
-filter_attach_eventtap(slack_filter, slack_shortcuts_get_eventtap)
-
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-
--- Opens a new Google Chrome window, using the Default Profile.
---
--- SAVVY:
--- - If Chrome is visible, the `make new window` AppleScript
---   will create a new window in front of the current window
---   without also brinding all other Chrome windows in front
---   of the current window.
--- - If Chrome is hidden, unhide it, which won't front the
---   newly visible windows in front of the current window.
--- - Avoid using `open`, e.g.,:
---     open -na "Google Chrome" --args --new-window
---   - If you haven't called that command in a while, it'll literally
---     take ~5s to run. Which is very disruptive to one's flow!
---   - It also fronts all the other Chrome windows on top of your
---     other windows — even though Alt-Tab will still take you
---     back to whatever app you were just on.
--- - Here's an AppleScript take that runs fast, but it doesn't
---   let us specify the profile (that I know of):
---     local task = hs.task.new(
---       "/usr/bin/osascript",
---       function() chrome_app:setFrontmost() end,
---       function() return false end,
---       {
---         '-e', 'tell application "Google Chrome"',
---           '-e', 'make new window',
---         '-e', 'end tell',
---       }
---     )
---     task:start()
--- - Note that closing the new Chrome window will nonetheless
---   bring another Chrome window to the front (if one is visible),
---   rather than returning you to whatever window you were using
---   before opening the new Chrome window.
-
-make_new_chrome_window = function(profile)
-  local chrome_app = hs.application.get("Google Chrome")
-
-  if chrome_app and chrome_app:isHidden() then
-    chrome_app:unhide()
-  end
-
-  local profile_dir = ""
-  if profile then
-    profile_dir = "--profile-directory=" .. profile
-  end
-
-  local task = hs.task.new(
-    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-    function()
-      local chrome_app = hs.application.get("Google Chrome")
-      if chrome_app then
-        chrome_app:setFrontmost()
-      end
-    end,
-    function() return false end,
-    {
-      "--new-window",
-      profile_dir,
-    }
-  )
-  task:start()
-end
-
--- BNDNG: <Cmd-T>
-local cmd_t = hs.hotkey.bind({"cmd"}, "T", function()
-  make_new_chrome_window("Default")
-end)
-
--------
-
--- Bring MRU Chrome window to the front, or start Chrome.
--- - If all Chrome windows are minimized, this activates Chrome
---   app but won't actually show any window.
-
--- BNDNG: <Shift-Cmd-T>
-local shift_cmd_t = hs.hotkey.bind({"shift", "cmd"}, "T", function()
-  local chrome_app = hs.application.get("Google Chrome")
-
-  if not chrome_app then
-    hs.application.launchOrFocus("Google Chrome")
-  else
-    if chrome_app:isHidden() then
-      chrome_app:unhide()
-    end
-
-    chrome_app:setFrontmost()
-  end
-end)
-
--------
-
--- Open URL in new Chrome window.
---
--- SAVVY: This unhides other hidden Chrome windows (though not
--- minimized Chrome windows). I'm not sure there's a way not to.
--- - I.e., I'm now sure we can open a new Chrome without unhiding
---   other Chrome windows.
---
--- COPYD/THANX: https://news.ycombinator.com/item?id=29535518
-function chromeWithProfile(profile, url)
-  local task = hs.task.new(
-    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-    nil,
-    function() return false end,
-    { "--profile-directory=" .. profile, "--new-window", url }
-  )
-  task:start()
-end
-
--------
-
--- We can trigger Hammerspoon tasks from the command line.
---
--- - E.g.,
---
---     open -g hammerspoon://sensible-open?url=https://google.com
---
---   Using:
---
---     hs.urlevent.bind("sensible-open", function(eventName, params)
---       chromeWithProfile("Default", params['url'])
---     end)
-
--- Wire a Hammerspoon URI action to setFrontmost the specified app.
---
--- - One user of this function is `sensible-open`:
---
---   https://github.com/landonb/sh-sensible-open#☔
---
--- `sensible-open` is used to open URLs from the command line, and by some
--- shell apps (like git-open). But that call might not always front Chrome
--- (i.e., it'll open a new Chrome window behind the active window; and
--- once that starts happening, only quitting and restarting Chrome seems
--- to make it work again).
--- 
--- - `sensible-open` relies on the `open` command, e.g.,
---
---     open -na 'Google Chrome' --args --new-window <URL>
---
---   but that function will sometimes open the new window *behind* the
---   active window, as described above.
---
--- - So here we offer the Hammerspoon setFrontmost function, which will
---   always bring the new window (and only the new window) to the front.
---
---   - Now `sensible-open` can check if Hammerspoon and this config is
---     installed, and can hook this function to fix the problem.
---
--- - MAYBE: We could eventually wire URLDispatcher and offer that to
---   sensible-open, for an even more powerful and customizable user
---   experience.
-
--- USAGE:
---
---   $ open -g "hammerspoon://setFrontmost?app=${browser_app}"
-
-hs.urlevent.bind("setFrontmost", function(eventName, params)
-  local app = hs.application(params['app'])
-
-  if app then
-    -- DUNNO: Is this similar to `front_win:raise():focus()`?
-    app:setFrontmost()
-  end
-end)
-
--------
-
--- Bring front and focus specific Chrome window,
--- or open URL if no matching window is found.
---
 -- CXREF:
---   https://www.hammerspoon.org/docs/hs.window.html#raise
---   https://www.hammerspoon.org/docs/hs.window.html#focus
+-- ~/.kit/mOS/macOS-Hammyspoony/Source/AppTapAttach.spoon/init.lua
 
--- INERT/2024-07-20: Add support to open URLs using different profiles,
--- e.g.,
---
---   open -a "Google Chrome" --args --profile-directory=$NAME
---
--- where $NAME for your current Chrome profile can be found by looking
--- at Profile Path in chrome://version
--- - REFER: https://news.ycombinator.com/item?id=29535518
---
--- See also zzamboni's innovative approach to ensuring URLs
--- are opened by a specific Chrome profile, or even by different
--- browsers depending on the URL path, using their own config and
--- the powerful URLDispatcher spoon:
---
---   https://github.com/zzamboni/dot-hammerspoon/blob/master/init.org#url-dispatching-to-site-specific-browsers
+-- Define filterAttachEventtap, for the AppTap* Spoons.
+appTapAttach = hs.loadSpoon("AppTapAttach")
 
--- SPIKE: Do we need to keep function reference so doesn't get
--- garbage-collected?
---
--- - I.e., not this?:
--- 
---     function browser_window_front_or_open(url, matches)
---       ...
---     end
+appTapAttach:start()
 
-browser_window_front_or_open = function(url, profile, matches)
-  local win
+-------
 
-  if not matches then
-    matches = profile
-    profile = "Default"
-  elseif not profile then
-    profile = "Default"
-  end
+local appTapGnucash = hs.loadSpoon("AppTapGnucash")
 
-  for i = 1, #matches do
-    win = hs.window(matches[i])
-    if win then break end
-  end
-
-  if win then
-    win:raise():focus()
-  elseif url ~= "" then
-    chromeWithProfile(profile, url)
-  end
-end
+appTapGnucash:start(appTapAttach)
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
--- Bring front/focus browser email window.
---
--- - Opens first window found with the following text:
---   - Gmail prefix
---       "Inbox "
---   - Google Calendar [author keeps Gmail and Cal tabs in same window]
---       "Google Calendar - "
---   - Outlook prefix [for when you use Outlook on a host and not Gmail]
---       "Mail - "
---   - Outlook, when you've been logged off (/srsly)
---       "Sign in to Outlook"
---   - Outlook, when you've been signed out (ugh, more timeout plz)
---       "Sign out"
---
--- - If you wanted to strictly only open Gmail, you could look
---   for user's email addy, e.g.,
---     "first.last@gmail.com"
+-- CXREF:
+-- ~/.kit/mOS/macOS-Hammyspoony/Source/AppTapAttach.spoon/init.lua
 
--- BNDNG: <Shift-Ctrl-Cmd-A>
-hs.hotkey.bind({"shift", "ctrl", "cmd"}, "A", function()
-  browser_window_front_or_open(
-    "https://mail.google.com/mail/u/0/#inbox",
-    {
-      "@gmail.com",
-      "Inbox ",
-      "Google Calendar - ",
-      "Mail - ",
-      "Sign in to Outlook",
-      "Sign out",
-    }
-  )
-end)
+local appTapSlack = hs.loadSpoon("AppTapSlack")
 
--------
+appTapSlack:start(appTapAttach)
 
--- Messenger or Assorted Chat tab foregrounder
---
--- - Opens first window found with the following text:
---   - Android SMS
---       "Messages for web"
---       "Google Messages for web"
---   - Facebook Messenger
---       "Messenger"
---   - Insta
---       "Inbox • Chats"
---   - Author's local BM index
---       "🗨️         Chat & Social"
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
--- BNDNG: <Shift-Ctrl-Cmd-S>
-hs.hotkey.bind({"shift", "ctrl", "cmd"}, "S", function()
-  browser_window_front_or_open(
-    "https://www.messenger.com/",
-    {
-      "Messages for web",
-      "Google Messages for web",
-      "Messenger",
-      "Inbox • Chats",
-      "🗨️         Chat & Social",
-    }
-  )
-end)
+-- CXREF:
+-- ~/.kit/mOS/macOS-Hammyspoony/Source/FrillsChrome.spoon/init.lua
 
--------
+frillsChrome = hs.loadSpoon("FrillsChrome")
 
--- PowerThesaurus [browser window]
+frillsChrome:bindHotkeys({
+  -- BNDNG: <Cmd-T>
+  newChromeWindow={{"cmd"}, "T"},
+  -- BNDNG: <Shift-Cmd-T>
+  frontChromeWindow={{"shift", "cmd"}, "T"},
+})
 
--- BNDNG: <Shift-Ctrl-Cmd-P>
-hs.hotkey.bind({"shift", "ctrl", "cmd"}, "P", function()
-  browser_window_front_or_open(
-    "https://www.powerthesaurus.org/",
-    {
-      "Power Thesaurus",
-    }
-  )
-end)
+local cmd_t = frillsChrome.keyNewChromeWindow
+local shift_cmd_t = frillsChrome.keyFrontChromeWindow
 
--------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
--- Regex Dictionary by Lou Hevly [browser window]
+-- CXREF:
+-- ~/.kit/mOS/macOS-Hammyspoony/Source/URISetFrontmost.spoon/init.lua
 
--- BNDNG: <Shift-Ctrl-Cmd-8>
-hs.hotkey.bind({"shift", "ctrl", "cmd"}, "8", function()
-  browser_window_front_or_open(
-    "https://www.visca.com/regexdict/",
-    {
-      "Regex Dictionary by Lou Hevly",
-    }
-  )
-end)
+local uriSetFrontmost = hs.loadSpoon("URISetFrontmost")
 
--------
+uriSetFrontmost:start()
 
--- Google Chrome — Raise *Inspect* Window
---
--- - You must pop DevTools out into a separate window for this to work.
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
--- BNDNG: <Shift-Ctrl-Cmd-R>
-hs.hotkey.bind({"shift", "ctrl", "cmd"}, "R", function()
-  browser_window_front_or_open(
-    "",
-    {
-      "DevTools",
-      "Inspect with Chrome Developer Tools",
-      "devtools://",
-    }
-  )
-end)
+-- CXREF:
+-- ~/.kit/mOS/macOS-Hammyspoony/Source/BrowserWindowFronters.spoon/init.lua
+
+browserWindowFronters = hs.loadSpoon("BrowserWindowFronters")
+
+browserWindowFronters:bindHotkeys({
+  -- BNDNG: <Shift-Ctrl-Cmd-A>
+  frontEmail={{"shift", "ctrl", "cmd"}, "A"},
+  -- BNDNG: <Shift-Ctrl-Cmd-S>
+  frontChats={{"shift", "ctrl", "cmd"}, "S"},
+  -- BNDNG: <Shift-Ctrl-Cmd-P>
+  frontPowerThesaurus={{"shift", "ctrl", "cmd"}, "P"},
+  -- BNDNG: <Shift-Ctrl-Cmd-8>
+  frontRegexDict={{"shift", "ctrl", "cmd"}, "8"},
+  -- BNDNG: <Shift-Ctrl-Cmd-R>
+  frontDevTools={{"shift", "ctrl", "cmd"}, "R"},
+})
+
+-- local shift_ctrl_cmd_a = browserWindowFronters.keyFrontEmail
+-- local shift_ctrl_cmd_s = browserWindowFronters.keyFrontChats
+-- local shift_ctrl_cmd_p = browserWindowFronters.keyFrontPowerThesaurus
+-- local shift_ctrl_cmd_8 = browserWindowFronters.keyFrontRegexDict
+-- local shift_ctrl_cmd_r = browserWindowFronters.keyFrontDevTools
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
@@ -933,10 +368,10 @@ ignore_hotkey_gimp(cmd_t)
 
 -- Prepare GnuCash window filter.
 --
--- - See also above: gnucash_shortcuts_get_eventtap
+-- - See also — appTapGnucash:gnucashShortcutsGetEventtap
 
 ignore_hotkey_gnucash = function(hotkey)
-  filter_ignore_hotkey(gnucash_filter, hotkey)
+  filter_ignore_hotkey(appTapGnucash.gnucashWindowFilter, hotkey)
 end
 
 -- Prepare a similar LibreOffice window filter.
@@ -966,9 +401,18 @@ ignore_hotkey_slack = function(hotkey)
   filter_ignore_hotkey(slack_filter, hotkey)
 end
 
-ignore_hotkey_slack(alacrittyAndTerminalConveniences.keyAlacrittyNewWindow)
+ignore_hotkey_slack(cmd_0)
 
 ignore_hotkey_slack(shift_cmd_t)
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+-- CXREF:
+-- ~/.kit/mOS/macOS-Hammyspoony/Source/AppTapLibreoffice.spoon/init.lua
+
+local appTapLibreoffice = hs.loadSpoon("AppTapLibreoffice")
+
+appTapLibreoffice:start(appTapAttach)
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
@@ -1031,51 +475,23 @@ end)
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
--- <Cmd-Minus> — Put YYYY-MM-DD into clipboard.
--- - Note the printf avoids newline injection.
---   - Though below we also use `tr -d`...
--- - CALSO: Homefries `$(TTT)` function, and Dubs-Vim 'TTT' alias, etc.
---    https://github.com/landonb/home-fries/blob/release/lib/datetime_now_TTT.sh#L45
---    https://github.com/landonb/dubs_edit_juice/blob/release/plugin/dubs_edit_juice.vim#L1513
+-- CXREF:
+-- ~/.kit/mOS/macOS-Hammyspoony/Source/DateTimeSnips.spoon/init.lua
 
--- BNDNG: <Cmd-Minus> (<Cmd-->)
-hs.hotkey.bind({"cmd"}, "-", function()
-  local task = hs.task.new(
-    "/bin/dash",
-    nil,
-    function() return false end,
-    { "-c", 'printf "%s" "$(date "+%Y-%m-%d")" | pbcopy' }
-  )
-  task:start()
-end)
+dateTimeSnips = hs.loadSpoon("DateTimeSnips")
 
--- <Ctrl-Cmd-Semicolon> — Put normal date plus:time into clipboard.
--- - HSTRY: Named after erstwhile Homefries $(TTTtt:) command.
+dateTimeSnips:bindHotkeys({
+  -- BNDNG: <Cmd-Minus> (<Cmd-->)
+  snipISODateToday={{"cmd"}, "-"},
+  -- BNDNG: <Ctrl-Cmd-Semicolon> (<Ctrl-Cmd-;>)
+  snipISODateTimeNormal={{"ctrl", "cmd"}, ";"},
+  -- BNDNG: <Ctrl-Cmd-Quote> (<Ctrl-Cmd-SingleQuote>, <Ctrl-Cmd-Apostrophe>, <Ctrl-Cmd-'>)
+  snipISODateTimeDashed={{"ctrl", "cmd"}, "'"},
+})
 
--- BNDNG: <Ctrl-Cmd-Semicolon> (<Ctrl-Cmd-;>)
-hs.hotkey.bind({"ctrl", "cmd"}, ";", function()
-  local task = hs.task.new(
-    "/bin/dash",
-    nil,
-    function() return false end,
-    { "-c", 'printf "%s" "$(date "+%Y-%m-%d %H:%M")" | tr -d "\n" | pbcopy' }
-  )
-  task:start()
-end)
-
--- <Ctrl-Cmd-Apostrophe(Quote)> — Put dashed date-plus-time into clipboard.
--- - CALSO: Homefries $(TTTtt-) command.
-
--- BNDNG: <Ctrl-Cmd-Quote> (<Ctrl-Cmd-SingleQuote>, <Ctrl-Cmd-Apostrophe>, <Ctrl-Cmd-'>)
-hs.hotkey.bind({"ctrl", "cmd"}, "'", function()
-  local task = hs.task.new(
-    "/bin/dash",
-    nil,
-    function() return false end,
-    { "-c", 'printf "%s" "$(date "+%Y-%m-%d-%H-%M")" | tr -d "\n" | pbcopy' }
-  )
-  task:start()
-end)
+-- local cmd_hyphen = dateTimeSnips.keySnipISODateToday
+-- local ctrl_cmd_colon = dateTimeSnips.keySnipISODateTimeNormal
+-- local ctrl_cmd_apostrophe = dateTimeSnips.keySnipISODateTimeDashed
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
@@ -1091,107 +507,25 @@ appWindowChooser.appName = "Google Chrome"
 -- - And they don't work, anyway, because of the Terminal window
 --   bindings defined above.
 
--- <Ctrl-Space>, as inspired by Contexts.
--- BNDNG: <Ctrl-Space> (<Ctrl- >)
-appWindowChooser:bindHotkeys({show_chooser={{"ctrl"}, "Space"}})
+appWindowChooser:bindHotkeys({
+  -- BNDNG: <Ctrl-Space> (<Ctrl- >) (as inspired by Contexts)
+  show_chooser={{"ctrl"}, "Space"}
+})
 
 appWindowChooser:start()
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
--- KLUGE: When Chrome Save dialog is open, prevent
---        <Ctrl-Left>/<Ctrl-Right> from changing location
---        of web page in the background.
--- - This design choice baffles me!
---   - Use case: I was saving a receipt and editing the filename
---     but hit a familiar keybinding to move the cursor,
---     <Ctrl-Left>, and I didn't notice that it moved the background
---     page backward in history. So I hit <Ctrl-Right> again, to look
---     for the cursor. Then I noticed the browser location had changed.
---     And after saving the document, the browser page had lost the
---     order confirmation, and instead it was scolding me for
---     resubmitting the order. Ha!
---   - I also disabled KE bindings to ensure it's not something funky
---     in my environment (though I'd be curious to test this on stock
---     macOS just to be sure).
---
--- - This watcher hooks Chrome windows and waits for
---   <Ctrl-Left>/<Ctrl-Right> events.
---   - If Chrome has a secondary window open, we assume it's
---     the Save dialog, and we replace the event with an event
---     to move the cursor, <Cmd-Left>/<Cmd-Right>.
--- - Note that if you use KE to swap <Ctrl-Left>/<Ctrl-Right> and
---   <Alt-Left>/<Alt-Right>, it's <Alt-Left>/<Alt-Right> wired to
---   location back/forward, but this binding still sees the
---   unadultered keybindings, <Ctrl-Left>/<Ctrl-Right>.
---   - I'm unsure if this is always the case, or if there's, e.g.,
---     a race condition between Hammerspoon and Karabiner Elements
---     and maybe this isn't always the case. But appears to work
---     this way so far in author's experience.
+-- CXREF:
+-- ~/.kit/mOS/macOS-Hammyspoony/Source/AppTapChrome.spoon/init.lua
 
-local chrome_rwd_fwd_get_eventtap = function()
-  return hs.eventtap.new(
-    {hs.eventtap.event.types.keyDown},
-    function(e)
-      -- USAGE: Uncomment to debug/pry:
-      --   local unmodified = false
-      --   hs.alert.show("CHARS: " .. e:getCharacters(unmodified))
-      --   hs.alert.show("FLAGS: " .. tableUtils:tableJoin(e:getFlags(), ", "))
-      -- Note that modifiers includes "fn" when arrow key pressed.
-      -- Note if you have KE swapping bindings, to you this is "alt", not "ctrl",
-      -- i.e., <Alt-Left>/<Alt-Right>
-      -- - But this still works (and problem still exists) when I disable
-      --   KE bindings.
-      -- - DUNNO: I'm not aware of any race condition here.
-      --   - BWARE: But maybe there's a case where Hammerspoon gets the
-      --     event after it's manipulated by KE, and what you see is "alt"
-      --     instead? Just be on the lookout, in case this stops working.
-      if (e:getFlags():containExactly({"ctrl", "fn"})
-        and (e:getKeyCode() == hs.keycodes.map["left"]
-          or e:getKeyCode() == hs.keycodes.map["right"])
-      ) then
-        suc, _parsed_out, _raw_out_or_error_dict = hs.osascript.applescript(
-          "tell application \"System Events\"\n" ..
-          "  tell process \"Google Chrome\"\n" ..
-          "    tell window 1\n" ..
-          "      properties of sheet 1\n" ..
-          "    end tell\n" ..
-          "  end tell\n" ..
-          "end tell\n"
-        )
-        --
-        -- ALTLY: Call via file path rather than passing AppleScript string.
-        -- - DUNNO: Is there a performance difference between the two approaches?
-        --
-        --  probe_osa = os.getenv("HOME") .. "/.kit/mOS/macOS-Hammyspoony/lib/probe-chrome-sheet-1-of-window-1.osa"
-        --  suc, _parsed_out, _raw_out_or_error_dict = hs.osascript.applescriptFromFile(probe_osa)
+local appTapChrome = hs.loadSpoon("AppTapChrome")
 
-        if suc then
-          -- Return true to delete the event
-          --  return true
-          -- Or better yet, replace with alt. keycode, <Cmd-Left>/<Cmd-Right>,
-          -- which has same effect: jump cursor to start/end of filename input.
-          if e:getKeyCode() == hs.keycodes.map["left"] then
-            return true, {hs.eventtap.event.newKeyEvent({"cmd", "fn"}, hs.keycodes.map["left"], true)}
-          elseif e:getKeyCode() == hs.keycodes.map["right"] then
-            return true, {hs.eventtap.event.newKeyEvent({"cmd", "fn"}, hs.keycodes.map["right"], true)}
-          end
-        end
-      end
-
-      -- Return false to propagate event.
-      return false
-    end
-  )
-end
-
-local chrome_filter = hs.window.filter.new("Google Chrome")
-
-filter_attach_eventtap(chrome_filter, chrome_rwd_fwd_get_eventtap)
+appTapChrome:start(appTapAttach)
 
 -- Not used herein, but defined for client usage.
 ignore_hotkey_chrome = function(hotkey)
-  filter_ignore_hotkey(chrome_filter, hotkey)
+  filter_ignore_hotkey(appTapChrome.chromeWindowFilter, hotkey)
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -1216,53 +550,19 @@ hs.hotkey.bind({"cmd", "alt"}, "c", function()
   aClock:toggleShow()
 end)
 
--- Hold <Cmd-Q> to quit apps.
---
--- - CXREF:
---   ~/.kit/mOS/hammerspoons/Source/HoldToQuit.spoon/init.lua
---
--- - I did not test... but I might if I find myself quiting
---   apps unexpectedly/accidentally.
---
---  holdToQuit = hs.loadSpoon("HoldToQuit")
---  holdToQuit:init()
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
--------
+-- CXREF:
+-- ~/.kit/mOS/macOS-Hammyspoony/Source/KillTrepidation.spoon/init.lua
 
--- Map <Ctrl-Q> to app:kill().
---
--- - I.e., make <Ctrl-Q> like <Cmd-Q>, for my Linux-addled brain.
---
--- SAVVY: Note that sending key stroke doesn't work without the app,
---        e.g., this doesn't have any effect:
---
---          hs.eventtap.keyStroke({"cmd"}, "Q")
---
---        - But this works:
---
---          hs.eventtap.keyStroke({"cmd"}, "Q", app)
---
---        So where does Hammerspoon send the key stroke if no app
---        is specified? (I don't know and I don't really care.)
---
--- In any case, we'll be pedantic and kill, which
--- "tries to terminate the app gracefully".
---
--- - I.e., <Ctrl-Q> always kills the active app, regardless...
-local inhibitCtrlQBinding = {
-  ["MacVim"] = true,
-}
+local killTrepidation = hs.loadSpoon("KillTrepidation")
 
-local cmd_q = hs.hotkey.bind({"ctrl"}, "Q", function()
-  local app = hs.application.frontmostApplication()
+killTrepidation:bindHotkeys({
+  -- BNDNG: <Ctrl-Q>
+  kill={{"ctrl"}, "Q"},
+})
 
-  if not inhibitCtrlQBinding[app:name()] then
-    -- CALSO: app:kill()
-    hs.eventtap.keyStroke({"cmd"}, "Q", app)
-  else
-    hs.eventtap.keyStroke({"ctrl"}, "Q", app)
-  end
-end)
+-- local ctrl_q = killTrepidation.keyKill
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
