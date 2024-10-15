@@ -125,17 +125,19 @@ function obj:chromeRwdFwdGetEventtap()
             end
          end
 
-         -- Delete Back-Word like readline (Cmd-w)
-         -- SAVVY: Ctrl-Backspace works in location but not text input;
-         --        Option-Backspace works in both.
          if eventType == hs.eventtap.event.types.keyDown then
             if eventFlags:containExactly({"ctrl"})
                and keyCode == hs.keycodes.map["w"]
             then
+               -- Delete Back-Word like readline (Cmd-w)
+               -- SAVVY: Ctrl-Backspace works in location but not text input;
+               --        Option-Backspace works in both.
+
                return true, {hs.eventtap.event.newKeyEvent({"alt"}, hs.keycodes.map["delete"], true)}
             elseif keyCode == hs.keycodes.map["F5"]
                and (eventFlags:containExactly({"fn"}) or eventFlags:containExactly({"shift", "fn"}))
             then
+               -- View > *Reload This Page*: <F5>/<Shift-F5> → <Ctrl-R>/<Shift-Ctrl-R>
                local withCtrl = tableUtils:tableMerge(eventFlags, {["ctrl"] = true})
                -- "Delete" the "fn" key (it goes with "F5", but not normal characters)
                withCtrl["fn"] = nil
