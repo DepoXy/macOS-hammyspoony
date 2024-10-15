@@ -1,3 +1,8 @@
+-- vim:tw=0:ts=3:sw=3:et:norl:nospell:ft=lua
+-- Author: Landon Bouma <https://tallybark.com/>
+-- Project: https://github.com/DepoXy/macOS-Hammyspoony#🥄
+-- License: MIT
+
 --- === NeverLoseFocus ===
 ---
 --- Whenever you close or minimize the last visible window of a macOS
