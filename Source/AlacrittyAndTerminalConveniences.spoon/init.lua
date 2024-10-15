@@ -63,12 +63,13 @@ function obj:unminimzeAllAlacrittyWindows()
       app_win:unminimize()
    end
 
-   -- SAVVY: Until you click one of the unminimized windows,
-   -- the previous <Shift-Ctrl-Cmd-W> binding won't minimize
-   -- Alacritty windows, nor will the <Cmd-1>, <Cmd-2>, etc.
-   -- bindings work. It's as though the windows don't know
-   -- they're unminimized yet! But activate (or setFrontmost)
-   -- seems to do the trick.
+   -- SAVVY: Until you click one of the unminimized windows, the
+   -- 'allButFrontmost' binding (from MinimizeAndHideWindows.spoon,
+   -- which Hammyspoony defaults to <Shift-Ctrl-Cmd-W>) won't minimize
+   -- Alacritty windows. Nor will the 'alacrittyWindowFronters1Through9Prefix'
+   -- bindings (e.g., <Cmd-1>, <Cmd-2>, etc.) work. It's as though the windows
+   -- don't know they're unminimized yet! But activate (or setFrontmost) seems
+   -- to do the trick.
    alacritty_app:activate()
    -- Also works:
    --   alacritty_app:setFrontmost()
