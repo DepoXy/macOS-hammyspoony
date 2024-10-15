@@ -53,25 +53,25 @@ obj.keyTerminalNewWindow = nil
 --   into focus.
 
 function obj:unminimzeAllAlacrittyWindows()
-  local alacritty_app = hs.application.get("Alacritty")
+   local alacritty_app = hs.application.get("Alacritty")
 
-  local app_wins = alacritty_app:allWindows()
+   local app_wins = alacritty_app:allWindows()
 
-  for key in pairs(app_wins) do
-    local app_win = app_wins[key]
+   for key in pairs(app_wins) do
+      local app_win = app_wins[key]
 
-    app_win:unminimize()
-  end
+      app_win:unminimize()
+   end
 
-  -- SAVVY: Until you click one of the unminimized windows,
-  -- the previous <Shift-Ctrl-Cmd-W> binding won't minimize
-  -- Alacritty windows, nor will the <Cmd-1>, <Cmd-2>, etc.
-  -- bindings work. It's as though the windows don't know
-  -- they're unminimized yet! But activate (or setFrontmost)
-  -- seems to do the trick.
-  alacritty_app:activate()
-  -- Also works:
-  --   alacritty_app:setFrontmost()
+   -- SAVVY: Until you click one of the unminimized windows,
+   -- the previous <Shift-Ctrl-Cmd-W> binding won't minimize
+   -- Alacritty windows, nor will the <Cmd-1>, <Cmd-2>, etc.
+   -- bindings work. It's as though the windows don't know
+   -- they're unminimized yet! But activate (or setFrontmost)
+   -- seems to do the trick.
+   alacritty_app:activate()
+   -- Also works:
+   --   alacritty_app:setFrontmost()
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -220,7 +220,7 @@ function obj:terminal_by_number_using_post_filter(win_num, win_hint)
 
    -- Or if user provided a hint, look for a matching window
    if win_hint then
-     found_win = hs.window.find(win_hint)
+      found_win = hs.window.find(win_hint)
    end
 
    if not found_win then
