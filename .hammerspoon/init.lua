@@ -139,6 +139,8 @@ reloadConfig:start()
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
+-- Load table utility fcns.
+
 -- CXREF:
 -- ~/.kit/mOS/macOS-Hammyspoony/Source/TableUtils.spoon/init.lua
 
@@ -896,6 +898,8 @@ local filter_ignore_hotkey = function(win_filter, hotkey)
     end)
 end
 
+-------
+
 -- Prepare app window filters and hotkey subscribers for apps that don't
 -- use native macOS windows (or whatever it is they do different; the
 -- author doesn't know Cocoa or macOS apps well enough to know exact
@@ -914,6 +918,8 @@ ignore_hotkey_acrobat_reader = function(hotkey)
   filter_ignore_hotkey(acrobat_reader_filter, hotkey)
 end
 
+-------
+
 -- Prepare a GIMP window filter and hotkey subscriber.
 local gimp_filter = hs.window.filter.new("GIMP")
 
@@ -922,6 +928,8 @@ ignore_hotkey_gimp = function(hotkey)
 end
 
 ignore_hotkey_gimp(cmd_t)
+
+-------
 
 -- Prepare GnuCash window filter.
 --
@@ -939,6 +947,8 @@ ignore_hotkey_libreoffice = function(hotkey)
   filter_ignore_hotkey(libreoffice_filter, hotkey)
 end
 
+-------
+
 -- Prepare a Meld window filter and hotkey subscriber.
 -- - Not used herein but used by some client-hs.lua, so defined here.
 local meld_filter = hs.window.filter.new("Meld")
@@ -946,6 +956,8 @@ local meld_filter = hs.window.filter.new("Meld")
 ignore_hotkey_meld = function(hotkey)
   filter_ignore_hotkey(meld_filter, hotkey)
 end
+
+-------
 
 -- Prepare a Slack window filter and hotkey subscriber.
 local slack_filter = hs.window.filter.new("Slack")
@@ -958,7 +970,7 @@ ignore_hotkey_slack(alacrittyAndTerminalConveniences.keyAlacrittyNewWindow)
 
 ignore_hotkey_slack(shift_cmd_t)
 
--------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- Finder foregrounder/opener
 
@@ -1192,16 +1204,17 @@ hs.loadSpoon("NeverLoseFocus"):start()
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- Nice! 4-second (or shorter, if you hotkey again, or <Esc>) clock overlay.
---  ~/.kit/mOS/hammerspoons/Source/AClock.spoon/init.lua
 --
+-- CXREF:
+-- ~/.kit/mOS/hammerspoons/Source/AClock.spoon/init.lua
+
 aClock = hs.loadSpoon("AClock")
+
 -- BNDNG: <Cmd-Alt-C>
 hs.hotkey.bind({"cmd", "alt"}, "c", function()
+  -- ALTLY: spoon.AClock:toggleShow()
   aClock:toggleShow()
 end)
-
-
-
 
 -- Hold <Cmd-Q> to quit apps.
 --
@@ -1259,6 +1272,7 @@ end)
 -- CXREF:
 -- ~/.kit/mOS/macOS-Hammyspoony/Source/LinuxlikeCutCopyPaste.spoon/init.lua
 
+-- BNDNGs: <Ctrl-X>, <Ctrl-C>, <Ctrl-V>, <Ctrl-A>
 hs.loadSpoon("LinuxlikeCutCopyPaste"):start()
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -1343,5 +1357,5 @@ end
 
 load_configs()
 
--------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
