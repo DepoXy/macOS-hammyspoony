@@ -73,6 +73,43 @@ end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
+obj.appEventtaps = {}
+
+function obj:registerApptap(appName, getEventtap)
+   obj.appEventtaps[appName] = getEventtap()
+end
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+-- REFER: Posisible event types:
+--    hs.application.watcher.activated
+--    hs.application.watcher.deactivated
+--    hs.application.watcher.hidden
+--    hs.application.watcher.launched
+--    hs.application.watcher.launching
+--    hs.application.watcher.terminated
+--    hs.application.watcher.unhidden
+
+obj.activeEventtap = nil
+
+function obj.appWatcherWatch(appName, eventType, theApp)
+   -- print("appName: " .. appName .. " / eventType: " .. eventType)
+
+   if eventType ~= hs.application.watcher.activated then
+      return
+   end
+
+   if obj.activeEventtap then
+      obj.activeEventtap:stop()
+      obj.activeEventtap = nil
+   end
+
+   if obj.appEventtaps[appName] then
+      obj.activeEventtap = obj.appEventtaps[appName]
+      obj.activeEventtap:start()
+   end
+end
+
 --- AppTapAttach:start()
 --- Method
 --- Starts the Spoon.
@@ -80,7 +117,9 @@ end
 --- Parameters:
 ---  * (none)
 function obj:start()
-   return
+   self.appWatcher = hs.application.watcher.new(self.appWatcherWatch)
+
+   self.appWatcher:start()
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --

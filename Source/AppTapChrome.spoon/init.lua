@@ -162,8 +162,8 @@ end
 function obj:start(appTapAttach)
    self.chromeWindowFilter = hs.window.filter.new("Google Chrome")
 
-   appTapAttach:filterAttachEventtap(
-      self.chromeWindowFilter,
+   appTapAttach:registerApptap(
+      "Google Chrome",
       self.chromeRwdFwdGetEventtap
    )
 end
