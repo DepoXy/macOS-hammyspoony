@@ -70,6 +70,7 @@ package.path = package.path .. ";" .. os.getenv("HOME") .. "/.kit/mOS/hammerspoo
 -- CXREF: Author is gradually promoting features below to their own Spoons:
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/AlacrittyAndTerminalConveniences.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/AppWindowChooser.spoon/init.lua
+--   ~/.kit/mOS/macOS-Hammyspoony/Source/FrillsAlacrittyAndTerminal.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/LinuxlikeCutCopyPaste.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/MinimizeAndHideWindows.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/NeverLoseFocus.spoon/init.lua
@@ -192,11 +193,11 @@ minimizeAndHideWindows:bindHotkeys({
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- CXREF:
--- ~/.kit/mOS/macOS-Hammyspoony/Source/AlacrittyAndTerminalConveniences.spoon/init.lua
+-- ~/.kit/mOS/macOS-Hammyspoony/Source/FrillsAlacrittyAndTerminal.spoon/init.lua
 
-alacrittyAndTerminalConveniences = hs.loadSpoon("AlacrittyAndTerminalConveniences")
+frillsAlacrittyAndTerminal = hs.loadSpoon("FrillsAlacrittyAndTerminal")
 
-alacrittyAndTerminalConveniences:bindHotkeys({
+frillsAlacrittyAndTerminal:bindHotkeys({
   -- BNDNG: <Shift-Ctrl-Cmd-0>
   unminimzeAllAlacrittyWindows={{"shift", "ctrl", "cmd"}, "0"},
   -- BNDNGs: <Cmd-1>, <Cmd-2>, ..., <Cmd-9>
