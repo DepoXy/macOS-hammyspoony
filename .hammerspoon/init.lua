@@ -184,7 +184,7 @@ frillsAlacrittyAndTerminal = hs.loadSpoon("FrillsAlacrittyAndTerminal")
 frillsAlacrittyAndTerminal:bindHotkeys({
   -- BNDNG: <Shift-Ctrl-Cmd-0>
   unminimzeAllAlacrittyWindows={{"shift", "ctrl", "cmd"}, "0"},
-  -- BNDNGs: <Cmd-1>, <Cmd-2>, ..., <Cmd-9>
+  -- BNDNG/s: <Cmd-1>, <Cmd-2>, ..., <Cmd-9>
   alacrittyWindowFronters1Through9Prefix={"cmd"},
   -- BNDNG: <Cmd-0>
   alacrittyNewWindow={{"cmd"}, "0"},
