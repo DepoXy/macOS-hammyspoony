@@ -74,6 +74,7 @@ package.path = package.path .. ";" .. os.getenv("HOME") .. "/.kit/mOS/hammerspoo
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/AppTapChrome.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/AppTapGnucash.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/AppTapLibreoffice.spoon/init.lua
+--   ~/.kit/mOS/macOS-Hammyspoony/Source/AppTapMeld.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/AppTapSlack.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/AppWindowChooser.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/BrowserWindowFronters.spoon/init.lua
@@ -413,6 +414,15 @@ ignore_hotkey_slack(shift_cmd_t)
 local appTapLibreoffice = hs.loadSpoon("AppTapLibreoffice")
 
 appTapLibreoffice:start(appTapAttach)
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+-- CXREF:
+-- ~/.kit/mOS/macOS-Hammyspoony/Source/AppTapMeld.spoon/init.lua
+
+local appTapMeld = hs.loadSpoon("AppTapMeld")
+
+appTapMeld:start(appTapAttach)
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
