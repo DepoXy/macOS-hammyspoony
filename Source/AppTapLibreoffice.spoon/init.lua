@@ -25,28 +25,30 @@ obj.logger = hs.logger.new('AppTapLibreoffice')
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
--- NTRST: While LibreOffice shows Home/End bound to "To Line Begin"/"To End of Line",
--- macOS itself wires Home/End to *document* start/end.
+-- NTRST: Although LibreOffice shows Home/End bound to
+--        "To Line Begin"/"To End of Line", macOS itself
+--        wires Home/End to *document* start/end.
 --
--- - *Windows keys on a Mac keyboard*
+--  - Here we fix that disconnect so that the supposed LibreOffice
+--    behavior happens, which is also how Home/End works on Linux
+--    and Windows, and possibly in your favorite text editor.
+--
+-- - REFER: *Windows keys on a Mac keyboard*
 --   https://support.apple.com/en-nz/guide/mac-help/cpmh0152/mac
 --
--- - BEGET: *Map home and end keys to beginning/end of line on macOS*
+-- - CALSO: *Map home and end keys to beginning/end of line on macOS*
 --   https://ask.libreoffice.org/t/map-home-and-end-keys-to-beginning-end-of-line-on-macos/51969/4
 --
--- - An old Stack Exchange Q/A suggests using ~/Library/KeyBindings/DefaultKeyBinding.dict,
---   but that's a decade's old approach, and some comments suggest that many modern apps do
---   not honor its bindings.
+-- - DATED: An old Q/A suggests using ~/Library/KeyBindings/DefaultKeyBinding.dict,
+--   but that's a decade's old approach, and some comments suggest that many modern
+--   apps do not honor its bindings.
 --
 --   - *Remap "Home" and "End" to beginning and end of line*
 --     https://apple.stackexchange.com/questions/16135/remap-home-and-end-to-beginning-and-end-of-line
 --
--- - So perhaps using Hammerspoon is not a bad approach, even it it's more
---   complicated than using DefaultKeyBinding.dict [and I've never tried to
---   use DefaultKeyBinding.dict, so why start now].
-
--- SAVVY: "Seeing the fn flag is expected for most non-character keys"
---   https://github.com/Hammerspoon/hammerspoon/issues/3101
+-- - SAVVY: So perhaps using Hammerspoon is not a bad approach, even it it's
+--   more complicated than using DefaultKeyBinding.dict [and I've never tried
+--   to use DefaultKeyBinding.dict, so why start now].
 
 function obj:libreofficeGetEventtap()
   return hs.eventtap.new(
@@ -62,37 +64,21 @@ function obj:libreofficeGetEventtap()
         local keyCode = e:getKeyCode()
         local eventFlags = e:getFlags()
 
-        if (keyCode == hs.keycodes.map["left"]
-          or keyCode == hs.keycodes.map["right"])
-        then
-          -- Note that modifiers includes "fn" when arrow key pressed.
-          if eventFlags:containExactly({"ctrl", "fn"}) then
-            return true, {hs.eventtap.event.newKeyEvent({"alt", "fn"}, keyCode, true)}
-          elseif eventFlags:containExactly({"shift", "ctrl", "fn"}) then
-            return true, {hs.eventtap.event.newKeyEvent({"shift", "alt", "fn"}, keyCode, true)}
-          elseif eventFlags:containExactly({"alt", "fn"}) then
-            return true, {hs.eventtap.event.newKeyEvent({"cmd", "fn"}, keyCode, true)}
-          elseif eventFlags:containExactly({"shift", "alt", "fn"}) then
-            return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd", "fn"}, keyCode, true)}
-          end
+        local deleteEvent
+        local newEvents
+
+        -- CXREF: ~/.kit/mOS/macOS-Hammyspoony/Source/MotionUtils.spoon/init.lua
+        deleteEvent, newEvents = motionUtils:newKeyEventForLeftRight(keyCode, eventFlags)
+        if deleteEvent then
+
+          return deleteEvent, newEvents
         end
 
-        if (keyCode == hs.keycodes.map["home"]
-          or keyCode == hs.keycodes.map["end"])
-        then
-          if eventFlags:containExactly({"fn"}) or eventFlags:containExactly({"shift", "fn"}) then
-            local newFlags = tableUtils:tableKeys(tableUtils:tableMerge(eventFlags, {["cmd"] = true}))
+        -- CXREF: ~/.kit/mOS/macOS-Hammyspoony/Source/MotionUtils.spoon/init.lua
+        deleteEvent, newEvents = motionUtils:newKeyEventForHomeEnd(keyCode, eventFlags)
+        if deleteEvent then
 
-            if keyCode == hs.keycodes.map["home"] then
-              return true, {hs.eventtap.event.newKeyEvent(newFlags, hs.keycodes.map["left"], true)}
-            elseif keyCode == hs.keycodes.map["end"] then
-              return true, {hs.eventtap.event.newKeyEvent(newFlags, hs.keycodes.map["right"], true)}
-            end
-          elseif eventFlags:containExactly({"ctrl", "fn"}) then
-            return true, {hs.eventtap.event.newKeyEvent({"fn"}, keyCode, true)}
-          elseif eventFlags:containExactly({"shift", "ctrl", "fn"}) then
-            return true, {hs.eventtap.event.newKeyEvent({"shift", "fn"}, keyCode, true)}
-          end
+          return deleteEvent, newEvents
         end
       end
 

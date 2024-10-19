@@ -161,6 +161,13 @@ tableUtils = hs.loadSpoon("TableUtils")
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- CXREF:
+-- ~/.kit/mOS/macOS-Hammyspoony/Source/MotionUtils.spoon/init.lua
+
+motionUtils = hs.loadSpoon("MotionUtils")
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+-- CXREF:
 -- ~/.kit/mOS/macOS-Hammyspoony/Source/MinimizeAndHideWindows.spoon/init.lua
 
 local minimizeAndHideWindows = hs.loadSpoon("MinimizeAndHideWindows")
