@@ -3,25 +3,25 @@
 -- Project: https://github.com/DepoXy/macOS-Hammyspoony#🥄
 -- License: MIT
 
---- === KillTrepidation ===
+--- === KillTrepidly ===
 ---
---- Download: [https://github.com/DepoXy/macOS-Hammyspoony/raw/release/Spoons/KillTrepidation.spoon.zip](https://github.com/DepoXy/macOS-Hammyspoony/raw/release/Spoons/KillTrepidation.spoon.zip)
+--- Download: [https://github.com/DepoXy/macOS-Hammyspoony/raw/release/Spoons/KillTrepidly.spoon.zip](https://github.com/DepoXy/macOS-Hammyspoony/raw/release/Spoons/KillTrepidly.spoon.zip)
 
 local obj = {}
 obj.__index = obj
 
 --- Metadata
-obj.name = "KillTrepidation"
+obj.name = "KillTrepidly"
 obj.version = "1.0.0"
 obj.author = "Landon Bouma <https://tallybark.com/>"
 obj.homepage = "https://github.com/DepoXy/macOS-Hammyspoony#🥄"
 obj.license = "MIT - https://opensource.org/licenses/MIT"
 
---- KillTrepidation.logger
+--- KillTrepidly.logger
 --- Variable
 --- - Logger object used within the Spoon. Can be accessed to set
 ---   the default log level for the messages coming from the Spoon.
-obj.logger = hs.logger.new('KillTrepidation')
+obj.logger = hs.logger.new('KillTrepidly')
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
@@ -81,7 +81,7 @@ end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
-function obj:bindHotkeyKillTrepidation(mapping)
+function obj:bindHotkeyKillTrepidly(mapping)
   if mapping["kill"] then
     if (self.keyKill) then
       self.keyKill:delete()
@@ -96,15 +96,15 @@ function obj:bindHotkeyKillTrepidation(mapping)
   end
 end
 
---- KillTrepidation:bindHotkeys(mapping)
+--- KillTrepidly:bindHotkeys(mapping)
 --- Method
---- Binds hotkeys for KillTrepidation
+--- Binds hotkeys for KillTrepidly
 ---
 --- Parameters:
 ---  * mapping - A table containing hotkey objifier/key details for the following items:
 ---   * kill - kill application
 function obj:bindHotkeys(mapping)
-  self:bindHotkeyKillTrepidation(mapping)
+  self:bindHotkeyKillTrepidly(mapping)
 end
 
 

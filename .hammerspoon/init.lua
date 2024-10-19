@@ -81,7 +81,7 @@ package.path = package.path .. ";" .. os.getenv("HOME") .. "/.kit/mOS/hammerspoo
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/DateTimeSnips.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/FrillsAlacrittyAndTerminal.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/FrillsChrome.spoon/init.lua
---   ~/.kit/mOS/macOS-Hammyspoony/Source/KillTrepidation.spoon/init.lua
+--   ~/.kit/mOS/macOS-Hammyspoony/Source/KillTrepidly.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/LinuxlikeCutCopyPaste.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/MinimizeAndHideWindows.spoon/init.lua
 --   ~/.kit/mOS/macOS-Hammyspoony/Source/NeverLoseFocus.spoon/init.lua
@@ -566,9 +566,9 @@ end)
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- CXREF:
--- ~/.kit/mOS/macOS-Hammyspoony/Source/KillTrepidation.spoon/init.lua
+-- ~/.kit/mOS/macOS-Hammyspoony/Source/KillTrepidly.spoon/init.lua
 
-local killTrepidation = hs.loadSpoon("KillTrepidation")
+local killTrepidation = hs.loadSpoon("KillTrepidly")
 
 killTrepidation:bindHotkeys({
   -- BNDNG: <Ctrl-Q>
