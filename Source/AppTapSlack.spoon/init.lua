@@ -25,10 +25,6 @@ obj.logger = hs.logger.new('AppTapSlack')
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
-obj.slackWindowFilter = nil
-
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-
 function obj:slackShortcutsGetEventtap()
    return hs.eventtap.new(
       {
@@ -230,10 +226,8 @@ end
 --- Parameters:
 ---  * appTapAttach
 function obj:start(appTapAttach)
-   self.slackWindowFilter = hs.window.filter.new("Slack")
-
-   appTapAttach:filterAttachEventtap(
-      self.slackWindowFilter,
+   appTapAttach:registerApptap(
+      "Slack",
       self.slackShortcutsGetEventtap
    )
 end

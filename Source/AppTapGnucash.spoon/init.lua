@@ -25,10 +25,6 @@ obj.logger = hs.logger.new('AppTapSlack')
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
-obj.gnucashWindowFilter = nil
-
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-
 -- SAVVY: This tedious menu shortcut remapping because
 -- GnuCash ignores the normal Keyboard Shortcuts you'd
 -- otherwise manage from System Settings, i.e.,
@@ -124,12 +120,10 @@ end
 --- Parameters:
 ---  * appTapAttach
 function obj:start(appTapAttach)
-   -- SAVVY: First arg to new() is Application name, which is
-   -- "Gnucash", and not window title name, which says "GnuCash".
-   self.gnucashWindowFilter = hs.window.filter.new("Gnucash")
-
-   appTapAttach:filterAttachEventtap(
-      self.gnucashWindowFilter,
+   -- SAVVY: Its Application name is "Gnucash" and not "GnuCash"
+   -- like the window title, its documentation, or website, etc.
+   appTapAttach:registerApptap(
+      "Gnucash",
       self.gnucashShortcutsGetEventtap
    )
 end

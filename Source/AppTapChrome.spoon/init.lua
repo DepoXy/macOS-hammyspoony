@@ -25,10 +25,6 @@ obj.logger = hs.logger.new('AppTapChrome')
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
-obj.chromeWindowFilter = nil
-
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-
 -- KLUGE: When Chrome Save dialog is open, prevent
 --        <Ctrl-Left>/<Ctrl-Right> from changing location
 --        of web page in the background.
@@ -162,8 +158,6 @@ end
 --- Parameters:
 ---  * appTapAttach
 function obj:start(appTapAttach)
-   self.chromeWindowFilter = hs.window.filter.new("Google Chrome")
-
    appTapAttach:registerApptap(
       "Google Chrome",
       self.chromeRwdFwdGetEventtap

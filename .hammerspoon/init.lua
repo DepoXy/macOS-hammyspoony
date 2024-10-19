@@ -214,7 +214,8 @@ local cmd_0 = frillsAlacrittyAndTerminal.keyAlacrittyNewWindow
 -- CXREF:
 -- ~/.kit/mOS/macOS-Hammyspoony/Source/AppTapAttach.spoon/init.lua
 
--- Define filterAttachEventtap, for the AppTap* Spoons.
+-- Define registerApptap, which the AppTap* Spoons use to wire their
+-- eventtap subscribers to specific applications.
 appTapAttach = hs.loadSpoon("AppTapAttach")
 
 appTapAttach:start()
@@ -368,11 +369,11 @@ ignore_hotkey_gimp(cmd_t)
 -------
 
 -- Prepare GnuCash window filter.
---
--- - See also — appTapGnucash:gnucashShortcutsGetEventtap
+
+local gnucashWindowFilter = hs.window.filter.new("Gnucash")
 
 ignore_hotkey_gnucash = function(hotkey)
-  filter_ignore_hotkey(appTapGnucash.gnucashWindowFilter, hotkey)
+  filter_ignore_hotkey(gnucashWindowFilter, hotkey)
 end
 
 -- Prepare a similar LibreOffice window filter.
@@ -533,9 +534,11 @@ local appTapChrome = hs.loadSpoon("AppTapChrome")
 
 appTapChrome:start(appTapAttach)
 
+chromeWindowFilter = hs.window.filter.new("Google Chrome")
+
 -- Not used herein, but defined for client usage.
 ignore_hotkey_chrome = function(hotkey)
-  filter_ignore_hotkey(appTapChrome.chromeWindowFilter, hotkey)
+  filter_ignore_hotkey(chromeWindowFilter, hotkey)
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --

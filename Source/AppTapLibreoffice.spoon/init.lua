@@ -25,10 +25,6 @@ obj.logger = hs.logger.new('AppTapLibreoffice')
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
-obj.libreofficeWindowFilter = nil
-
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-
 -- NTRST: While LibreOffice shows Home/End bound to To Line Begin/To End of Line,
 -- macOS itself wires Home/End to document start/document end.
 --
@@ -112,10 +108,8 @@ end
 --- Parameters:
 ---  * appTapAttach
 function obj:start(appTapAttach)
-   self.libreofficeWindowFilter = hs.window.filter.new("LibreOffice")
-
-   appTapAttach:filterAttachEventtap(
-      self.libreofficeWindowFilter,
+   appTapAttach:registerApptap(
+      "LibreOffice",
       self.libreofficeGetEventtap
    )
 end
