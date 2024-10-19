@@ -25,8 +25,8 @@ obj.logger = hs.logger.new('AppTapLibreoffice')
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
--- NTRST: While LibreOffice shows Home/End bound to To Line Begin/To End of Line,
--- macOS itself wires Home/End to document start/document end.
+-- NTRST: While LibreOffice shows Home/End bound to "To Line Begin"/"To End of Line",
+-- macOS itself wires Home/End to *document* start/end.
 --
 -- - *Windows keys on a Mac keyboard*
 --   https://support.apple.com/en-nz/guide/mac-help/cpmh0152/mac
@@ -44,6 +44,9 @@ obj.logger = hs.logger.new('AppTapLibreoffice')
 -- - So perhaps using Hammerspoon is not a bad approach, even it it's more
 --   complicated than using DefaultKeyBinding.dict [and I've never tried to
 --   use DefaultKeyBinding.dict, so why start now].
+
+-- SAVVY: "Seeing the fn flag is expected for most non-character keys"
+--   https://github.com/Hammerspoon/hammerspoon/issues/3101
 
 function obj:libreofficeGetEventtap()
   return hs.eventtap.new(
