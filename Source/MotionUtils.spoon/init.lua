@@ -30,9 +30,19 @@ obj.logger = hs.logger.new('MotionUtils')
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- Normal macOS motions:
--- - <Ctrl-Left>/<Ctrl-Right> is same as <Left>/<Right>
--- - <Cmd-Left>/<Cmd-Right> is line-wise beg/end.
--- - <Alt-Left>/<Alt-Right> is word-wise beg/end.
+-- - Both <Ctrl-Left>/<Ctrl-Right> and <Shift-Ctrl-Left>/<Shift-Ctrl-Right>
+--   are same as <Left>/<Right> in LibreOffice;
+--   - In Chrome edit input, <Ctrl-Left>/<Ctrl-Right> is line-wise beg/end.
+-- - <Cmd-Left>/<Cmd-Right> is line-wise beg/end. With <Shift>, selects text.
+--   - Same behavior in LibreOffice and Chrome.
+--   - In Chrome when edit input is not active, <Cmd-Left>/<Cmd-Right> is
+--     history Back/Forward. (When edit active, it's line-wise beg/end.)
+--     - (Otherwise in Chrome, <Cmd-[> and <Cmd-]> are also Back/Forward,
+--        and they always work, regardless of what's active.)
+-- - <Alt-Left>/<Alt-Right> is word-wise beg/end. With <Shift>, selects text.
+--   - Same behavior in LibreOffice and Chrome.
+--   - In Linux, regardless if edit input active or not,
+--     <Alt-Left>/<Alt-Right> is always history Back/Forward.
 --
 -- On Linux and in (author's) Vim:
 -- - <Ctrl-Left>/<Ctrl-Right> is word-wise beg/end.
@@ -66,17 +76,56 @@ end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
--- Normal macOS <Home>/<End> goes to document beg/end,
+-- Normal macOS <Home>/<End> goes to document beg/end in LibreOffice,
 -- but on Linux and in Vim, <Home>/<End> are line-wise.
 -- - So map <Home>/<End> to macOS <Cmd-Left>/<Cmd-Right>.
 --
--- Normal macOS <Ctrl-Home>/<Ctrl-End> does nothing, bit on Linux
+-- Normal macOS <Ctrl-Home>/<Ctrl-End> does nothing, but on Linux
 -- and in Vim, <Ctrl-Home>/<Ctrl-End> go to document beg/end.
 -- - So map <Ctrl-Home>/<Ctrl-End> to macOS <Home>/<End> (remember
 --   that newKeyEvent bypasses Hammerspoon and NSUserKeyEquivalents).
 --
+-- <Shift-Ctrl-Home>/<Shift-Ctrl-End> does nothing.
+-- <Shift-Cmd-Home>/<Shift-Cmd-End> is same as <Shift-Home>/<Shift-End>.
+-- <Shift-Alt-Home>/<Shift-Alt-End> does nothing.
+--
 -- Also map same bindings with <Shift> to select text across the
 -- same motion.
+--
+-- In macOS Chrome AXComboBox:
+-- - <Home>/<End> first scrolls combobox up/down, and then pressing
+--   again scrolls the browser window up/down; and in neither instance
+--   does it move the cursor.
+--
+-- - <Ctrl-Home>/<Ctrl-End> is same as <Home>/<End>.
+-- - <Cmd-Home>/<Cmd-End> does nothing.
+-- - <Alt-Home>/<Alt-End> does nothing.
+--
+-- - <Shift-Home>/<Shift-End> selects from cursor to combobox bed/end.
+-- - <Shift-Ctrl|Cmd|Alt-Home>/<Shift-Ctrl|Cmd|Alt-End> does nothing.
+--
+-- In both LibreOffice and in Chrome AXComboBox:
+-- - <Up>/<Down> moves cursor one line up/down.
+-- - <Ctrl-Up>/<Ctrl-Down> move cursor one line up/down.
+-- - <Cmd-Up>/<Cmd-Down> moves doc-wise to beg/end.
+-- - <Alt-Up>/<Alt-Down> moves line-wise to beg/end.
+--
+-- In Chrome AXComboBox:
+-- - <PageUp>/<PageDown> scrolls combobox by the pageful, and after
+--   top/bottom of the combobox is visible, pressing again pages the
+--   browser window, all without moving the cursor.
+--
+-- - <Ctrl-PageUp>/<Ctrl-PageDown> changes tabs backward/forward.
+-- - <Cmd-PageUp>/<Cmd-PageDown> does nothing.
+-- - <Alt-PageUp>/<Alt-PageDown> moves the cursor by the pageful.
+--   When top/bottom of the combobox reached, nothing more happens
+--   (and neither is the browser window is scrolled).
+--
+-- - <Shift-Ctrl-PageUp>/<Shift-Ctrl-PageDown> moves (reorders) current
+--   tab backward/forward.
+-- - <Shift-Cmd-PageUp>/<Shift-Cmd-PageDown> does nothing.
+-- - <Shift-Alt-PageUp>/<Shift-Alt-PageDown> is same as
+--   <Alt-PageUp>/<Alt-PageDown> (and does not select text).
 
 function obj:newKeyEventForHomeEnd(keyCode, eventFlags)
   if (keyCode == hs.keycodes.map["home"]
@@ -84,17 +133,35 @@ function obj:newKeyEventForHomeEnd(keyCode, eventFlags)
   then
     if eventFlags:containExactly({"fn"})
       or eventFlags:containExactly({"shift", "fn"})
+    then
+      local leftOrRight
+      if keyCode == hs.keycodes.map["home"] then
+        leftOrRight = hs.keycodes.map["left"]
+      elseif keyCode == hs.keycodes.map["end"] then
+        leftOrRight = hs.keycodes.map["right"]
+      end
+
       local newFlags = tableUtils:tableKeys(tableUtils:tableMerge(eventFlags, {["cmd"] = true}))
 
+      return true, {hs.eventtap.event.newKeyEvent(newFlags, leftOrRight, true)}
+    else
+      -- Works in LibreOffice, but not in Chrome:
+      --   return true, {hs.eventtap.event.newKeyEvent({"fn"}, keyCode, true)}
+      -- Same for:
+      --   return true, {hs.eventtap.event.newKeyEvent({"shift", "fn"}, keyCode, true)}
+      -- So use <Cmd-Up>/<Cmd-Down>
+      local upOrDown
       if keyCode == hs.keycodes.map["home"] then
-        return true, {hs.eventtap.event.newKeyEvent(newFlags, hs.keycodes.map["left"], true)}
+        upOrDown = hs.keycodes.map["up"]
       elseif keyCode == hs.keycodes.map["end"] then
-        return true, {hs.eventtap.event.newKeyEvent(newFlags, hs.keycodes.map["right"], true)}
+        upOrDown = hs.keycodes.map["down"]
       end
-    elseif eventFlags:containExactly({"ctrl", "fn"}) then
-      return true, {hs.eventtap.event.newKeyEvent({"fn"}, keyCode, true)}
-    elseif eventFlags:containExactly({"shift", "ctrl", "fn"}) then
-      return true, {hs.eventtap.event.newKeyEvent({"shift", "fn"}, keyCode, true)}
+
+      if eventFlags:containExactly({"ctrl", "fn"}) then
+        return true, {hs.eventtap.event.newKeyEvent({"cmd", "fn"}, upOrDown, true)}
+      elseif eventFlags:containExactly({"shift", "ctrl", "fn"}) then
+        return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd", "fn"}, upOrDown, true)}
+      end
     end
   end
 end

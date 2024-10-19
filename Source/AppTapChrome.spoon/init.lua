@@ -25,36 +25,6 @@ obj.logger = hs.logger.new('AppTapChrome')
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
--- KLUGE: When Chrome Save dialog is open, prevent
---        <Ctrl-Left>/<Ctrl-Right> from changing location
---        of web page in the background.
--- - This design choice baffles me!
---   - Use case: I was saving a receipt and editing the filename
---     but hit a familiar keybinding to move the cursor,
---     <Ctrl-Left>, and I didn't notice that it moved the background
---     page backward in history. So I hit <Ctrl-Right> again, to look
---     for the cursor. Then I noticed the browser location had changed.
---     And after saving the document, the browser page had lost the
---     order confirmation, and instead it was scolding me for
---     resubmitting the order. Ha!
---   - I also disabled KE bindings to ensure it's not something funky
---     in my environment (though I'd be curious to test this on stock
---     macOS just to be sure).
---
--- - This watcher hooks Chrome windows and waits for
---   <Ctrl-Left>/<Ctrl-Right> events.
---   - If Chrome has a secondary window open, we assume it's
---     the Save dialog, and we replace the event with an event
---     to move the cursor, <Cmd-Left>/<Cmd-Right>.
--- - Note that if you use KE to swap <Ctrl-Left>/<Ctrl-Right> and
---   <Alt-Left>/<Alt-Right>, it's <Alt-Left>/<Alt-Right> wired to
---   location back/forward, but this binding still sees the
---   unadultered keybindings, <Ctrl-Left>/<Ctrl-Right>.
---   - I'm unsure if this is always the case, or if there's, e.g.,
---     a race condition between Hammerspoon and Karabiner Elements
---     and maybe this isn't always the case. But appears to work
---     this way so far in author's experience.
-
 function obj:chromeRwdFwdGetEventtap()
   return hs.eventtap.new(
     {
@@ -63,90 +33,187 @@ function obj:chromeRwdFwdGetEventtap()
       hs.eventtap.event.types.leftMouseUp,
     },
     function(e)
-      -- USAGE: Uncomment to debug/pry:
-      --   local unmodified = false
-      --   hs.alert.show("CHARS: " .. e:getCharacters(unmodified))
-      --   hs.alert.show("FLAGS: " .. tableUtils:tableJoin(e:getFlags(), ", "))
-      -- Note that modifiers includes "fn" when arrow key pressed.
-      -- Note if you have KE swapping bindings, to you this is "alt", not "ctrl",
-      -- i.e., <Alt-Left>/<Alt-Right>
-      -- - But this still works (and problem still exists) when I disable
-      --   KE bindings.
-      -- - DUNNO: I'm not aware of any race condition here.
-      --   - BWARE: But maybe there's a case where Hammerspoon gets the
-      --     event after it's manipulated by KE, and what you see is "alt"
-      --     instead? Just be on the lookout, in case this stops working.
-      local keyCode = e:getKeyCode()
-      local eventFlags = e:getFlags()
-      local eventType = e:getType()
-
-      if (eventType == hs.eventtap.event.types.keyDown)
-        and (eventFlags:containExactly({"ctrl", "fn"})
-        and (keyCode == hs.keycodes.map["left"]
-          or keyCode == hs.keycodes.map["right"])
-      ) then
-        suc, _parsed_out, _raw_out_or_error_dict = hs.osascript.applescript(
-          "tell application \"System Events\"\n" ..
-          "  tell process \"Google Chrome\"\n" ..
-          "    tell window 1\n" ..
-          "      properties of sheet 1\n" ..
-          "    end tell\n" ..
-          "  end tell\n" ..
-          "end tell\n"
-        )
-        -- ALTLY: Call via file path rather than passing AppleScript string.
-        -- - DUNNO: Is there a performance difference between the two approaches?
-        --
-        --  probe_osa = os.getenv("HOME") ..
-        --    "/.kit/mOS/macOS-Hammyspoony/lib/probe-chrome-sheet-1-of-window-1.osa"
-        --  suc, _parsed_out, _raw_out_or_error_dict = hs.osascript.applescriptFromFile(probe_osa)
-
-        if suc then
-          hs.alert.show("TOTAL BAM") -- XXX
-          -- Return true to delete the event
-          --   return true
-          -- Or better yet, replace with alt. keycode, <Cmd-Left>/<Cmd-Right>,
-          -- which has same effect: jump cursor to start/end of filename input.
-
-          return true, {hs.eventtap.event.newKeyEvent({"alt", "fn"}, keyCode, true)}
-        end
-      end
-
-      -- Map <Ctrl-Click> to <Cmd-Click>, i.e., open link in new tab.
-      if eventFlags:containExactly({"ctrl"}) then
-        if eventType == hs.eventtap.event.types.leftMouseDown
-          or eventType == hs.eventtap.event.types.leftMouseUp
-        then
-          return true, {hs.eventtap.event.newMouseEvent(eventType, e:location(), {"cmd"})}
-        end
-      end
-
-      if eventType == hs.eventtap.event.types.keyDown then
-        if eventFlags:containExactly({"ctrl"})
-          and keyCode == hs.keycodes.map["w"]
-        then
-          -- Delete Back-Word like readline (Cmd-w)
-          -- SAVVY: Ctrl-Backspace works in location but not text input;
-          --        Option-Backspace works in both.
-
-          return true, {hs.eventtap.event.newKeyEvent({"alt"}, hs.keycodes.map["delete"], true)}
-        elseif keyCode == hs.keycodes.map["F5"]
-          and (eventFlags:containExactly({"fn"}) or eventFlags:containExactly({"shift", "fn"}))
-        then
-          -- View > *Reload This Page*: <F5>/<Shift-F5> → <Ctrl-R>/<Shift-Ctrl-R>
-          local withCtrl = tableUtils:tableMerge(eventFlags, {["ctrl"] = true})
-          -- "Delete" the "fn" key (it goes with "F5", but not normal characters)
-          withCtrl["fn"] = nil
-          local newFlags = tableUtils:tableKeys(withCtrl)
-
-          return true, {hs.eventtap.event.newKeyEvent(newFlags, hs.keycodes.map["r"], true)}
-        end
-      end
-
-      -- Return false to propagate event.
-      return false
+      return self:chromeRwdFwdGetEventtapCallback(e)
     end
   )
+end
+
+function obj:chromeRwdFwdGetEventtapCallback(e)
+  local eventType = e:getType()
+  -- SAVVY: Flags contain "fn" when non-character pressed, e.g.,
+  -- arrow key, Home/End, etc.
+  local eventFlags = e:getFlags()
+  local keyCode = e:getKeyCode()
+
+  -- USAGE: Uncomment to debug/pry:
+  --   print("e:getType(): " .. hs.inspect(eventType))
+  --   print("e:getFlags(): " .. tableUtils:tableJoin(eventFlags, ", "))
+  --   print("e:getKeyCode(): " .. hs.inspect(keyCode))
+  --   local unmodified = false
+  --   print("e:getCharacters(false): " .. hs.inspect(e:getCharacters(unmodified)))
+
+  -- Mouse down/Mouse up events
+  if eventType == hs.eventtap.event.types.leftMouseDown
+    or eventType == hs.eventtap.event.types.leftMouseUp
+  then
+
+    -- Map <Ctrl-Click> to <Cmd-Click>, i.e., open link in new tab.
+    if eventFlags:containExactly({"ctrl"}) then
+      return true, {hs.eventtap.event.newMouseEvent(eventType, e:location(), {"cmd"})}
+    end
+  end
+
+  -- Key down events.
+  if eventType == hs.eventtap.event.types.keyDown then
+
+    -- Delete backward on <Ctrl-W>
+    if eventFlags:containExactly({"ctrl"})
+      and keyCode == hs.keycodes.map["w"]
+    then
+      -- SAVVY: <Ctrl-Backspace> works in location but not text input;
+      --        <Alt-Backspace> works in both.
+
+      return true, {hs.eventtap.event.newKeyEvent({"alt"}, hs.keycodes.map["delete"], true)}
+    end
+
+    -- Reload on <F5>/<Shift-F5>
+    if keyCode == hs.keycodes.map["F5"]
+      and (eventFlags:containExactly({"fn"}) or eventFlags:containExactly({"shift", "fn"}))
+    then
+      -- <F5>/<Shift-F5> → <Ctrl-R>/<Shift-Ctrl-R> (View > *Reload This Page*)
+      local withCtrl = tableUtils:tableMerge(eventFlags, {["ctrl"] = true})
+      -- "Delete" the "fn" key (it goes with "F5", but not normal characters).
+      withCtrl["fn"] = nil
+      local newFlags = tableUtils:tableKeys(withCtrl)
+
+      return true, {hs.eventtap.event.newKeyEvent(newFlags, hs.keycodes.map["r"], true)}
+    end
+
+    -- Check for <Left>/<Right> and <Home>/<End> combinations.
+    local deleteEvent
+    local newEvents
+
+    -- Map <Cmd-Left>/<Cmd-Right> to history Back/Forward, always,
+    -- and not just when edit input is not active.
+    deleteEvent = self:processEventForLeftRight("cmd", keyCode, eventFlags)
+    if deleteEvent then
+      -- hs.alert.show("processEventForLeftRight/cmd")
+
+      return deleteEvent
+    end
+
+    -- When edit control active, <Left>/<Right> and <Home>/<End> combos move
+    -- the cursor.
+    local roleOfElement = self:sussRoleOfElement()
+
+    if self.textInputRoles[roleOfElement] then
+      -- CXREF: ~/.kit/mOS/macOS-Hammyspoony/Source/MotionUtils.spoon/init.lua
+      deleteEvent, newEvents = motionUtils:newKeyEventForLeftRight(keyCode, eventFlags)
+      if deleteEvent then
+        -- hs.alert.show("newKeyEventForLeftRight")
+
+        return deleteEvent, newEvents
+      end
+
+      -- Remap <Home>/<End> from doc beg/end to line-wise beg/end;
+      -- use <Ctrl-Home>/<Ctrl-End> for doc beg/end;
+      -- and don't scroll browser window when at combobox beg/end.
+      --
+      -- CXREF: ~/.kit/mOS/macOS-Hammyspoony/Source/MotionUtils.spoon/init.lua
+      deleteEvent, newEvents = motionUtils:newKeyEventForHomeEnd(keyCode, eventFlags)
+      if deleteEvent then
+        -- hs.alert.show("newKeyEventForHomeEnd")
+
+        return deleteEvent, newEvents
+      end
+    else
+      -- Wire <Alt-Left>/<Alt-Right> to Backward/Forward like in Linux,
+      -- but unlike in Linux, only when *not* in an edit control (in
+      -- Linux, <Alt-Left>/<Alt-Right> always changes location, even
+      -- when an edit control is active (which is my only gripe about
+      -- the Linux behavior)).
+      deleteEvent = self:processEventForLeftRight("alt", keyCode, eventFlags)
+      if deleteEvent then
+        -- hs.alert.show("processEventForLeftRight/alt")
+
+        return deleteEvent
+      end
+    end
+  end  -- eventType == hs.eventtap.event.types.keyDown
+
+  -- Return false to propagate event.
+  return false
+end
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+-- Edit input roles:
+--
+--   AXTextField  — e.g., Chrome location input
+--   AXTextArea   — e.g., GitHub multi-line edit box
+--   AXComboBox   — e.g., Google search box
+
+obj.textInputRoles = {
+  ["AXTextField"] = true,
+  ["AXTextArea"] = true,
+  ["AXComboBox"] = true,
+}
+
+-- I don't know AppleScript well and couldn't find decent docs,
+-- but somehow after an hour of digging I found that these work:
+--
+--   'attribute "AXFocusedUIElement"'
+--   'properties of attribute "AXFocusedUIElement"'
+--   'value of attribute "AXFocusedUIElement"'
+
+function obj:sussRoleOfElement()
+  local _success, roleOfElement, _rawOutOrErrorDict = hs.osascript.applescript(
+    "tell application \"System Events\"\n" ..
+    "  tell process \"Google Chrome\"\n" ..
+    "    role of value of attribute \"AXFocusedUIElement\"\n" ..
+    "  end tell\n" ..
+    "end tell\n"
+  )
+  -- print("roleOfElement: " .. hs.inspect(roleOfElement))
+  -- print("_rawOutOrErrorDict: " .. hs.inspect(_rawOutOrErrorDict))
+  -- hs.alert.show("roleOfElement: " .. hs.inspect(roleOfElement))
+
+  -- Note that if nothing is selected/focused/active, this is nil.
+  --   if not roleOfElement then
+  --     hs.alert.show("ALERT: No roleOfElement!")
+  --   end
+
+  return roleOfElement
+end
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+-- On Linux, <Alt-Left>/<Alt-Right> *always* calls history Back/Forward.
+-- On macOS, <Cmd-Left>/<Cmd-Right> only calls Back/Forward if an edit
+-- control is not active (<Cmd-[>/<Cmd-]> also B/F, but always work.)
+
+-- Note that sending keystroke to command that's redefined using
+-- `defaults write com.google.Chrome NSUserKeyEquivalents` does
+-- not work. (You can send keystroke for the original binding,
+-- though).
+--
+-- So here we pick the command from the menu instead.
+
+function obj:processEventForLeftRight(cmdOrAlt, keyCode, eventFlags)
+  if eventFlags:containExactly({cmdOrAlt, "fn"})
+    and (keyCode == hs.keycodes.map["left"]
+      or keyCode == hs.keycodes.map["right"])
+  then
+    local app = hs.application.find("Google Chrome")
+
+    if keyCode == hs.keycodes.map["left"] then
+      app:selectMenuItem({"History", "Back"})
+    elseif keyCode == hs.keycodes.map["right"] then
+      app:selectMenuItem({"History", "Forward"})
+    end
+
+    return true
+  end
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -160,7 +227,9 @@ end
 function obj:start(appTapAttach)
   appTapAttach:registerApptap(
     "Google Chrome",
-    self.chromeRwdFwdGetEventtap
+    function()
+      return self:chromeRwdFwdGetEventtap()
+    end
   )
 end
 
