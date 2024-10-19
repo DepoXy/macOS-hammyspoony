@@ -52,18 +52,7 @@ function obj:chromeRwdFwdGetEventtapCallback(e)
   --   local unmodified = false
   --   print("e:getCharacters(false): " .. hs.inspect(e:getCharacters(unmodified)))
 
-  -- Mouse down/Mouse up events
-  if eventType == hs.eventtap.event.types.leftMouseDown
-    or eventType == hs.eventtap.event.types.leftMouseUp
-  then
-
-    -- Map <Ctrl-Click> to <Cmd-Click>, i.e., open link in new tab.
-    if eventFlags:containExactly({"ctrl"}) then
-      return true, {hs.eventtap.event.newMouseEvent(eventType, e:location(), {"cmd"})}
-    end
-  end
-
-  -- Key down events.
+  -- Process Key down events.
   if eventType == hs.eventtap.event.types.keyDown then
 
     -- Delete backward on <Ctrl-W>
@@ -140,6 +129,19 @@ function obj:chromeRwdFwdGetEventtapCallback(e)
       end
     end
   end  -- eventType == hs.eventtap.event.types.keyDown
+
+  -- Process Mouse down/Mouse up events
+  if eventType == hs.eventtap.event.types.leftMouseDown
+    or eventType == hs.eventtap.event.types.leftMouseUp
+  then
+
+    -- Map <Ctrl-Click> to <Cmd-Click>, i.e., open link in new tab.
+    if eventFlags:containExactly({"ctrl"}) then
+
+      -- Emit <Cmd-Click> at event location.
+      return true, {hs.eventtap.event.newMouseEvent(eventType, e:location(), {"cmd"})}
+    end
+  end
 
   -- Return false to propagate event.
   return false
