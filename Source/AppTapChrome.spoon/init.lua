@@ -45,15 +45,15 @@ function obj:chromeRwdFwdGetEventtapCallback(e)
   local eventFlags = e:getFlags()
   local keyCode = e:getKeyCode()
 
-  -- USAGE: Uncomment to debug/pry:
-  --   print("e:getType(): " .. hs.inspect(eventType))
-  --   print("e:getFlags(): " .. tableUtils:tableJoin(eventFlags, ", "))
-  --   print("e:getKeyCode(): " .. hs.inspect(keyCode))
-  --   local unmodified = false
-  --   print("e:getCharacters(false): " .. hs.inspect(e:getCharacters(unmodified)))
-
   -- Process Key down events.
   if eventType == hs.eventtap.event.types.keyDown then
+
+    -- USAGE: Uncomment to debug/pry:
+    --   print("e:getType(): " .. hs.inspect(eventType))
+    --   print("e:getFlags(): " .. tableUtils:tableJoin(eventFlags, ", "))
+    --   print("e:getKeyCode(): " .. hs.inspect(keyCode))
+    --   local unmodified = false
+    --   print("e:getCharacters(false): " .. hs.inspect(e:getCharacters(unmodified)))
 
     -- Delete backward on <Ctrl-W>
     if eventFlags:containExactly({"ctrl"})
