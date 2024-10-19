@@ -1,4 +1,4 @@
--- vim:tw=0:ts=3:sw=3:et:norl:nospell:ft=lua
+-- vim:tw=0:ts=2:sw=2:et:norl:nospell:ft=lua
 -- Author: Landon Bouma <https://tallybark.com/>
 -- Project: https://github.com/DepoXy/macOS-Hammyspoony#🥄
 -- License: MIT
@@ -53,26 +53,26 @@ obj.keyTerminalNewWindow = nil
 --   into focus.
 
 function obj:unminimzeAllAlacrittyWindows()
-   local alacritty_app = hs.application.get("Alacritty")
+  local alacritty_app = hs.application.get("Alacritty")
 
-   local app_wins = alacritty_app:allWindows()
+  local app_wins = alacritty_app:allWindows()
 
-   for key in pairs(app_wins) do
-      local app_win = app_wins[key]
+  for key in pairs(app_wins) do
+    local app_win = app_wins[key]
 
-      app_win:unminimize()
-   end
+    app_win:unminimize()
+  end
 
-   -- SAVVY: Until you click one of the unminimized windows, the
-   -- 'allButFrontmost' binding (from MinimizeAndHideWindows.spoon,
-   -- which Hammyspoony defaults to <Shift-Ctrl-Cmd-W>) won't minimize
-   -- Alacritty windows. Nor will the 'alacrittyWindowFronters1Through9Prefix'
-   -- bindings (e.g., <Cmd-1>, <Cmd-2>, etc.) work. It's as though the windows
-   -- don't know they're unminimized yet! But activate (or setFrontmost) seems
-   -- to do the trick.
-   alacritty_app:activate()
-   -- Also works:
-   --   alacritty_app:setFrontmost()
+  -- SAVVY: Until you click one of the unminimized windows, the
+  -- 'allButFrontmost' binding (from MinimizeAndHideWindows.spoon,
+  -- which Hammyspoony defaults to <Shift-Ctrl-Cmd-W>) won't minimize
+  -- Alacritty windows. Nor will the 'alacrittyWindowFronters1Through9Prefix'
+  -- bindings (e.g., <Cmd-1>, <Cmd-2>, etc.) work. It's as though the windows
+  -- don't know they're unminimized yet! But activate (or setFrontmost) seems
+  -- to do the trick.
+  alacritty_app:activate()
+  -- Also works:
+  --   alacritty_app:setFrontmost()
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -217,54 +217,54 @@ end
 -- (commented) functions).
 
 function obj:terminal_by_number_using_post_filter(win_num, win_hint)
-   local found_win
+  local found_win
 
-   -- Or if user provided a hint, look for a matching window
-   if win_hint then
-      found_win = hs.window.find(win_hint)
-   end
+  -- Or if user provided a hint, look for a matching window
+  if win_hint then
+    found_win = hs.window.find(win_hint)
+  end
 
-   if not found_win then
-      prefix_pattern = "^" .. win_num .. ". "
-      -- SAVVY: hs.window.find returns zero, one, or more windows,
-      -- but you'll only capture one window with this basic call:
-      --   local win = hs.window.find(prefix_pattern)
-      -- To capture all windows, convert return values to a table:
-      local wins = { hs.window.find(prefix_pattern) }
-      -- table.pack also works:
-      --   local win = table.pack(hs.window.find(prefix_pattern))
-      -- What's happening is illustrated by this call (but don't do this):
-      --   local win1, win2, win3 = hs.window.find(prefix_pattern)
+  if not found_win then
+    prefix_pattern = "^" .. win_num .. ". "
+    -- SAVVY: hs.window.find returns zero, one, or more windows,
+    -- but you'll only capture one window with this basic call:
+    --   local win = hs.window.find(prefix_pattern)
+    -- To capture all windows, convert return values to a table:
+    local wins = { hs.window.find(prefix_pattern) }
+    -- table.pack also works:
+    --   local win = table.pack(hs.window.find(prefix_pattern))
+    -- What's happening is illustrated by this call (but don't do this):
+    --   local win1, win2, win3 = hs.window.find(prefix_pattern)
 
-      local term_apps = { Alacritty = true, iTerm2 = true, Terminal = true, }
+    local term_apps = { Alacritty = true, iTerm2 = true, Terminal = true, }
 
-      for _, win in pairs(wins) do
-         local app_title = win:application():title()
-         -- hs.alert.show("win — " .. win:title() .. " / app — " .. app_title)
-         if term_apps[app_title] then
-            win:raise():focus()
+    for _, win in pairs(wins) do
+      local app_title = win:application():title()
+      -- hs.alert.show("win — " .. win:title() .. " / app — " .. app_title)
+      if term_apps[app_title] then
+        win:raise():focus()
 
-            return true
-         end
+        return true
       end
+    end
 
-      -- If no terminal window matched, use any application window that matches.
-      found_win = wins and wins[1]
-   end
+    -- If no terminal window matched, use any application window that matches.
+    found_win = wins and wins[1]
+  end
 
-   if found_win then
-      found_win:raise():focus()
+  if found_win then
+    found_win:raise():focus()
 
-      return true
-   end
+    return true
+  end
 
-   return false
+  return false
 end
 
 -- The win_hint arg lets user override these bindings in their
 -- own private config, using a backup window title pattern.
 function obj:alacritty_by_window_number_prefix(win_num, win_hint)
-   return self:terminal_by_number_using_post_filter(win_num, win_hint)
+  return self:terminal_by_number_using_post_filter(win_num, win_hint)
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -283,129 +283,129 @@ end
 --   event to the app to run the (hidden) New Window <Cmd-N> menu item.
 
 function obj:alacrittyNewWindow()
-   local task = hs.task.new(
-      "/usr/bin/open",
-      function(exit_code, stdout, stderr)
-         -- Default timeout, opt. 3rd arg, is 200000 microsecs (200 msec).
-         hs.eventtap.keyStroke({"cmd"}, "N", hs.application.get("Alacritty"))
-      end,
-      function() return false end,
-      { "-a", "alacritty" }
-   )
-   task:start()
+  local task = hs.task.new(
+    "/usr/bin/open",
+    function(exit_code, stdout, stderr)
+      -- Default timeout, opt. 3rd arg, is 200000 microsecs (200 msec).
+      hs.eventtap.keyStroke({"cmd"}, "N", hs.application.get("Alacritty"))
+    end,
+    function() return false end,
+    { "-a", "alacritty" }
+  )
+  task:start()
 end
 
 -- Alacritty foregrounder/opener
 
 function obj:alacrittyForegrounderOpener()
-   hs.application.launchOrFocus("Alacritty")
+  hs.application.launchOrFocus("Alacritty")
 end
 
 -- Terminal.app — New Window
 -- - For the rare time you want to test Apple Terminal.app
 
 function obj:terminalNewWindow()
-   local task = hs.task.new(
-      "/usr/bin/osascript",
-      nil,
-      function() return false end,
-      {
-         '-e', 'tell app "Terminal"',
-            '-e', 'do script ""',
-            '-e', 'activate',
-         '-e', 'end tell',
-      }
-   )
-   task:start()
+  local task = hs.task.new(
+    "/usr/bin/osascript",
+    nil,
+    function() return false end,
+    {
+      '-e', 'tell app "Terminal"',
+        '-e', 'do script ""',
+        '-e', 'activate',
+      '-e', 'end tell',
+    }
+  )
+  task:start()
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 function obj:bindHotkeyUnminimzeAllAlacrittyWindows(mapping)
-   if mapping["unminimzeAllAlacrittyWindows"] then
-      if (self.keyUnminimzeAllAlacrittyWindows) then
-         self.keyUnminimzeAllAlacrittyWindows:delete()
-      end
+  if mapping["unminimzeAllAlacrittyWindows"] then
+    if (self.keyUnminimzeAllAlacrittyWindows) then
+      self.keyUnminimzeAllAlacrittyWindows:delete()
+    end
 
-      self.keyUnminimzeAllAlacrittyWindows = hs.hotkey.bindSpec(
-         mapping["unminimzeAllAlacrittyWindows"],
-         function()
-            self:unminimzeAllAlacrittyWindows()
-         end
-      )
-   end
+    self.keyUnminimzeAllAlacrittyWindows = hs.hotkey.bindSpec(
+      mapping["unminimzeAllAlacrittyWindows"],
+      function()
+        self:unminimzeAllAlacrittyWindows()
+      end
+    )
+  end
 end
 
 function obj:bindHotkeysAlacrittyWindowFronters1Through9(mapping)
-   if mapping["alacrittyWindowFronters1Through9Prefix"] then
-      if (self.keysAlacrittyWindowFronters1Through9) then
-         tableUtils:tableForEach(
-            self.keysAlacrittyWindowFronters1Through9,
-            function (key, val) val:delete() end
-         )
-      end
-   end
-
-   self.keysAlacrittyWindowFronters1Through9 = {}
-
-   for key in pairs({1, 2, 3, 4, 5, 6, 7, 8, 9}) do
-      table.insert(
-         self.keysAlacrittyWindowFronters1Through9,
-         -- MAYBE: Use hs.hotkey.bindSpec instead?
-         hs.hotkey.bind(
-            mapping["alacrittyWindowFronters1Through9Prefix"],
-            tostring(key),
-            function()
-               self:alacritty_by_window_number_prefix(key)
-            end
-         )
+  if mapping["alacrittyWindowFronters1Through9Prefix"] then
+    if (self.keysAlacrittyWindowFronters1Through9) then
+      tableUtils:tableForEach(
+        self.keysAlacrittyWindowFronters1Through9,
+        function (key, val) val:delete() end
       )
-   end
+    end
+  end
+
+  self.keysAlacrittyWindowFronters1Through9 = {}
+
+  for key in pairs({1, 2, 3, 4, 5, 6, 7, 8, 9}) do
+    table.insert(
+      self.keysAlacrittyWindowFronters1Through9,
+      -- MAYBE: Use hs.hotkey.bindSpec instead?
+      hs.hotkey.bind(
+        mapping["alacrittyWindowFronters1Through9Prefix"],
+        tostring(key),
+        function()
+          self:alacritty_by_window_number_prefix(key)
+        end
+      )
+    )
+  end
 end
 
 function obj:bindHotkeysAlacrittyNewWindow(mapping)
-   if mapping["alacrittyNewWindow"] then
-      if (self.keyAlacrittyNewWindow) then
-         self.keyAlacrittyNewWindow:delete()
-      end
+  if mapping["alacrittyNewWindow"] then
+    if (self.keyAlacrittyNewWindow) then
+      self.keyAlacrittyNewWindow:delete()
+    end
 
-      self.keyAlacrittyNewWindow = hs.hotkey.bindSpec(
-         mapping["alacrittyNewWindow"],
-         function()
-            self:alacrittyNewWindow()
-         end
-      )
-   end
+    self.keyAlacrittyNewWindow = hs.hotkey.bindSpec(
+      mapping["alacrittyNewWindow"],
+      function()
+        self:alacrittyNewWindow()
+      end
+    )
+  end
 end
 
 function obj:bindHotkeysAlacrittyForegrounderOpener(mapping)
-   if mapping["alacrittyForegrounderOpener"] then
-      if (self.keyAlacrittyForegrounderOpener) then
-         self.keyAlacrittyForegrounderOpener:delete()
-      end
+  if mapping["alacrittyForegrounderOpener"] then
+    if (self.keyAlacrittyForegrounderOpener) then
+      self.keyAlacrittyForegrounderOpener:delete()
+    end
 
-      self.keyAlacrittyForegrounderOpener = hs.hotkey.bindSpec(
-         mapping["alacrittyForegrounderOpener"],
-         function()
-            self:alacrittyForegrounderOpener()
-         end
-      )
-   end
+    self.keyAlacrittyForegrounderOpener = hs.hotkey.bindSpec(
+      mapping["alacrittyForegrounderOpener"],
+      function()
+        self:alacrittyForegrounderOpener()
+      end
+    )
+  end
 end
 
 function obj:bindHotkeysTerminalNewWindow(mapping)
-   if mapping["terminalNewWindow"] then
-      if (self.keyTerminalNewWindow) then
-         self.keyTerminalNewWindow:delete()
-      end
+  if mapping["terminalNewWindow"] then
+    if (self.keyTerminalNewWindow) then
+      self.keyTerminalNewWindow:delete()
+    end
 
-      self.keyTerminalNewWindow = hs.hotkey.bindSpec(
-         mapping["terminalNewWindow"],
-         function()
-            self:terminalNewWindow()
-         end
-      )
-   end
+    self.keyTerminalNewWindow = hs.hotkey.bindSpec(
+      mapping["terminalNewWindow"],
+      function()
+        self:terminalNewWindow()
+      end
+    )
+  end
 end
 
 --- AlacrittyAndTerminalConveniences:bindHotkeys(mapping)
@@ -420,11 +420,11 @@ end
 ---   * alacrittyForegrounderOpener — front Alacritty, or open new Alacritty window if not running
 ---   * terminalNewWindow — open new Terminal.app window
 function obj:bindHotkeys(mapping)
-   self:bindHotkeyUnminimzeAllAlacrittyWindows(mapping)
-   self:bindHotkeysAlacrittyWindowFronters1Through9(mapping)
-   self:bindHotkeysAlacrittyNewWindow(mapping)
-   self:bindHotkeysAlacrittyForegrounderOpener(mapping)
-   self:bindHotkeysTerminalNewWindow(mapping)
+  self:bindHotkeyUnminimzeAllAlacrittyWindows(mapping)
+  self:bindHotkeysAlacrittyWindowFronters1Through9(mapping)
+  self:bindHotkeysAlacrittyNewWindow(mapping)
+  self:bindHotkeysAlacrittyForegrounderOpener(mapping)
+  self:bindHotkeysTerminalNewWindow(mapping)
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --

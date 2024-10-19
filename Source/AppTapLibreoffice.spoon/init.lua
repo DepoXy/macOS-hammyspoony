@@ -1,4 +1,4 @@
--- vim:tw=0:ts=3:sw=3:et:norl:nospell:ft=lua
+-- vim:tw=0:ts=2:sw=2:et:norl:nospell:ft=lua
 -- Author: Landon Bouma <https://tallybark.com/>
 -- Project: https://github.com/DepoXy/macOS-Hammyspoony#🥄
 -- License: MIT
@@ -46,57 +46,57 @@ obj.logger = hs.logger.new('AppTapLibreoffice')
 --   use DefaultKeyBinding.dict, so why start now].
 
 function obj:libreofficeGetEventtap()
-   return hs.eventtap.new(
-      {
-         hs.eventtap.event.types.keyDown,
-      },
-      function(e)
-         -- USAGE: Uncomment to debug/pry:
-         --   local unmodified = false
-         --   hs.alert.show("CHARS: " .. e:getCharacters(unmodified))
-         --   hs.alert.show("FLAGS: " .. tableUtils:tableJoin(e:getFlags(), ", "))
-         if e:getType() == hs.eventtap.event.types.keyDown then
-            local keyCode = e:getKeyCode()
-            local eventFlags = e:getFlags()
+  return hs.eventtap.new(
+    {
+      hs.eventtap.event.types.keyDown,
+    },
+    function(e)
+      -- USAGE: Uncomment to debug/pry:
+      --   local unmodified = false
+      --   hs.alert.show("CHARS: " .. e:getCharacters(unmodified))
+      --   hs.alert.show("FLAGS: " .. tableUtils:tableJoin(e:getFlags(), ", "))
+      if e:getType() == hs.eventtap.event.types.keyDown then
+        local keyCode = e:getKeyCode()
+        local eventFlags = e:getFlags()
 
-            if (keyCode == hs.keycodes.map["left"]
-               or keyCode == hs.keycodes.map["right"])
-            then
-               -- Note that modifiers includes "fn" when arrow key pressed.
-               if eventFlags:containExactly({"ctrl", "fn"}) then
-                  return true, {hs.eventtap.event.newKeyEvent({"alt", "fn"}, keyCode, true)}
-               elseif eventFlags:containExactly({"shift", "ctrl", "fn"}) then
-                  return true, {hs.eventtap.event.newKeyEvent({"shift", "alt", "fn"}, keyCode, true)}
-               elseif eventFlags:containExactly({"alt", "fn"}) then
-                  return true, {hs.eventtap.event.newKeyEvent({"cmd", "fn"}, keyCode, true)}
-               elseif eventFlags:containExactly({"shift", "alt", "fn"}) then
-                  return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd", "fn"}, keyCode, true)}
-               end
+        if (keyCode == hs.keycodes.map["left"]
+          or keyCode == hs.keycodes.map["right"])
+        then
+          -- Note that modifiers includes "fn" when arrow key pressed.
+          if eventFlags:containExactly({"ctrl", "fn"}) then
+            return true, {hs.eventtap.event.newKeyEvent({"alt", "fn"}, keyCode, true)}
+          elseif eventFlags:containExactly({"shift", "ctrl", "fn"}) then
+            return true, {hs.eventtap.event.newKeyEvent({"shift", "alt", "fn"}, keyCode, true)}
+          elseif eventFlags:containExactly({"alt", "fn"}) then
+            return true, {hs.eventtap.event.newKeyEvent({"cmd", "fn"}, keyCode, true)}
+          elseif eventFlags:containExactly({"shift", "alt", "fn"}) then
+            return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd", "fn"}, keyCode, true)}
+          end
+        end
+
+        if (keyCode == hs.keycodes.map["home"]
+          or keyCode == hs.keycodes.map["end"])
+        then
+          if eventFlags:containExactly({"fn"}) or eventFlags:containExactly({"shift", "fn"}) then
+            local newFlags = tableUtils:tableKeys(tableUtils:tableMerge(eventFlags, {["cmd"] = true}))
+
+            if keyCode == hs.keycodes.map["home"] then
+              return true, {hs.eventtap.event.newKeyEvent(newFlags, hs.keycodes.map["left"], true)}
+            elseif keyCode == hs.keycodes.map["end"] then
+              return true, {hs.eventtap.event.newKeyEvent(newFlags, hs.keycodes.map["right"], true)}
             end
-
-            if (keyCode == hs.keycodes.map["home"]
-               or keyCode == hs.keycodes.map["end"])
-            then
-               if eventFlags:containExactly({"fn"}) or eventFlags:containExactly({"shift", "fn"}) then
-                  local newFlags = tableUtils:tableKeys(tableUtils:tableMerge(eventFlags, {["cmd"] = true}))
-
-                  if keyCode == hs.keycodes.map["home"] then
-                     return true, {hs.eventtap.event.newKeyEvent(newFlags, hs.keycodes.map["left"], true)}
-                  elseif keyCode == hs.keycodes.map["end"] then
-                     return true, {hs.eventtap.event.newKeyEvent(newFlags, hs.keycodes.map["right"], true)}
-                  end
-               elseif eventFlags:containExactly({"ctrl", "fn"}) then
-                  return true, {hs.eventtap.event.newKeyEvent({"fn"}, keyCode, true)}
-               elseif eventFlags:containExactly({"shift", "ctrl", "fn"}) then
-                  return true, {hs.eventtap.event.newKeyEvent({"shift", "fn"}, keyCode, true)}
-               end
-            end
-         end
-
-         -- Return false to propagate event.
-         return false
+          elseif eventFlags:containExactly({"ctrl", "fn"}) then
+            return true, {hs.eventtap.event.newKeyEvent({"fn"}, keyCode, true)}
+          elseif eventFlags:containExactly({"shift", "ctrl", "fn"}) then
+            return true, {hs.eventtap.event.newKeyEvent({"shift", "fn"}, keyCode, true)}
+          end
+        end
       end
-   )
+
+      -- Return false to propagate event.
+      return false
+    end
+  )
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -108,10 +108,10 @@ end
 --- Parameters:
 ---  * appTapAttach
 function obj:start(appTapAttach)
-   appTapAttach:registerApptap(
-      "LibreOffice",
-      self.libreofficeGetEventtap
-   )
+  appTapAttach:registerApptap(
+    "LibreOffice",
+    self.libreofficeGetEventtap
+  )
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --

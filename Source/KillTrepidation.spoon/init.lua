@@ -1,4 +1,4 @@
--- vim:tw=0:ts=3:sw=3:et:norl:nospell:ft=lua
+-- vim:tw=0:ts=2:sw=2:et:norl:nospell:ft=lua
 -- Author: Landon Bouma <https://tallybark.com/>
 -- Project: https://github.com/DepoXy/macOS-Hammyspoony#🥄
 -- License: MIT
@@ -65,35 +65,35 @@ obj.keyKill = nil
 -- - I.e., <Ctrl-Q> always kills the active app, regardless...
 
 local inhibitCtrlQBinding = {
-   ["MacVim"] = true,
+  ["MacVim"] = true,
 }
 
 function obj:killTrepidation()
-   local app = hs.application.frontmostApplication()
+  local app = hs.application.frontmostApplication()
 
-   if not inhibitCtrlQBinding[app:name()] then
-      -- CALSO: app:kill()
-      hs.eventtap.keyStroke({"cmd"}, "Q", app)
-   else
-      hs.eventtap.keyStroke({"ctrl"}, "Q", app)
-   end
+  if not inhibitCtrlQBinding[app:name()] then
+    -- CALSO: app:kill()
+    hs.eventtap.keyStroke({"cmd"}, "Q", app)
+  else
+    hs.eventtap.keyStroke({"ctrl"}, "Q", app)
+  end
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 function obj:bindHotkeyKillTrepidation(mapping)
-   if mapping["kill"] then
-      if (self.keyKill) then
-         self.keyKill:delete()
-      end
+  if mapping["kill"] then
+    if (self.keyKill) then
+      self.keyKill:delete()
+    end
 
-      self.keyKill = hs.hotkey.bindSpec(
-         mapping["kill"],
-         function()
-            self:killTrepidation()
-         end
-      )
-   end
+    self.keyKill = hs.hotkey.bindSpec(
+      mapping["kill"],
+      function()
+        self:killTrepidation()
+      end
+    )
+  end
 end
 
 --- KillTrepidation:bindHotkeys(mapping)
@@ -104,7 +104,7 @@ end
 ---  * mapping - A table containing hotkey objifier/key details for the following items:
 ---   * kill - kill application
 function obj:bindHotkeys(mapping)
-   self:bindHotkeyKillTrepidation(mapping)
+  self:bindHotkeyKillTrepidation(mapping)
 end
 
 

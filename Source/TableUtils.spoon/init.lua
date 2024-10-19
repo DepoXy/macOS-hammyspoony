@@ -1,4 +1,4 @@
--- vim:tw=0:ts=3:sw=3:et:norl:nospell:ft=lua
+-- vim:tw=0:ts=2:sw=2:et:norl:nospell:ft=lua
 -- Author: Landon Bouma <https://tallybark.com/>
 -- Project: https://github.com/DepoXy/macOS-Hammyspoony#🥄
 -- License: MIT
@@ -40,68 +40,68 @@ obj.logger = hs.logger.new('TableUtils')
 -- already figured out and published.
 
 function obj:tableCopy(tbl)
-   local newTbl = {}
+  local newTbl = {}
 
-   for key, val in pairs(tbl) do
-     newTbl[key] = val
-   end
+  for key, val in pairs(tbl) do
+    newTbl[key] = val
+  end
 
-   return newTbl
+  return newTbl
 end
 
 function obj:tableForEach(tbl, callback)
-   for key, val in pairs(tbl) do
-     callback(key, val)
-   end
+  for key, val in pairs(tbl) do
+    callback(key, val)
+  end
 end
 
 function obj:tableJoin(table, sep)
-   local keys = ""
+  local keys = ""
 
-   for k, _ in pairs(table) do
-      if keys ~= "" then
-         keys = keys .. sep
-      end
-      keys = keys .. k
-   end
+  for k, _ in pairs(table) do
+    if keys ~= "" then
+      keys = keys .. sep
+    end
+    keys = keys .. k
+  end
 
-   return keys
+  return keys
 end
 
 function obj:tableKeys(tbl)
-   local keys = {}
+  local keys = {}
 
-   for key,_ in pairs(tbl) do
-      table.insert(keys, key)
-   end
+  for key,_ in pairs(tbl) do
+    table.insert(keys, key)
+  end
 
-   return keys
+  return keys
 end
 
 function obj:tableLen(tbl)
-   local count = 0
+  local count = 0
 
-   for _ in pairs(tbl) do
-      count = count + 1
-   end
+  for _ in pairs(tbl) do
+    count = count + 1
+  end
 
-   return count
+  return count
 end
 
 function obj:tableMerge(lhs, rhs)
-   local newTbl = self:tableCopy(lhs)
+  local newTbl = self:tableCopy(lhs)
 
-   for key, val in pairs(rhs) do
-      if type(val) == "table"
-         and type(newTbl[key] or false) == "table"
-      then
-         newTbl = tableMerge(newTbl[key] or {}, rhs[key] or {})
-      else
-         newTbl[key] = val
-      end
-   end
+  for key, val in pairs(rhs) do
+    if type(val) == "table"
+      and type(newTbl[key] or false) == "table"
+    then
+      newTbl = tableMerge(newTbl[key] or {}, rhs[key] or {})
+    else
+      newTbl[key] = val
+    end
+  end
 
-   return newTbl
+  return newTbl
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --

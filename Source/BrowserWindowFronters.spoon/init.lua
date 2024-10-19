@@ -1,4 +1,4 @@
--- vim:tw=0:ts=3:sw=3:et:norl:nospell:ft=lua
+-- vim:tw=0:ts=2:sw=2:et:norl:nospell:ft=lua
 -- Author: Landon Bouma <https://tallybark.com/>
 -- Project: https://github.com/DepoXy/macOS-Hammyspoony#🥄
 -- License: MIT
@@ -43,13 +43,13 @@ obj.keyFrontDevTools = nil
 --
 -- COPYD/THANX: https://news.ycombinator.com/item?id=29535518
 function obj:chromeWithProfile(profile, url)
-   local task = hs.task.new(
-      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-      nil,
-      function() return false end,
-      { "--profile-directory=" .. profile, "--new-window", url }
-   )
-   task:start()
+  local task = hs.task.new(
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    nil,
+    function() return false end,
+    { "--profile-directory=" .. profile, "--new-window", url }
+  )
+  task:start()
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -87,25 +87,25 @@ end
 --     end
 
 function obj:browserWindowFrontOrOpen(url, profile, matches)
-   local win
+  local win
 
-   if not matches then
-      matches = profile
-      profile = "Default"
-   elseif not profile then
-      profile = "Default"
-   end
+  if not matches then
+    matches = profile
+    profile = "Default"
+  elseif not profile then
+    profile = "Default"
+  end
 
-   for i = 1, #matches do
-      win = hs.window(matches[i])
-      if win then break end
-   end
+  for i = 1, #matches do
+    win = hs.window(matches[i])
+    if win then break end
+  end
 
-   if win then
-      win:raise():focus()
-   elseif url ~= "" then
-      self:chromeWithProfile(profile, url)
-   end
+  if win then
+    win:raise():focus()
+  elseif url ~= "" then
+    self:chromeWithProfile(profile, url)
+  end
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -129,17 +129,17 @@ end
 --     "first.last@gmail.com"
 
 function obj:frontEmail()
-   self:browserWindowFrontOrOpen(
-      "https://mail.google.com/mail/u/0/#inbox",
-      {
-         "@gmail.com",
-         "Inbox ",
-         "Google Calendar - ",
-         "Mail - ",
-         "Sign in to Outlook",
-         "Sign out",
-      }
-   )
+  self:browserWindowFrontOrOpen(
+    "https://mail.google.com/mail/u/0/#inbox",
+    {
+      "@gmail.com",
+      "Inbox ",
+      "Google Calendar - ",
+      "Mail - ",
+      "Sign in to Outlook",
+      "Sign out",
+    }
+  )
 end
 
 -------
@@ -158,16 +158,16 @@ end
 --       "🗨️         Chat & Social"
 
 function obj:frontChats()
-   self:browserWindowFrontOrOpen(
-      "https://www.messenger.com/",
-      {
-         "Messages for web",
-         "Google Messages for web",
-         "Messenger",
-         "Inbox • Chats",
-         "🗨️         Chat & Social",
-      }
-   )
+  self:browserWindowFrontOrOpen(
+    "https://www.messenger.com/",
+    {
+      "Messages for web",
+      "Google Messages for web",
+      "Messenger",
+      "Inbox • Chats",
+      "🗨️         Chat & Social",
+    }
+  )
 end
 
 -------
@@ -175,12 +175,12 @@ end
 -- PowerThesaurus [browser window]
 
 function obj:frontPowerThesaurus()
-   self:browserWindowFrontOrOpen(
-      "https://www.powerthesaurus.org/",
-      {
-         "Power Thesaurus",
-      }
-   )
+  self:browserWindowFrontOrOpen(
+    "https://www.powerthesaurus.org/",
+    {
+      "Power Thesaurus",
+    }
+  )
 end
 
 -------
@@ -188,12 +188,12 @@ end
 -- Regex Dictionary by Lou Hevly [browser window]
 
 function obj:frontRegexDict()
-   self:browserWindowFrontOrOpen(
-      "https://www.visca.com/regexdict/",
-      {
-         "Regex Dictionary by Lou Hevly",
-      }
-   )
+  self:browserWindowFrontOrOpen(
+    "https://www.visca.com/regexdict/",
+    {
+      "Regex Dictionary by Lou Hevly",
+    }
+  )
 end
 
 -------
@@ -203,91 +203,91 @@ end
 -- - You must pop DevTools out into a separate window for this to work.
 
 function obj:frontDevTools()
-   self:browserWindowFrontOrOpen(
-      "",
-      {
-         "DevTools",
-         "Inspect with Chrome Developer Tools",
-         "devtools://",
-      }
-   )
+  self:browserWindowFrontOrOpen(
+    "",
+    {
+      "DevTools",
+      "Inspect with Chrome Developer Tools",
+      "devtools://",
+    }
+  )
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 function obj:bindHotkeyFrontEmail(mapping)
-   if mapping["frontEmail"] then
-      if (self.keyFrontEmail) then
-         self.keyFrontEmail:delete()
-      end
+  if mapping["frontEmail"] then
+    if (self.keyFrontEmail) then
+      self.keyFrontEmail:delete()
+    end
 
-      self.keyFrontEmail = hs.hotkey.bindSpec(
-         mapping["frontEmail"],
-         function()
-            self:frontEmail()
-         end
-      )
-   end
+    self.keyFrontEmail = hs.hotkey.bindSpec(
+      mapping["frontEmail"],
+      function()
+        self:frontEmail()
+      end
+    )
+  end
 end
 
 function obj:bindHotkeyFrontChats(mapping)
-   if mapping["frontChats"] then
-      if (self.keyFrontChats) then
-         self.keyFrontChats:delete()
-      end
+  if mapping["frontChats"] then
+    if (self.keyFrontChats) then
+      self.keyFrontChats:delete()
+    end
 
-      self.keyFrontChats = hs.hotkey.bindSpec(
-         mapping["frontChats"],
-         function()
-            self:frontChats()
-         end
-      )
-   end
+    self.keyFrontChats = hs.hotkey.bindSpec(
+      mapping["frontChats"],
+      function()
+        self:frontChats()
+      end
+    )
+  end
 end
 
 function obj:bindHotkeyFrontPowerThesaurus(mapping)
-   if mapping["frontPowerThesaurus"] then
-      if (self.keyFrontPowerThesaurus) then
-         self.keyFrontPowerThesaurus:delete()
-      end
+  if mapping["frontPowerThesaurus"] then
+    if (self.keyFrontPowerThesaurus) then
+      self.keyFrontPowerThesaurus:delete()
+    end
 
-      self.keyFrontPowerThesaurus = hs.hotkey.bindSpec(
-         mapping["frontPowerThesaurus"],
-         function()
-            self:frontPowerThesaurus()
-         end
-      )
-   end
+    self.keyFrontPowerThesaurus = hs.hotkey.bindSpec(
+      mapping["frontPowerThesaurus"],
+      function()
+        self:frontPowerThesaurus()
+      end
+    )
+  end
 end
 
 function obj:bindHotkeyFrontRegexDict(mapping)
-   if mapping["frontRegexDict"] then
-      if (self.keyFrontRegexDict) then
-         self.keyFrontRegexDict:delete()
-      end
+  if mapping["frontRegexDict"] then
+    if (self.keyFrontRegexDict) then
+      self.keyFrontRegexDict:delete()
+    end
 
-      self.keyFrontRegexDict = hs.hotkey.bindSpec(
-         mapping["frontRegexDict"],
-         function()
-            self:frontRegexDict()
-         end
-      )
-   end
+    self.keyFrontRegexDict = hs.hotkey.bindSpec(
+      mapping["frontRegexDict"],
+      function()
+        self:frontRegexDict()
+      end
+    )
+  end
 end
 
 function obj:bindHotkeyFrontDevTools(mapping)
-   if mapping["frontDevTools"] then
-      if (self.keyFrontDevTools) then
-         self.keyFrontDevTools:delete()
-      end
+  if mapping["frontDevTools"] then
+    if (self.keyFrontDevTools) then
+      self.keyFrontDevTools:delete()
+    end
 
-      self.keyFrontDevTools = hs.hotkey.bindSpec(
-         mapping["frontDevTools"],
-         function()
-            self:frontDevTools()
-         end
-      )
-   end
+    self.keyFrontDevTools = hs.hotkey.bindSpec(
+      mapping["frontDevTools"],
+      function()
+        self:frontDevTools()
+      end
+    )
+  end
 end
 
 --- FrillsChrome:bindHotkeys(mapping)
@@ -302,11 +302,11 @@ end
 ---   * frontRegexDict — 
 ---   * frontDevTools — 
 function obj:bindHotkeys(mapping)
-   self:bindHotkeyFrontEmail(mapping)
-   self:bindHotkeyFrontChats(mapping)
-   self:bindHotkeyFrontPowerThesaurus(mapping)
-   self:bindHotkeyFrontRegexDict(mapping)
-   self:bindHotkeyFrontDevTools(mapping)
+  self:bindHotkeyFrontEmail(mapping)
+  self:bindHotkeyFrontChats(mapping)
+  self:bindHotkeyFrontPowerThesaurus(mapping)
+  self:bindHotkeyFrontRegexDict(mapping)
+  self:bindHotkeyFrontDevTools(mapping)
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --

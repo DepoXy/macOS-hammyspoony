@@ -1,4 +1,4 @@
--- vim:tw=0:ts=3:sw=3:et:norl:nospell:ft=lua
+-- vim:tw=0:ts=2:sw=2:et:norl:nospell:ft=lua
 -- Author: Landon Bouma <https://tallybark.com/>
 -- Project: https://github.com/DepoXy/macOS-Hammyspoony#🥄
 -- License: MIT
@@ -79,19 +79,19 @@ obj.logger = hs.logger.new('URISetFrontmost')
 --     hs.urlevent.bind(
 --       "setFrontmost",
 --       function(eventName, params)
---          self:uriSetFrontmost(eventName, params)
+--         self:uriSetFrontmost(eventName, params)
 --       end
 --     )
 
 obj.uriSetFrontmost = function(eventName, params)
-   print("eventName: " .. hs.inspect(eventName))
-   print("params: " .. hs.inspect(params))
-   local app = hs.application(params['app'])
+  print("eventName: " .. hs.inspect(eventName))
+  print("params: " .. hs.inspect(params))
+  local app = hs.application(params['app'])
 
-   if app then
-      -- DUNNO: Is this similar to `front_win:raise():focus()`?
-      app:setFrontmost()
-   end
+  if app then
+    -- DUNNO: Is this similar to `front_win:raise():focus()`?
+    app:setFrontmost()
+  end
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -103,7 +103,7 @@ end
 --- Parameters:
 ---  * None
 function obj:start()
-   hs.urlevent.bind("setFrontmost", self.uriSetFrontmost)
+  hs.urlevent.bind("setFrontmost", self.uriSetFrontmost)
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --

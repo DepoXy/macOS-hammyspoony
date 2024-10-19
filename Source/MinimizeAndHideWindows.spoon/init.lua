@@ -1,4 +1,4 @@
--- vim:tw=0:ts=3:sw=3:et:norl:nospell:ft=lua
+-- vim:tw=0:ts=2:sw=2:et:norl:nospell:ft=lua
 -- Author: Landon Bouma <https://tallybark.com/>
 -- Project: https://github.com/DepoXy/macOS-Hammyspoony#🥄
 -- License: MIT
@@ -164,77 +164,77 @@ obj.keyAllWindows = nil
 -- ALTLY: See also macOS <Cmd-Alt-h>, which hides all *other* app windows.
 
 function obj:hideMinimzeAllButFrontmost()
-   local front_win = hs.window.frontmostWindow()
+  local front_win = hs.window.frontmostWindow()
 
-   -- Minimize Alacritty windows first.
-   -- - Note that I tried calling minimize from the task callback,
-   --   but I couldn't get it to work. My hope was to minimize
-   --   hidden windows so user didn't have to see all the animation
-   --   happening. Oh, well.
-   local appWins = hs.application.get("Alacritty"):allWindows()
-   for key, _ in pairs(appWins) do
-      local appWin = appWins[key]
+  -- Minimize Alacritty windows first.
+  -- - Note that I tried calling minimize from the task callback,
+  --   but I couldn't get it to work. My hope was to minimize
+  --   hidden windows so user didn't have to see all the animation
+  --   happening. Oh, well.
+  local appWins = hs.application.get("Alacritty"):allWindows()
+  for key, _ in pairs(appWins) do
+    local appWin = appWins[key]
 
-      appWin:minimize()
-   end
+    appWin:minimize()
+  end
 
-   -- ALTLY: hs.osascript.applescriptFromFile(fileName)
-   local task = hs.task.new(
-      "/usr/bin/osascript",
-      -- Wait until the script finishes, then re-raise what was the active window
-      -- Note this may unhide the frontmost window's app's other windows, too.
-      -- - E.g., if a Chrome window is active, showing it later will make
-      --   other hidden Chrome windows visible.
-      -- - But if you run this command on GVim or Alacritty, it'll hide or
-      --   minimize all other windows, and then only one window will be
-      --   visible at the end.
-      function()
-         front_win:raise():focus()
-      end,
-      { os.getenv("HOME") .. "/.kit/mOS/macOS-Hammyspoony/lib/hide-all-windows.osa" }
-   )
+  -- ALTLY: hs.osascript.applescriptFromFile(fileName)
+  local task = hs.task.new(
+    "/usr/bin/osascript",
+    -- Wait until the script finishes, then re-raise what was the active window
+    -- Note this may unhide the frontmost window's app's other windows, too.
+    -- - E.g., if a Chrome window is active, showing it later will make
+    --   other hidden Chrome windows visible.
+    -- - But if you run this command on GVim or Alacritty, it'll hide or
+    --   minimize all other windows, and then only one window will be
+    --   visible at the end.
+    function()
+      front_win:raise():focus()
+    end,
+    { os.getenv("HOME") .. "/.kit/mOS/macOS-Hammyspoony/lib/hide-all-windows.osa" }
+  )
 
-   task:start()
+  task:start()
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 function obj:hideAllWindows()
-   hide_osa = os.getenv("HOME") .. "/.kit/mOS/macOS-Hammyspoony/lib/hide-all-windows.osa"
+  hide_osa = os.getenv("HOME") .. "/.kit/mOS/macOS-Hammyspoony/lib/hide-all-windows.osa"
 
-   hs.osascript.applescriptFromFile(hide_osa)
+  hs.osascript.applescriptFromFile(hide_osa)
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 function obj:bindHotkeyAllButFrontmost(mapping)
-   if mapping["allButFrontmost"] then
-      if (self.keyAllButFrontmost) then
-         self.keyAllButFrontmost:delete()
-      end
+  if mapping["allButFrontmost"] then
+    if (self.keyAllButFrontmost) then
+      self.keyAllButFrontmost:delete()
+    end
 
-      self.keyAllButFrontmost = hs.hotkey.bindSpec(
-         mapping["allButFrontmost"],
-         function()
-            self:hideMinimzeAllButFrontmost()
-         end
-      )
-   end
+    self.keyAllButFrontmost = hs.hotkey.bindSpec(
+      mapping["allButFrontmost"],
+      function()
+        self:hideMinimzeAllButFrontmost()
+      end
+    )
+  end
 end
 
 function obj:bindHotkeyAllWindows(mapping)
-   if mapping["allWindows"] then
-      if (self.keyAllWindows) then
-         self.keyAllWindows:delete()
-      end
+  if mapping["allWindows"] then
+    if (self.keyAllWindows) then
+      self.keyAllWindows:delete()
+    end
 
-      self.keyAllWindows = hs.hotkey.bindSpec(
-         mapping["allWindows"],
-         function()
-            self:hideAllWindows()
-         end
-      )
-   end
+    self.keyAllWindows = hs.hotkey.bindSpec(
+      mapping["allWindows"],
+      function()
+        self:hideAllWindows()
+      end
+    )
+  end
 end
 
 --- MinimizeAndHideWindows:bindHotkeys(mapping)
@@ -246,8 +246,8 @@ end
 ---   * allButFrontmost - hide/minimize all windows except frontmost
 ---   * allWindows - hide all windows
 function obj:bindHotkeys(mapping)
-   self:bindHotkeyAllButFrontmost(mapping)
-   self:bindHotkeyAllWindows(mapping)
+  self:bindHotkeyAllButFrontmost(mapping)
+  self:bindHotkeyAllWindows(mapping)
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --

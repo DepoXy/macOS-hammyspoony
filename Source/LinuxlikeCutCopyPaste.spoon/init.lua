@@ -1,4 +1,4 @@
--- vim:tw=0:ts=3:sw=3:et:norl:nospell:ft=lua
+-- vim:tw=0:ts=2:sw=2:et:norl:nospell:ft=lua
 -- Author: Landon Bouma <https://tallybark.com/>
 -- Project: https://github.com/DepoXy/macOS-Hammyspoony#🥄
 -- License: MIT
@@ -53,9 +53,9 @@ obj.logger = hs.logger.new('LinuxlikeCutCopyPaste')
 --- - Named after Karabiner-Elements' `frontmost_application_unless`.
 
 obj.frontmostApplicationUnless = {
-   ["iTerm2"] = true,
-   ["Terminal"] = true,
-   ["Alacritty"] = true,
+  ["iTerm2"] = true,
+  ["Terminal"] = true,
+  ["Alacritty"] = true,
 }
 
 --- TRACK/2024-10-09: If any app already wires some behavior from any
@@ -66,13 +66,13 @@ obj.frontmostApplicationUnless = {
 ---   it only adds an additional <Cmd> key stroke.
 
 function obj:emitCommandKeyEquivalent(char)
-   local app = hs.application.frontmostApplication()
+  local app = hs.application.frontmostApplication()
 
-   if not self.frontmostApplicationUnless[app:name()] then
-      hs.eventtap.keyStroke({"cmd"}, char, app)
-   else
-      hs.eventtap.keyStroke({"ctrl"}, char, app)
-   end
+  if not self.frontmostApplicationUnless[app:name()] then
+    hs.eventtap.keyStroke({"cmd"}, char, app)
+  else
+    hs.eventtap.keyStroke({"ctrl"}, char, app)
+  end
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -84,11 +84,11 @@ end
 --- Parameters:
 ---  * None
 function obj:start()
-   for _, char in ipairs({"X", "C", "V", "A"}) do
-      hs.hotkey.bind({"ctrl"}, char, function()
-         self:emitCommandKeyEquivalent(char)
-      end)
-   end
+  for _, char in ipairs({"X", "C", "V", "A"}) do
+    hs.hotkey.bind({"ctrl"}, char, function()
+      self:emitCommandKeyEquivalent(char)
+    end)
+  end
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --

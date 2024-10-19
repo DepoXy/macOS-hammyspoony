@@ -1,4 +1,4 @@
--- vim:tw=0:ts=3:sw=3:et:norl:nospell:ft=lua
+-- vim:tw=0:ts=2:sw=2:et:norl:nospell:ft=lua
 -- Author: Landon Bouma <https://tallybark.com/>
 -- Project: https://github.com/DepoXy/macOS-Hammyspoony#🥄
 -- License: MIT
@@ -68,32 +68,32 @@ obj.keyFrontChromeWindow = nil
 --   before opening the new Chrome window.
 
 function obj:makeNewChromeWindow(profile)
-   local chrome_app = hs.application.get("Google Chrome")
+  local chrome_app = hs.application.get("Google Chrome")
 
-   if chrome_app and chrome_app:isHidden() then
-      chrome_app:unhide()
-   end
+  if chrome_app and chrome_app:isHidden() then
+    chrome_app:unhide()
+  end
 
-   local profile_dir = ""
-   if profile then
-      profile_dir = "--profile-directory=" .. profile
-   end
+  local profile_dir = ""
+  if profile then
+    profile_dir = "--profile-directory=" .. profile
+  end
 
-   local task = hs.task.new(
-      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-      function()
-         local chrome_app = hs.application.get("Google Chrome")
-         if chrome_app then
-            chrome_app:setFrontmost()
-         end
-      end,
-      function() return false end,
-      {
-         "--new-window",
-         profile_dir,
-      }
-   )
-   task:start()
+  local task = hs.task.new(
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    function()
+      local chrome_app = hs.application.get("Google Chrome")
+      if chrome_app then
+        chrome_app:setFrontmost()
+      end
+    end,
+    function() return false end,
+    {
+      "--new-window",
+      profile_dir,
+    }
+  )
+  task:start()
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -103,49 +103,49 @@ end
 --   app but won't actually show any window.
 
 function obj:frontMRUChromeWindow()
-   local chrome_app = hs.application.get("Google Chrome")
+  local chrome_app = hs.application.get("Google Chrome")
 
-   if not chrome_app then
-      hs.application.launchOrFocus("Google Chrome")
-   else
-      if chrome_app:isHidden() then
-         chrome_app:unhide()
-      end
+  if not chrome_app then
+    hs.application.launchOrFocus("Google Chrome")
+  else
+    if chrome_app:isHidden() then
+      chrome_app:unhide()
+    end
 
-      chrome_app:setFrontmost()
-   end
+    chrome_app:setFrontmost()
+  end
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 function obj:bindHotkeyNewChromeWindow(mapping)
-   if mapping["newChromeWindow"] then
-      if (self.keyNewChromeWindow) then
-         self.keyNewChromeWindow:delete()
-      end
+  if mapping["newChromeWindow"] then
+    if (self.keyNewChromeWindow) then
+      self.keyNewChromeWindow:delete()
+    end
 
-      self.keyNewChromeWindow = hs.hotkey.bindSpec(
-         mapping["newChromeWindow"],
-         function()
-            self:makeNewChromeWindow("Default")
-         end
-      )
-   end
+    self.keyNewChromeWindow = hs.hotkey.bindSpec(
+      mapping["newChromeWindow"],
+      function()
+        self:makeNewChromeWindow("Default")
+      end
+    )
+  end
 end
 
 function obj:bindHotkeyFrontChromeWindow(mapping)
-   if mapping["frontChromeWindow"] then
-      if (self.keyFrontChromeWindow) then
-         self.keyFrontChromeWindow:delete()
-      end
+  if mapping["frontChromeWindow"] then
+    if (self.keyFrontChromeWindow) then
+      self.keyFrontChromeWindow:delete()
+    end
 
-      self.keyFrontChromeWindow = hs.hotkey.bindSpec(
-         mapping["frontChromeWindow"],
-         function()
-            self:frontMRUChromeWindow()
-         end
-      )
-   end
+    self.keyFrontChromeWindow = hs.hotkey.bindSpec(
+      mapping["frontChromeWindow"],
+      function()
+        self:frontMRUChromeWindow()
+      end
+    )
+  end
 end
 
 --- FrillsChrome:bindHotkeys(mapping)
@@ -157,8 +157,8 @@ end
 ---   * newChromeWindow — open new Chrome window
 ---   * frontChromeWindow — bring MRU Chrome window to the front, or start Chrome
 function obj:bindHotkeys(mapping)
-   self:bindHotkeyNewChromeWindow(mapping)
-   self:bindHotkeyFrontChromeWindow(mapping)
+  self:bindHotkeyNewChromeWindow(mapping)
+  self:bindHotkeyFrontChromeWindow(mapping)
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --

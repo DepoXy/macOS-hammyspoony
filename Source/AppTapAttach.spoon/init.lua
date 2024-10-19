@@ -1,4 +1,4 @@
--- vim:tw=0:ts=3:sw=3:et:norl:nospell:ft=lua
+-- vim:tw=0:ts=2:sw=2:et:norl:nospell:ft=lua
 -- Author: Landon Bouma <https://tallybark.com/>
 -- Project: https://github.com/DepoXy/macOS-Hammyspoony#🥄
 -- License: MIT
@@ -28,7 +28,7 @@ obj.logger = hs.logger.new('AppTapAttach')
 obj.appEventtaps = {}
 
 function obj:registerApptap(appName, getEventtap)
-   obj.appEventtaps[appName] = getEventtap()
+  obj.appEventtaps[appName] = getEventtap()
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -45,21 +45,21 @@ end
 obj.activeEventtap = nil
 
 function obj.appWatcherWatch(appName, eventType, theApp)
-   -- print("appName: " .. appName .. " / eventType: " .. eventType)
+  -- print("appName: " .. appName .. " / eventType: " .. eventType)
 
-   if eventType ~= hs.application.watcher.activated then
-      return
-   end
+  if eventType ~= hs.application.watcher.activated then
+    return
+  end
 
-   if obj.activeEventtap then
-      obj.activeEventtap:stop()
-      obj.activeEventtap = nil
-   end
+  if obj.activeEventtap then
+    obj.activeEventtap:stop()
+    obj.activeEventtap = nil
+  end
 
-   if obj.appEventtaps[appName] then
-      obj.activeEventtap = obj.appEventtaps[appName]
-      obj.activeEventtap:start()
-   end
+  if obj.appEventtaps[appName] then
+    obj.activeEventtap = obj.appEventtaps[appName]
+    obj.activeEventtap:start()
+  end
 end
 
 --- AppTapAttach:start()
@@ -69,9 +69,9 @@ end
 --- Parameters:
 ---  * (none)
 function obj:start()
-   self.appWatcher = hs.application.watcher.new(self.appWatcherWatch)
+  self.appWatcher = hs.application.watcher.new(self.appWatcherWatch)
 
-   self.appWatcher:start()
+  self.appWatcher:start()
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --

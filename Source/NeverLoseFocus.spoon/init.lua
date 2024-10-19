@@ -1,4 +1,4 @@
--- vim:tw=0:ts=3:sw=3:et:norl:nospell:ft=lua
+-- vim:tw=0:ts=2:sw=2:et:norl:nospell:ft=lua
 -- Author: Landon Bouma <https://tallybark.com/>
 -- Project: https://github.com/DepoXy/macOS-Hammyspoony#🥄
 -- License: MIT
@@ -94,7 +94,7 @@ obj.logger = hs.logger.new('NeverLoseFocus')
 obj.trace = false
 -- USAGE: Enable obj.trace for popup messaging.
 --
---  obj.trace = true
+--   obj.trace = true
 
 -- Shows a brief popup, and logs to the Hammerspoon Console.
 -- - Callers can use hs.inspect() to convert tables and more complex
@@ -103,10 +103,10 @@ obj.trace = false
 --     obj.logger.setLogLevel("debug")
 --     obj.logger.d(msg)
 function obj:debug(msg, force)
-   if (self.trace or force) then
-      hs.alert.show(msg)
-      print(msg)
-   end
+  if (self.trace or force) then
+    hs.alert.show(msg)
+    print(msg)
+  end
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -152,21 +152,21 @@ obj.lua_array_first_element = 1
 --   _app_name we'll track
 --   _event is a string: "windowFocused"
 function obj:mruAppsTrackFocused(_win, app_name, _event)
-   self:debug("INFOCUS: " .. app_name)
+  self:debug("INFOCUS: " .. app_name)
 
-   -- - Remove app from previous position, if previously recorded.
-   local idx = self:indexOf(self.mru_apps, app_name)
-   if idx then
-      table.remove(self.mru_apps, idx)
-   end
+  -- - Remove app from previous position, if previously recorded.
+  local idx = self:indexOf(self.mru_apps, app_name)
+  if idx then
+    table.remove(self.mru_apps, idx)
+  end
 
-   -- User focused this app, so make it the most-recently-used app.
-   -- - Except ignore Hammerspoon, it's... different (it reports multiple
-   --   (unnamed) visibleWindows(), even when its Console window is closed).
-   if not self:isAppExcluded(app_name) then
-      -- - Insert app at the first position.
-      table.insert(self.mru_apps, self.lua_array_first_element, app_name)
-   end
+  -- User focused this app, so make it the most-recently-used app.
+  -- - Except ignore Hammerspoon, it's... different (it reports multiple
+  --   (unnamed) visibleWindows(), even when its Console window is closed).
+  if not self:isAppExcluded(app_name) then
+    -- - Insert app at the first position.
+    table.insert(self.mru_apps, self.lua_array_first_element, app_name)
+  end
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -184,89 +184,89 @@ end
 --     them all, and #viz_wins is still 5....
 
 function obj:mruAppsTrackUnfocused(win, app_name, event)
-   self:debugReportApp("UNFOCUS", app_name, event, "")
+  self:debugReportApp("UNFOCUS", app_name, event, "")
 
-   -- Not so fast! (See comment above.)
-   local delay_secs = 0.2
+  -- Not so fast! (See comment above.)
+  local delay_secs = 0.2
 
-   hs.timer.doAfter(
-      delay_secs,
-      function()
-         self:mruAppsTrackUnfocusedCallback(win, app_name, event)
-      end
-   )
+  hs.timer.doAfter(
+    delay_secs,
+    function()
+      self:mruAppsTrackUnfocusedCallback(win, app_name, event)
+    end
+  )
 end
 
 function obj:mruAppsTrackUnfocusedCallback(win, app_name, event)
-   self:debugReportApp("UNFOCUS", app_name, "200ms later", "")
+  self:debugReportApp("UNFOCUS", app_name, "200ms later", "")
 
-   local the_app = hs.application.get(app_name)
+  local the_app = hs.application.get(app_name)
 
-   local viz_wins = the_app and the_app:visibleWindows() or {}
+  local viz_wins = the_app and the_app:visibleWindows() or {}
 
-   -- IDGIT: Hammerspoon reports different numbers of #viz_wins after you
-   -- close the Conole window. 10. 29. 25. 35. All over the place.
-   -- - So ignore the visibleWindows() count for Hammerspoon.
-   if ((#viz_wins > 0) and not (self:isAppExcluded(app_name))) then
-      self:debug("- App still has visible windows")
-   else
-      -- The app has no more visible windows, so it's no longer
-      -- a most-recently-used-and-still-visible application.
-      local idx = self:indexOf(obj.mru_apps, app_name)
-      if idx then
-         table.remove(obj.mru_apps, idx)
-      end
+  -- IDGIT: Hammerspoon reports different numbers of #viz_wins after you
+  -- close the Conole window. 10. 29. 25. 35. All over the place.
+  -- - So ignore the visibleWindows() count for Hammerspoon.
+  if ((#viz_wins > 0) and not (self:isAppExcluded(app_name))) then
+    self:debug("- App still has visible windows")
+  else
+    -- The app has no more visible windows, so it's no longer
+    -- a most-recently-used-and-still-visible application.
+    local idx = self:indexOf(obj.mru_apps, app_name)
+    if idx then
+      table.remove(obj.mru_apps, idx)
+    end
 
-      -- Now look for another application's window to promote to focus.
-      local mru_app = obj.mru_apps[obj.lua_array_first_element]
+    -- Now look for another application's window to promote to focus.
+    local mru_app = obj.mru_apps[obj.lua_array_first_element]
 
-      while mru_app do
-         self:debugReportApp("PROBING", mru_app, "", "  ")
+    while mru_app do
+      self:debugReportApp("PROBING", mru_app, "", "  ")
 
-         local the_app = hs.application.get(mru_app)
+      local the_app = hs.application.get(mru_app)
 
-         local focused_win = the_app and the_app:focusedWindow()
+      local focused_win = the_app and the_app:focusedWindow()
 
-         -- TRACK: Just curious if visibleWindows XOR focusedWindow.
-         self:debugCompare_visibleWindows_And_focusedWindow(the_app)
+      -- TRACK: Just curious if visibleWindows XOR focusedWindow.
+      self:debugCompare_visibleWindows_And_focusedWindow(the_app)
 
-         if ((focused_win == nil) or self:isAppExcluded(mru_app)) then
-            table.remove(obj.mru_apps, obj.lua_array_first_element)
-            mru_app = obj.mru_apps[obj.lua_array_first_element]
-         else
-            break
-         end
-      end
-
-      if mru_app then
-         self:debug("- Focusing: " .. mru_app)
-         hs.application.get(mru_app):setFrontmost()
+      if ((focused_win == nil) or self:isAppExcluded(mru_app)) then
+        table.remove(obj.mru_apps, obj.lua_array_first_element)
+        mru_app = obj.mru_apps[obj.lua_array_first_element]
       else
-         self:debug("- Nothing to focus")
-         local quotes = {
-            "You have no focus!",
-            "Clarity affords focus",  -- Thomas Leonard [who?]
-            "Never lose focus",
-            "If you're going through hell, keep going.",  -- Winston Churchill
-         }
-         local rand = math.random(#quotes)
-
-         hs.alert.show(quotes[rand])
+        break
       end
-   end
+    end
+
+    if mru_app then
+      self:debug("- Focusing: " .. mru_app)
+      hs.application.get(mru_app):setFrontmost()
+    else
+      self:debug("- Nothing to focus")
+      local quotes = {
+        "You have no focus!",
+        "Clarity affords focus",  -- Thomas Leonard [who?]
+        "Never lose focus",
+        "If you're going through hell, keep going.",  -- Winston Churchill
+      }
+      local rand = math.random(#quotes)
+
+      hs.alert.show(quotes[rand])
+    end
+  end
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 function obj:isAppExcluded(app_name)
-   local is_excluded = (false
-      or (app_name == "Hammerspoon")
-      -- What Hammerspoon sometimes reports for the Console window,
-      -- but not always... hrmm.
-      or (app_name == "Notification Center")
-   )
+  local is_excluded = (false
+    or (app_name == "Hammerspoon")
+    -- What Hammerspoon sometimes reports for the Console window,
+    -- but not always... hrmm.
+    or (app_name == "Notification Center")
+  )
 
-   return is_excluded
+  return is_excluded
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -278,82 +278,83 @@ end
 --          even after closing the "Hammerspoon Console" window.
 
 function obj:debugReportApp(context, app_name, event, spacing)
-   local the_app = hs.application.get(app_name)
+  local the_app = hs.application.get(app_name)
 
-   local event_parenthetical = ""
-   -- A Lua'ism: ~= is not equals (and not '!=', nor '<>').
-   if event ~= "" then
-      event_parenthetical = " (" .. event .. ")"
-   end
+  local event_parenthetical = ""
+  -- A Lua'ism: ~= is not equals (and not '!=', nor '<>').
+  if event ~= "" then
+    event_parenthetical = " (" .. event .. ")"
+  end
 
-   self:debug(spacing .. context .. ": " .. app_name .. event_parenthetical)
-   if the_app then
-      local viz_wins = the_app:visibleWindows()
-      local isFrontmost = the_app:isFrontmost()
-      local isHidden = the_app:isHidden()
-      local focusedWindow = the_app:focusedWindow()
-      self:debug(spacing .. "- #viz_wins:     " .. #viz_wins)
-      self:debug(spacing .. "- isFrontmost:   " .. hs.inspect(isFrontmost))
-      self:debug(spacing .. "- isHidden:      " .. hs.inspect(isHidden))
-      self:debug(spacing .. "- focusedWindow: " .. (focusedWindow and focusedWindow:title() or "nil"))
-   else
-      self:debug(spacing .. "- App has since been closed")
-   end
+  self:debug(spacing .. context .. ": " .. app_name .. event_parenthetical)
+  if the_app then
+    local viz_wins = the_app:visibleWindows()
+    local isFrontmost = the_app:isFrontmost()
+    local isHidden = the_app:isHidden()
+    local focusedWindow = the_app:focusedWindow()
+    self:debug(spacing .. "- #viz_wins:    " .. #viz_wins)
+    self:debug(spacing .. "- isFrontmost:  " .. hs.inspect(isFrontmost))
+    self:debug(spacing .. "- isHidden:     " .. hs.inspect(isHidden))
+    self:debug(spacing .. "- focusedWindow: " .. (focusedWindow and focusedWindow:title() or "nil"))
+  else
+    self:debug(spacing .. "- App has since been closed")
+  end
 end
 
 -- TRACK: I had issues with visibleWindows() early in development, but I
 -- think that was before I added the 200ms sleep to mruAppsTrackUnfocused.
 -- - But I'm still curious if these 2 fcns. ever disagree.
 function obj:debugCompare_visibleWindows_And_focusedWindow(the_app)
-   if not the_app then
-      return
-   end
+  if not the_app then
+    return
+  end
 
-   local viz_wins = the_app:visibleWindows()
-   local focused_win = the_app:focusedWindow()
+  local viz_wins = the_app:visibleWindows()
+  local focused_win = the_app:focusedWindow()
 
-   if (
-      ((#viz_wins == 0) and (focused_win ~= nil))
-      or ((#viz_wins > 0) and (focused_win == nil))
-   ) then
-      local always_print = true
+  if (
+    ((#viz_wins == 0) and (focused_win ~= nil))
+    or ((#viz_wins > 0) and (focused_win == nil))
+  ) then
+    local always_print = true
 
-      self:debug("GAFFE: focusedWindow and visibleWindows mismatch:", always_print)
-      self:debug(" - focusedWindow: " .. (focusedWindow and focusedWindow:title() or "nil"), always_print)
-      self:debug(" - visibleWindows: " .. hs.inspect(viz_wins), always_print)
-   end
-   end
+    self:debug("GAFFE: focusedWindow and visibleWindows mismatch:", always_print)
+    self:debug(" - focusedWindow: " .. (focusedWindow and focusedWindow:title() or "nil"), always_print)
+    self:debug(" - visibleWindows: " .. hs.inspect(viz_wins), always_print)
+  end
+end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- Return the first index with the given value, or nil if not found.
 function obj:indexOf(array, value)
-   for i, v in ipairs(array) do
-      if v == value then
+  for i, v in ipairs(array) do
+    if v == value then
 
-         return i
-      end
-   end
+      return i
+    end
+  end
 
-   return nil
+  return nil
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
-function obj:start()
-   self.all_windows_filter:subscribe(
-      hs.window.filter.windowUnfocused,
-      function(win, app_name, event)
-         self:mruAppsTrackUnfocused(win, app_name, event)
-      end
-   )
 
-   self.all_windows_filter:subscribe(
-      hs.window.filter.windowFocused,
-      function(win, app_name, event)
-         self:mruAppsTrackFocused(win, app_name, event)
-      end
-   )
+function obj:start()
+  self.all_windows_filter:subscribe(
+    hs.window.filter.windowUnfocused,
+    function(win, app_name, event)
+      self:mruAppsTrackUnfocused(win, app_name, event)
+    end
+  )
+
+  self.all_windows_filter:subscribe(
+    hs.window.filter.windowFocused,
+    function(win, app_name, event)
+      self:mruAppsTrackFocused(win, app_name, event)
+    end
+  )
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --

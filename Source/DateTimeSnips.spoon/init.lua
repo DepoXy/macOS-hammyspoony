@@ -1,4 +1,4 @@
--- vim:tw=0:ts=3:sw=3:et:norl:nospell:ft=lua
+-- vim:tw=0:ts=2:sw=2:et:norl:nospell:ft=lua
 -- Author: Landon Bouma <https://tallybark.com/>
 -- Project: https://github.com/DepoXy/macOS-Hammyspoony#🥄
 -- License: MIT
@@ -40,86 +40,86 @@ obj.keySnipISODateTimeDashed = nil
 --    https://github.com/landonb/dubs_edit_juice/blob/release/plugin/dubs_edit_juice.vim#L1513
 
 function obj:snipISODateToday()
-   local task = hs.task.new(
-      "/bin/dash",
-      nil,
-      function() return false end,
-      { "-c", 'printf "%s" "$(date "+%Y-%m-%d")" | pbcopy' }
-   )
-   task:start()
+  local task = hs.task.new(
+    "/bin/dash",
+    nil,
+    function() return false end,
+    { "-c", 'printf "%s" "$(date "+%Y-%m-%d")" | pbcopy' }
+  )
+  task:start()
 end
 
 -- <Ctrl-Cmd-Semicolon> — Put normal date plus:time into clipboard.
 -- - HSTRY: Named after erstwhile Homefries $(TTTtt:) command.
 
 function obj:snipISODateTimeNormal()
-   local task = hs.task.new(
-      "/bin/dash",
-      nil,
-      function() return false end,
-      { "-c", 'printf "%s" "$(date "+%Y-%m-%d %H:%M")" | tr -d "\n" | pbcopy' }
-   )
-   task:start()
+  local task = hs.task.new(
+    "/bin/dash",
+    nil,
+    function() return false end,
+    { "-c", 'printf "%s" "$(date "+%Y-%m-%d %H:%M")" | tr -d "\n" | pbcopy' }
+  )
+  task:start()
 end
 
 -- <Ctrl-Cmd-Apostrophe(Quote)> — Put dashed date-plus-time into clipboard.
 -- - CALSO: Homefries $(TTTtt-) command.
 
 function obj:snipISODateTimeDashed()
-   local task = hs.task.new(
-      "/bin/dash",
-      nil,
-      function() return false end,
-      { "-c", 'printf "%s" "$(date "+%Y-%m-%d-%H-%M")" | tr -d "\n" | pbcopy' }
-   )
-   task:start()
+  local task = hs.task.new(
+    "/bin/dash",
+    nil,
+    function() return false end,
+    { "-c", 'printf "%s" "$(date "+%Y-%m-%d-%H-%M")" | tr -d "\n" | pbcopy' }
+  )
+  task:start()
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 function obj:bindHotkeySnipISODateToday(mapping)
-   if mapping["snipISODateToday"] then
-      if (self.keySnipISODateToday) then
-         self.keySnipISODateToday:delete()
-      end
+  if mapping["snipISODateToday"] then
+    if (self.keySnipISODateToday) then
+      self.keySnipISODateToday:delete()
+    end
 
-      self.keySnipISODateToday = hs.hotkey.bindSpec(
-         mapping["snipISODateToday"],
-         function()
-            self:snipISODateToday()
-         end
-      )
-   end
+    self.keySnipISODateToday = hs.hotkey.bindSpec(
+      mapping["snipISODateToday"],
+      function()
+        self:snipISODateToday()
+      end
+    )
+  end
 end
 
 function obj:bindHotkeySnipISODateTimeNormal(mapping)
-   if mapping["snipISODateTimeNormal"] then
-      if (self.keySnipISODateTimeNormal) then
-         self.keySnipISODateTimeNormal:delete()
-      end
+  if mapping["snipISODateTimeNormal"] then
+    if (self.keySnipISODateTimeNormal) then
+      self.keySnipISODateTimeNormal:delete()
+    end
 
-      self.keySnipISODateTimeNormal = hs.hotkey.bindSpec(
-         mapping["snipISODateTimeNormal"],
-         function()
-            self:snipISODateTimeNormal()
-         end
-      )
-   end
+    self.keySnipISODateTimeNormal = hs.hotkey.bindSpec(
+      mapping["snipISODateTimeNormal"],
+      function()
+        self:snipISODateTimeNormal()
+      end
+    )
+  end
 end
 
 function obj:bindHotkeySnipISODateTimeDashed(mapping)
-   if mapping["snipISODateTimeDashed"] then
-      if (self.keySnipISODateTimeDashed) then
-         self.keySnipISODateTimeDashed:delete()
-      end
+  if mapping["snipISODateTimeDashed"] then
+    if (self.keySnipISODateTimeDashed) then
+      self.keySnipISODateTimeDashed:delete()
+    end
 
-      self.keySnipISODateTimeDashed = hs.hotkey.bindSpec(
-         mapping["snipISODateTimeDashed"],
-         function()
-            self:snipISODateTimeDashed()
-         end
-      )
-   end
+    self.keySnipISODateTimeDashed = hs.hotkey.bindSpec(
+      mapping["snipISODateTimeDashed"],
+      function()
+        self:snipISODateTimeDashed()
+      end
+    )
+  end
 end
 
 
@@ -133,9 +133,9 @@ end
 ---   * snipISODateTimeNormal — 
 ---   * snipISODateTimeDashed — 
 function obj:bindHotkeys(mapping)
-   self:bindHotkeySnipISODateToday(mapping)
-   self:bindHotkeySnipISODateTimeNormal(mapping)
-   self:bindHotkeySnipISODateTimeDashed(mapping)
+  self:bindHotkeySnipISODateToday(mapping)
+  self:bindHotkeySnipISODateTimeNormal(mapping)
+  self:bindHotkeySnipISODateTimeDashed(mapping)
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
