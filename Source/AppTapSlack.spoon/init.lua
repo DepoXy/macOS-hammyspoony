@@ -31,7 +31,9 @@ obj.slackWindowFilter = nil
 
 function obj:slackShortcutsGetEventtap()
    return hs.eventtap.new(
-      {hs.eventtap.event.types.keyDown},
+      {
+         hs.eventtap.event.types.keyDown,
+      },
       function(e)
          -- USAGE: Uncomment to debug/pry:
             --   local unmodified = false
