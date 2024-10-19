@@ -43,10 +43,10 @@ function obj:chromeRwdFwdGetEventtapCallback(e)
   -- SAVVY: Flags contain "fn" when non-character pressed.
   -- - E.g., <Left>, <Right>, <Home>, <End>, etc.
   local eventFlags = e:getFlags()
-  local keyCode = e:getKeyCode()
 
   -- Process Key down events.
   if eventType == hs.eventtap.event.types.keyDown then
+    local keyCode = e:getKeyCode()
 
     -- USAGE: Uncomment to debug/pry:
     --   print("e:getType(): " .. hs.inspect(eventType))
@@ -56,26 +56,57 @@ function obj:chromeRwdFwdGetEventtapCallback(e)
     --   print("e:getCharacters(false): " .. hs.inspect(e:getCharacters(unmodified)))
 
     -- Delete backward on <Ctrl-W>
-    if eventFlags:containExactly({"ctrl"})
-      and keyCode == hs.keycodes.map["w"]
-    then
-      -- SAVVY: <Ctrl-Backspace> works in location but not text input;
-      --        <Alt-Backspace> works in both.
+    if keyCode == hs.keycodes.map["w"] then
+      if eventFlags:containExactly({"ctrl"}) then
+        -- SAVVY: <Ctrl-Backspace> works in location but not text input;
+        --        <Alt-Backspace> works in any edit control, incl. locat.
 
-      return true, {hs.eventtap.event.newKeyEvent({"alt"}, hs.keycodes.map["delete"], true)}
+        -- Emit <Alt-Backspace>
+        return true, {hs.eventtap.event.newKeyEvent({"alt"}, hs.keycodes.map["delete"], true)}
+      else
+        return false
+      end
+    end
+
+    -- BWARE: Return quickly, lest character events run out-of-order!
+    -- - E.g., if user types faster than this code can process the
+    --   events, characters might be swapped (emitted out of sequence).
+    --   - Or sometimes author has seen the accent character picker pop up!
+    -- - SAVVY: This is b/c the AppleScript call in sussRoleOfElement().
+    if not eventFlags["fn"] then
+      -- We know that special character has *not* been pressed.
+
+      return false
     end
 
     -- Reload on <F5>/<Shift-F5>
-    if keyCode == hs.keycodes.map["F5"]
-      and (eventFlags:containExactly({"fn"}) or eventFlags:containExactly({"shift", "fn"}))
-    then
-      -- <F5>/<Shift-F5> → <Ctrl-R>/<Shift-Ctrl-R> (View > *Reload This Page*)
-      local withCtrl = tableUtils:tableMerge(eventFlags, {["ctrl"] = true})
-      -- "Delete" the "fn" key (it goes with "F5", but not normal characters).
-      withCtrl["fn"] = nil
-      local newFlags = tableUtils:tableKeys(withCtrl)
+    if keyCode == hs.keycodes.map["F5"] then
+      if eventFlags:containExactly({"fn"})
+        or eventFlags:containExactly({"shift", "fn"})
+      then
+        -- <F5>/<Shift-F5> → <Ctrl-R>/<Shift-Ctrl-R> (View > *Reload This Page*)
+        local withCtrl = tableUtils:tableMerge(eventFlags, {["ctrl"] = true})
+        -- "Delete" the "fn" key (it goes with "F5", but not normal characters).
+        withCtrl["fn"] = nil
+        local newFlags = tableUtils:tableKeys(withCtrl)
 
-      return true, {hs.eventtap.event.newKeyEvent(newFlags, hs.keycodes.map["r"], true)}
+        -- Emit <Ctrl-R> or <Shift-Ctrl-R>
+        return true, {hs.eventtap.event.newKeyEvent(newFlags, hs.keycodes.map["r"], true)}
+      else
+        return false
+      end
+    end
+
+    -- BWARE: See note above: Avoid race condition with other events
+    -- caused by sussRoleOfElement() running slowly b/c AppleScript.
+    if true
+      and keyCode ~= hs.keycodes.map["left"]
+      and keyCode ~= hs.keycodes.map["right"]
+      and keyCode ~= hs.keycodes.map["home"]
+      and keyCode ~= hs.keycodes.map["end"]
+    then
+
+      return false
     end
 
     -- Process <Left>/<Right> and <Home>/<End> combinations.
