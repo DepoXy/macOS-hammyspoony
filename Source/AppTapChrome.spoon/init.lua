@@ -25,6 +25,29 @@ obj.logger = hs.logger.new('AppTapChrome')
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
+--- AppTapChrome feature flags
+--- Variables
+--- - USAGE: To disable a feature, set its feature flag to false.
+---   - E.g.,
+---
+---       appTapAttach = hs.loadSpoon("AppTapAttach")
+---       appTapAttach:start()
+---
+---       local appTapChrome = hs.loadSpoon("AppTapChrome")
+---       appTapChrome.enable["DeleteBackwardUsingCtrlW"] = false
+---       appTapChrome:start(appTapAttach)
+
+obj.enable = {}
+obj.enable["DeleteBackwardUsingCtrlW"] = true
+obj.enable["ReloadThisPageUsingF5"] = true
+obj.enable["AlwaysOnBackForwardUsingCmdLeftRight"] = true
+obj.enable["LinuxlikeLeftRightMotions"] = true
+obj.enable["LinuxlikeHomeEndMotions"] = true
+obj.enable["SometimesOnBackForwardUsingAltLeftRight"] = true
+obj.enable["OpenLinkInNewTabUsingCtrlClick"] = true
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
 function obj:chromeRwdFwdGetEventtap()
   return hs.eventtap.new(
     {
@@ -57,7 +80,9 @@ function obj:chromeRwdFwdGetEventtapCallback(e)
 
     -- Delete backward on <Ctrl-W>
     if keyCode == hs.keycodes.map["w"] then
-      if eventFlags:containExactly({"ctrl"}) then
+      if obj.enable["DeleteBackwardUsingCtrlW"]
+        and eventFlags:containExactly({"ctrl"})
+      then
         -- SAVVY: <Ctrl-Backspace> works in location but not text input;
         --        <Alt-Backspace> works in any edit control, incl. locat.
 
@@ -81,8 +106,10 @@ function obj:chromeRwdFwdGetEventtapCallback(e)
 
     -- Reload on <F5>/<Shift-F5>
     if keyCode == hs.keycodes.map["F5"] then
-      if eventFlags:containExactly({"fn"})
-        or eventFlags:containExactly({"shift", "fn"})
+      if obj.enable["ReloadThisPageUsingF5"]
+        and (eventFlags:containExactly({"fn"})
+          or eventFlags:containExactly({"shift", "fn"})
+        )
       then
         -- <F5>/<Shift-F5> → <Ctrl-R>/<Shift-Ctrl-R> (View > *Reload This Page*)
         local withCtrl = tableUtils:tableMerge(eventFlags, {["ctrl"] = true})
@@ -115,11 +142,22 @@ function obj:chromeRwdFwdGetEventtapCallback(e)
 
     -- Map <Cmd-Left>/<Cmd-Right> to history Back/Forward, always,
     -- and not just when edit input is not active.
-    deleteEvent = self:processEventForLeftRight("cmd", keyCode, eventFlags)
-    if deleteEvent then
-      -- hs.alert.show("processEventForLeftRight/cmd")
+    if obj.enable["AlwaysOnBackForwardUsingCmdLeftRight"] then
+      deleteEvent = self:processEventForLeftRight("cmd", keyCode, eventFlags)
+      if deleteEvent then
+        -- hs.alert.show("processEventForLeftRight/cmd")
 
-      return deleteEvent
+        return deleteEvent
+      end
+    end
+
+    if not (
+      obj.enable["LinuxlikeLeftRightMotions"]
+      or obj.enable["LinuxlikeHomeEndMotions"]
+      or obj.enable["SometimesOnBackForwardUsingAltLeftRight"]
+    ) then
+
+      return false
     end
 
     -- When edit control active, <Left>/<Right> and <Home>/<End> combos move
@@ -127,24 +165,28 @@ function obj:chromeRwdFwdGetEventtapCallback(e)
     local roleOfElement = self:sussRoleOfElement()
 
     if self.textInputRoles[roleOfElement] then
-      -- CXREF: ~/.kit/mOS/macOS-Hammyspoony/Source/MotionUtils.spoon/init.lua
-      deleteEvent, newEvents = motionUtils:newKeyEventForLeftRight(keyCode, eventFlags)
-      if deleteEvent then
-        -- hs.alert.show("newKeyEventForLeftRight")
+      -- Remap modifier + <Left>/<Right> combinations to be more Linux-like.
+      if obj.enable["LinuxlikeLeftRightMotions"] then
+        -- CXREF: ~/.kit/mOS/macOS-Hammyspoony/Source/MotionUtils.spoon/init.lua
+        deleteEvent, newEvents = motionUtils:newKeyEventForLeftRight(keyCode, eventFlags)
+        if deleteEvent then
+          -- hs.alert.show("newKeyEventForLeftRight")
 
-        return deleteEvent, newEvents
+          return deleteEvent, newEvents
+        end
       end
 
       -- Remap <Home>/<End> from doc beg/end to line-wise beg/end;
       -- use <Ctrl-Home>/<Ctrl-End> for doc beg/end;
       -- and don't scroll browser window when at combobox beg/end.
-      --
-      -- CXREF: ~/.kit/mOS/macOS-Hammyspoony/Source/MotionUtils.spoon/init.lua
-      deleteEvent, newEvents = motionUtils:newKeyEventForHomeEnd(keyCode, eventFlags)
-      if deleteEvent then
-        -- hs.alert.show("newKeyEventForHomeEnd")
+      if obj.enable["LinuxlikeHomeEndMotions"] then
+        -- CXREF: ~/.kit/mOS/macOS-Hammyspoony/Source/MotionUtils.spoon/init.lua
+        deleteEvent, newEvents = motionUtils:newKeyEventForHomeEnd(keyCode, eventFlags)
+        if deleteEvent then
+          -- hs.alert.show("newKeyEventForHomeEnd")
 
-        return deleteEvent, newEvents
+          return deleteEvent, newEvents
+        end
       end
     else
       -- Wire <Alt-Left>/<Alt-Right> to Backward/Forward like in Linux,
@@ -152,11 +194,13 @@ function obj:chromeRwdFwdGetEventtapCallback(e)
       -- Linux, <Alt-Left>/<Alt-Right> always changes location, even
       -- when an edit control is active (which is my only gripe about
       -- the Linux behavior)).
-      deleteEvent = self:processEventForLeftRight("alt", keyCode, eventFlags)
-      if deleteEvent then
-        -- hs.alert.show("processEventForLeftRight/alt")
+      if obj.enable["SometimesOnBackForwardUsingAltLeftRight"] then
+        deleteEvent = self:processEventForLeftRight("alt", keyCode, eventFlags)
+        if deleteEvent then
+          -- hs.alert.show("processEventForLeftRight/alt")
 
-        return deleteEvent
+          return deleteEvent
+        end
       end
     end
   end  -- eventType == hs.eventtap.event.types.keyDown
@@ -167,10 +211,12 @@ function obj:chromeRwdFwdGetEventtapCallback(e)
   then
 
     -- Map <Ctrl-Click> to <Cmd-Click>, i.e., open link in new tab.
-    if eventFlags:containExactly({"ctrl"}) then
+    if obj.enable["OpenLinkInNewTabUsingCtrlClick"] then
+      if eventFlags:containExactly({"ctrl"}) then
 
-      -- Emit <Cmd-Click> at event location.
-      return true, {hs.eventtap.event.newMouseEvent(eventType, e:location(), {"cmd"})}
+        -- Emit <Cmd-Click> at event location.
+        return true, {hs.eventtap.event.newMouseEvent(eventType, e:location(), {"cmd"})}
+      end
     end
   end
 

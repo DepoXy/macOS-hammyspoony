@@ -539,6 +539,16 @@ appWindowChooser:start()
 
 local appTapChrome = hs.loadSpoon("AppTapChrome")
 
+-- USAGE: "Salt to taste" — In lieu of `bindHotkeys`, feature toggles.
+-- - Note these all default true. They're included here for visibility.
+appTapChrome.enable["DeleteBackwardUsingCtrlW"] = true
+appTapChrome.enable["ReloadThisPageUsingF5"] = true
+appTapChrome.enable["AlwaysOnBackForwardUsingCmdLeftRight"] = true
+appTapChrome.enable["LinuxlikeLeftRightMotions"] = true
+appTapChrome.enable["LinuxlikeHomeEndMotions"] = true
+appTapChrome.enable["SometimesOnBackForwardUsingAltLeftRight"] = true
+appTapChrome.enable["OpenLinkInNewTabUsingCtrlClick"] = true
+
 appTapChrome:start(appTapAttach)
 
 chromeWindowFilter = hs.window.filter.new("Google Chrome")
