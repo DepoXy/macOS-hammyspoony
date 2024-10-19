@@ -557,8 +557,10 @@ hs.loadSpoon("NeverLoseFocus"):start()
 
 aClock = hs.loadSpoon("AClock")
 
--- BNDNG: <Cmd-Alt-C>
-hs.hotkey.bind({"cmd", "alt"}, "c", function()
+-- BNDNG: <Ctrl-Alt-C>
+-- - Complements <Ctrl-Alt-D> Show Desktop, which might reveal GeekTool
+--   geeklet(s), if you put any there (as suggested by DepoXy setup docs).
+hs.hotkey.bind({"ctrl", "alt"}, "c", function()
   -- ALTLY: spoon.AClock:toggleShow()
   aClock:toggleShow()
 end)
