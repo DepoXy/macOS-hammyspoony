@@ -57,7 +57,7 @@ function obj:libreofficeGetEventtap()
          --   hs.alert.show("FLAGS: " .. tableUtils:tableJoin(e:getFlags(), ", "))
          if e:getType() == hs.eventtap.event.types.keyDown then
             local keyCode = e:getKeyCode()
-               local eventFlags = e:getFlags()
+            local eventFlags = e:getFlags()
 
             if (keyCode == hs.keycodes.map["left"]
                or keyCode == hs.keycodes.map["right"])
