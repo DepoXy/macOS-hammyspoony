@@ -156,7 +156,7 @@ reloadConfig:start()
 -- CXREF:
 -- ~/.kit/mOS/macOS-Hammyspoony/Source/TableUtils.spoon/init.lua
 
-local tableUtils = hs.loadSpoon("TableUtils")
+tableUtils = hs.loadSpoon("TableUtils")
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
