@@ -40,8 +40,8 @@ end
 
 function obj:chromeRwdFwdGetEventtapCallback(e)
   local eventType = e:getType()
-  -- SAVVY: Flags contain "fn" when non-character pressed, e.g.,
-  -- arrow key, Home/End, etc.
+  -- SAVVY: Flags contain "fn" when non-character pressed.
+  -- - E.g., <Left>, <Right>, <Home>, <End>, etc.
   local eventFlags = e:getFlags()
   local keyCode = e:getKeyCode()
 
@@ -89,7 +89,7 @@ function obj:chromeRwdFwdGetEventtapCallback(e)
       return true, {hs.eventtap.event.newKeyEvent(newFlags, hs.keycodes.map["r"], true)}
     end
 
-    -- Check for <Left>/<Right> and <Home>/<End> combinations.
+    -- Process <Left>/<Right> and <Home>/<End> combinations.
     local deleteEvent
     local newEvents
 
