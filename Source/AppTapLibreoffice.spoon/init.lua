@@ -64,6 +64,22 @@ function obj:libreofficeGetEventtap()
         local keyCode = e:getKeyCode()
         local eventFlags = e:getFlags()
 
+        -- Short-circuit if we know there's nothing left to process.
+        if not eventFlags["fn"] then
+
+          return false
+        end
+
+        if true
+          and keyCode ~= hs.keycodes.map["left"]
+          and keyCode ~= hs.keycodes.map["right"]
+          and keyCode ~= hs.keycodes.map["home"]
+          and keyCode ~= hs.keycodes.map["end"]
+        then
+
+          return false
+        end
+
         local deleteEvent
         local newEvents
 
