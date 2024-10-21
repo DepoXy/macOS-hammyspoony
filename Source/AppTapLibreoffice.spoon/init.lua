@@ -64,6 +64,28 @@ function obj:libreofficeGetEventtap()
         local keyCode = e:getKeyCode()
         local eventFlags = e:getFlags()
 
+        if e:getFlags():containExactly({"ctrl"}) then
+          if false then
+
+          -- *** LibreOffice
+
+          -- Most keybindings are changed via `defaults`:
+          --   default write org.libreoffice.script NSUserKeyEquivalents '{ ... }'
+          -- - See also its own Tools > Customize... > Keyboard Shortcuts 
+
+          -- *** Edit
+
+          -- Edit > Undo, Edit > Undo: Paste clipboard, etc.
+          elseif keyCode == hs.keycodes.map["z"] then
+            return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["z"], true)}
+
+            -- Edit > Redo, Edit > Redo: Replace: “segmentation ” → “C” [sic!?], etc.
+          elseif keyCode == hs.keycodes.map["y"] then
+            return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["y"], true)}
+
+          end
+        end
+
         -- Short-circuit if we know there's nothing left to process.
         if not eventFlags["fn"] then
 
