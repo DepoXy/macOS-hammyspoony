@@ -86,8 +86,13 @@ end
 --       ...
 --     end
 
-function obj:browserWindowFrontOrOpen(url, profile, matches)
+function obj:browserWindowFrontOrOpen(url, profile, matches, toggle)
   local win
+
+  if type(matches) == "boolean" then
+    toggle = matches
+    matches = nil
+  end
 
   if not matches then
     matches = profile
@@ -102,7 +107,17 @@ function obj:browserWindowFrontOrOpen(url, profile, matches)
   end
 
   if win then
-    win:raise():focus()
+    local front_win = nil
+
+    if toggle then
+      front_win = hs.window.frontmostWindow()
+    end
+
+    if front_win ~= win then
+      win:raise():focus()
+    else
+      front_win:minimize()
+    end
   elseif url ~= "" then
     self:chromeWithProfile(profile, url)
   end
@@ -129,6 +144,8 @@ end
 --     "first.last@gmail.com"
 
 function obj:frontEmail()
+  local toggle = true
+
   self:browserWindowFrontOrOpen(
     "https://mail.google.com/mail/u/0/#inbox",
     {
@@ -138,7 +155,8 @@ function obj:frontEmail()
       "Mail - ",
       "Sign in to Outlook",
       "Sign out",
-    }
+    },
+    toggle
   )
 end
 
@@ -158,6 +176,8 @@ end
 --       "🗨️         Chat & Social"
 
 function obj:frontChats()
+  local toggle = true
+
   self:browserWindowFrontOrOpen(
     "https://www.messenger.com/",
     {
@@ -166,7 +186,8 @@ function obj:frontChats()
       "Messenger",
       "Inbox • Chats",
       "🗨️         Chat & Social",
-    }
+    },
+    toggle
   )
 end
 
