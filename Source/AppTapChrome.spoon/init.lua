@@ -211,6 +211,7 @@ function obj:chromeRwdFwdGetEventtapCallback(e)
   then
 
     -- Map <Ctrl-Click> to <Cmd-Click>, i.e., open link in new tab.
+    -- - SAVVY: <Shift-Click> opens link in new window.
     if obj.enable["OpenLinkInNewTabUsingCtrlClick"] then
       if eventFlags:containExactly({"ctrl"}) then
 
