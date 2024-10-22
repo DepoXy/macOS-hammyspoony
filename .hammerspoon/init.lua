@@ -460,7 +460,7 @@ end)
 
 -- BNDNG: <Shift-Ctrl-Cmd-F>
 hs.hotkey.bind({"shift", "ctrl", "cmd"}, "F", function()
-  hs.application.launchOrFocus("Slack")
+  minimizeAndHideWindows:launchOrFocusOrMinimize("Slack")
 end)
 
 -------
@@ -478,7 +478,7 @@ end)
 
 -- BNDNG: <Shift-Ctrl-Cmd-X>
 hs.hotkey.bind({"shift", "ctrl", "cmd"}, "X", function()
-  hs.application.launchOrFocus("Spotify")
+  minimizeAndHideWindows:launchOrFocusOrMinimize("Spotify")
 end)
 
 -------

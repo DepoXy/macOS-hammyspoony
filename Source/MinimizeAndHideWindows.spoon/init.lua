@@ -207,6 +207,30 @@ end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
+-- launchOrFocusOrMinimize will hs.application.launchOrFocus() the
+-- requested app, or if the app is already active, it'll minimize
+-- the frontmost window.
+--
+-- - Use it to toggle an application window, e.g., you could use
+--   it to summon Spotify to see what song is playing, then press
+--   the same keybinding to minimize Spotify away.
+
+-- Note this fcn. is unrelated to the other keybindings herein, but
+-- it's related to window minimize — also the author didn't want to
+-- make a new Spoon just for this simple feature.
+
+function obj:launchOrFocusOrMinimize(appName)
+  local frontWin = hs.window.frontmostWindow()
+
+  if frontWin and frontWin:application():title() == appName then
+    frontWin:minimize()
+  else
+    hs.application.launchOrFocus(appName)
+  end
+end
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
 function obj:bindHotkeyAllButFrontmost(mapping)
   if mapping["allButFrontmost"] then
     if (self.keyAllButFrontmost) then
