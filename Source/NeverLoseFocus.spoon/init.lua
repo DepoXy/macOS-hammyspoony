@@ -250,9 +250,9 @@ function obj:mruAppsTrackUnfocusedCallback(win, app_name, event)
         "Never lose focus",
         "If you're going through hell, keep going.",  -- Winston Churchill
       }
-      local rand = math.random(#quotes)
+      local randQuote = math.random(#quotes)
 
-      hs.alert.show(quotes[rand])
+      hs.alert.show(quotes[randQuote])
     end
   end
 end
