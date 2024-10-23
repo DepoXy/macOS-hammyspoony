@@ -219,13 +219,13 @@ function obj:mruAppsTrackUnfocusedCallback(win, app_name, event)
   else
     -- The app has no more visible windows, so it's no longer
     -- a most-recently-used-and-still-visible application.
-    local idx = self:indexOf(obj.mru_apps, app_name)
+    local idx = self:indexOf(self.mru_apps, app_name)
     if idx then
-      table.remove(obj.mru_apps, idx)
+      table.remove(self.mru_apps, idx)
     end
 
     -- Now look for another application's window to promote to focus.
-    local mru_app = obj.mru_apps[obj.lua_array_first_element]
+    local mru_app = self.mru_apps[self.lua_array_first_element]
 
     while mru_app do
       self:debugReportApp("PROBING", mru_app, "", "  ")
@@ -238,8 +238,8 @@ function obj:mruAppsTrackUnfocusedCallback(win, app_name, event)
       self:debugCompare_visibleWindows_And_focusedWindow(the_app)
 
       if ((focused_win == nil) or self:isAppExcluded(mru_app)) then
-        table.remove(obj.mru_apps, obj.lua_array_first_element)
-        mru_app = obj.mru_apps[obj.lua_array_first_element]
+        table.remove(self.mru_apps, self.lua_array_first_element)
+        mru_app = self.mru_apps[self.lua_array_first_element]
       else
         break
       end
@@ -251,7 +251,7 @@ function obj:mruAppsTrackUnfocusedCallback(win, app_name, event)
     else
       self:debug("- Nothing to focus")
 
-      if obj.inspireMe then
+      if self.inspireMe then
         local quotes = {
           "You have no focus!",
           "Clarity affords focus",  -- Thomas Leonard [who?]

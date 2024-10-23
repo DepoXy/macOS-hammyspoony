@@ -80,7 +80,7 @@ function obj:chromeRwdFwdGetEventtapCallback(e)
 
     -- Delete backward on <Ctrl-W>
     if keyCode == hs.keycodes.map["w"] then
-      if obj.enable["DeleteBackwardUsingCtrlW"]
+      if self.enable["DeleteBackwardUsingCtrlW"]
         and eventFlags:containExactly({"ctrl"})
       then
         -- SAVVY: <Ctrl-Backspace> works in location but not text input;
@@ -106,7 +106,7 @@ function obj:chromeRwdFwdGetEventtapCallback(e)
 
     -- Reload on <F5>/<Shift-F5>
     if keyCode == hs.keycodes.map["F5"] then
-      if obj.enable["ReloadThisPageUsingF5"]
+      if self.enable["ReloadThisPageUsingF5"]
         and (eventFlags:containExactly({"fn"})
           or eventFlags:containExactly({"shift", "fn"})
         )
@@ -142,7 +142,7 @@ function obj:chromeRwdFwdGetEventtapCallback(e)
 
     -- Map <Cmd-Left>/<Cmd-Right> to history Back/Forward, always,
     -- and not just when edit input is not active.
-    if obj.enable["AlwaysOnBackForwardUsingCmdLeftRight"] then
+    if self.enable["AlwaysOnBackForwardUsingCmdLeftRight"] then
       deleteEvent = self:processEventForLeftRight("cmd", keyCode, eventFlags)
       if deleteEvent then
         -- hs.alert.show("processEventForLeftRight/cmd")
@@ -152,9 +152,9 @@ function obj:chromeRwdFwdGetEventtapCallback(e)
     end
 
     if not (
-      obj.enable["LinuxlikeLeftRightMotions"]
-      or obj.enable["LinuxlikeHomeEndMotions"]
-      or obj.enable["SometimesOnBackForwardUsingAltLeftRight"]
+      self.enable["LinuxlikeLeftRightMotions"]
+      or self.enable["LinuxlikeHomeEndMotions"]
+      or self.enable["SometimesOnBackForwardUsingAltLeftRight"]
     ) then
 
       return false
@@ -166,7 +166,7 @@ function obj:chromeRwdFwdGetEventtapCallback(e)
 
     if self.textInputRoles[roleOfElement] then
       -- Remap modifier + <Left>/<Right> combinations to be more Linux-like.
-      if obj.enable["LinuxlikeLeftRightMotions"] then
+      if self.enable["LinuxlikeLeftRightMotions"] then
         -- CXREF: ~/.kit/mOS/macOS-Hammyspoony/Source/MotionUtils.spoon/init.lua
         deleteEvent, newEvents = motionUtils:newKeyEventForLeftRight(keyCode, eventFlags)
         if deleteEvent then
@@ -179,7 +179,7 @@ function obj:chromeRwdFwdGetEventtapCallback(e)
       -- Remap <Home>/<End> from doc beg/end to line-wise beg/end;
       -- use <Ctrl-Home>/<Ctrl-End> for doc beg/end;
       -- and don't scroll browser window when at combobox beg/end.
-      if obj.enable["LinuxlikeHomeEndMotions"] then
+      if self.enable["LinuxlikeHomeEndMotions"] then
         -- CXREF: ~/.kit/mOS/macOS-Hammyspoony/Source/MotionUtils.spoon/init.lua
         deleteEvent, newEvents = motionUtils:newKeyEventForHomeEnd(keyCode, eventFlags)
         if deleteEvent then
@@ -194,7 +194,7 @@ function obj:chromeRwdFwdGetEventtapCallback(e)
       -- Linux, <Alt-Left>/<Alt-Right> always changes location, even
       -- when an edit control is active (which is my only gripe about
       -- the Linux behavior)).
-      if obj.enable["SometimesOnBackForwardUsingAltLeftRight"] then
+      if self.enable["SometimesOnBackForwardUsingAltLeftRight"] then
         deleteEvent = self:processEventForLeftRight("alt", keyCode, eventFlags)
         if deleteEvent then
           -- hs.alert.show("processEventForLeftRight/alt")
@@ -212,7 +212,7 @@ function obj:chromeRwdFwdGetEventtapCallback(e)
 
     -- Map <Ctrl-Click> to <Cmd-Click>, i.e., open link in new tab.
     -- - SAVVY: <Shift-Click> opens link in new window.
-    if obj.enable["OpenLinkInNewTabUsingCtrlClick"] then
+    if self.enable["OpenLinkInNewTabUsingCtrlClick"] then
       if eventFlags:containExactly({"ctrl"}) then
 
         -- Emit <Cmd-Click> at event location.

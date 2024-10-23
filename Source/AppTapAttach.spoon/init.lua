@@ -52,7 +52,7 @@ end
 obj.appEventtaps = {}
 
 function obj:registerApptap(appName, getEventtap)
-  obj.appEventtaps[appName] = getEventtap()
+  self.appEventtaps[appName] = getEventtap()
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -104,28 +104,28 @@ obj.eventTypeName = {
 }
 
 function obj:appWatcherWatch(appName, eventType, theApp)
-  self:debug("APPTAP: " .. obj.eventTypeName[eventType] .. " / " .. appName)
+  self:debug("APPTAP: " .. self.eventTypeName[eventType] .. " / " .. appName)
 
   if eventType == hs.application.watcher.deactivated then
     self:stopTimer()
 
-    if obj.activeEventtap then
-      obj.activeEventtap:stop()
-      obj.activeEventtap = nil
+    if self.activeEventtap then
+      self.activeEventtap:stop()
+      self.activeEventtap = nil
     end
 
-    if obj.pendingEventtap then
-      obj.activeEventtap = obj.pendingEventtap
-      obj.pendingEventtap = nil
-      obj.activeEventtap:start()
+    if self.pendingEventtap then
+      self.activeEventtap = self.pendingEventtap
+      self.pendingEventtap = nil
+      self.activeEventtap:start()
     end
   elseif eventType == hs.application.watcher.activated then
-    obj.pendingEventtap = obj.appEventtaps[appName]
+    self.pendingEventtap = self.appEventtaps[appName]
 
     self:stopTimer()
 
-    obj.activateDeactiveTimer = hs.timer.doAfter(
-      obj.timerDelaySecs,
+    self.activateDeactiveTimer = hs.timer.doAfter(
+      self.timerDelaySecs,
       function()
         self:alertIfDeactivatedEventNotReceivedSoon(appName)
       end
@@ -134,9 +134,9 @@ function obj:appWatcherWatch(appName, eventType, theApp)
 end
 
 function obj:stopTimer()
-  if obj.activateDeactiveTimer then
-    obj.activateDeactiveTimer:stop()
-    obj.activateDeactiveTimer = nil
+  if self.activateDeactiveTimer then
+    self.activateDeactiveTimer:stop()
+    self.activateDeactiveTimer = nil
   end
 end
 
