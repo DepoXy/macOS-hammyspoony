@@ -64,14 +64,14 @@ obj.keyKill = nil
 --
 -- - I.e., <Ctrl-Q> always kills the active app, regardless...
 
-local inhibitCtrlQBinding = {
+obj.inhibitCtrlQBinding = {
   ["MacVim"] = true,
 }
 
 function obj:killTrepidation()
   local app = hs.application.frontmostApplication()
 
-  if not inhibitCtrlQBinding[app:name()] then
+  if not self.inhibitCtrlQBinding[app:name()] then
     -- CALSO: app:kill()
     hs.eventtap.keyStroke({"cmd"}, "Q", app)
   else
