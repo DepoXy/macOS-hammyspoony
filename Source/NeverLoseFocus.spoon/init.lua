@@ -251,8 +251,9 @@ function obj:mruAppsTrackUnfocusedCallback(win, app_name, event)
         "If you're going through hell, keep going.",  -- Winston Churchill
       }
       local randQuote = math.random(#quotes)
+      local showSecs = 2.718
 
-      hs.alert.show(quotes[randQuote])
+      hs.alert.show(quotes[randQuote], showSecs)
     end
   end
 end
