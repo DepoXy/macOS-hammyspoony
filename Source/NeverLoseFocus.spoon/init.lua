@@ -340,7 +340,6 @@ end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
-
 function obj:start()
   self.all_windows_filter:subscribe(
     hs.window.filter.windowUnfocused,
