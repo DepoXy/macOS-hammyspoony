@@ -92,9 +92,19 @@ obj.timerDelaySecs = 0.2
 --   4 — hs.application.watcher.unhidden
 --   5 — hs.application.watcher.activated
 --   6 — hs.application.watcher.deactivated
+--
+obj.eventTypeName = {
+  [hs.application.watcher.launching]    = "launching  ",
+  [hs.application.watcher.launched]     = "launched   ",
+  [hs.application.watcher.terminated]   = "terminated ",
+  [hs.application.watcher.hidden]       = "hidden     ",
+  [hs.application.watcher.unhidden]     = "unhidden   ",
+  [hs.application.watcher.activated]    = "activated  ",
+  [hs.application.watcher.deactivated]  = "deactivated"
+}
 
 function obj:appWatcherWatch(appName, eventType, theApp)
-  -- print("appName: " .. appName .. " / eventType: " .. eventType)
+  self:debug("APPTAP: " .. obj.eventTypeName[eventType] .. " / " .. appName)
 
   if eventType == hs.application.watcher.deactivated then
     self:stopTimer()
@@ -132,15 +142,15 @@ end
 
 function obj:alertIfDeactivatedEventNotReceivedSoon(appName)
   -- This is an unexpected path.
-
   local timeoutSecs = 5  -- Defaults 2 secs.
 
-  hs.alert.show(
-    "ALERT: No *deactivated* event followed *activate*"
+  local message = ("APPTAP: ALERT: No *activated* → *deactivated* "
       .. " / App: " .. appName
-      .. " / Delay: " .. self.timerDelaySecs .. " mins.",
-    timeoutSecs
+      .. " / Delay: " .. self.timerDelaySecs .. " mins."
   )
+
+  hs.alert.show(message, timeoutSecs)
+  self:debug(message)
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
