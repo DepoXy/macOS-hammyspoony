@@ -107,7 +107,6 @@ function obj:bindHotkeys(mapping)
   self:bindHotkeyKillTrepidly(mapping)
 end
 
-
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 return obj
