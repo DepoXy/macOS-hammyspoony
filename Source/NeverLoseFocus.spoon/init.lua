@@ -256,29 +256,29 @@ function obj:mruAppsTrackUnfocusedCallback(win, app_name, event)
           "You have no focus!",
           "Clarity affords focus",  -- Thomas Leonard [who?]
           "Never lose focus",
-          "If you're going through hell,\nkeep going.",  -- Winston Churchill
-          -- "Concentrate all your thoughts upon the work in hand." /
-          "The sun’s rays do not burn\nuntil brought to a focus.",  -- Alexander Graham Bell
-          "If you want to make your dreams come true,\nthe first thing you have to do is wake up.",  -- J.M. Power
-          "Concentrate: you can’t have it all.",  -- Twyla Tharp
-          "Concentration is a fine antidote to anxiety.",  -- Jack Nicklaus
-          "It is during our darkest moments\nthat we must focus to see the light.", -- Aristotle Onassis
-          "You can't depend on your eyes\nwhen your imagination is out of focus.", -- Mark Twain
-          "The ego is nothing other than\nthe focus of conscious attention.",  -- Alan Watts
-          "Planets move in ellipses\nwith the Sun at one focus.",  -- Johannes Kepler
-          "The focus of subjectivity\nis a distorting mirror.",  -- Hans-Georg Gadamer
-          "If you just focus\non the smallest details,\nyou never get\nthe big picture right.",  -- Leroy Hood
-          "Focus 90% of your time on solutions\nand only 10% of your time on problems.",  -- Anthony J. D'Angelo
-          -- "Rage has such focus.\nIt can't go on forever,\nbut it's invigorating.",  -- Siri Hustvedt
-          "Focus on doing the right things\ninstead of a bunch of things.",  -- Mike Krieger
-          "If you want to survive\nthe zombie apocalypse,\nyou need to focus on\nincreasing your stamina.",  -- Tom Payne
-          "Who cares about winning?\nWe should focus on serving.",  -- Justin Trudeau
-          "The more you focus,\nthe more that focus becomes a habit.",  -- Charles Duhigg
-          "There's nothing like desperation\nto sharpen your sense of focus.",  -- Thomas Newman
-          "Our focus is on outputs\nrather than inputs.",  -- Stephen Cambone
-          "Shoot a few scenes out of focus.\nI want to win the foreign film award.",  -- Billy Wilder
-          "Selective amnesia is a good thing to have.\nSo is good focus.",  -- Adam Vinatieri
-          -- "Each feature I make is my focus at that time.",  -- Richard King
+          "If you're going through hell,\nkeep going",  -- Winston Churchill
+          -- "Concentrate all your thoughts upon the work in hand" /
+          "The sun’s rays do not burn\nuntil brought to a focus",  -- Alexander Graham Bell
+          "If you want to make your dreams come true,\nthe first thing you have to do is wake up",  -- J.M. Power
+          "Concentrate: you can’t have it all",  -- Twyla Tharp
+          "Concentration is a fine antidote to anxiety",  -- Jack Nicklaus
+          "It is during our darkest moments\nthat we must focus to see the light", -- Aristotle Onassis
+          "You can't depend on your eyes\nwhen your imagination is out of focus", -- Mark Twain
+          "The ego is nothing other than\nthe focus of conscious attention",  -- Alan Watts
+          "Planets move in ellipses\nwith the Sun at one focus",  -- Johannes Kepler
+          "The focus of subjectivity\nis a distorting mirror",  -- Hans-Georg Gadamer
+          "If you just focus\non the smallest details,\nyou never get\nthe big picture right",  -- Leroy Hood
+          "Focus 90% of your time on solutions\nand only 10% of your time on problems",  -- Anthony J. D'Angelo
+          -- "Rage has such focus.\nIt can't go on forever,\nbut it's invigorating",  -- Siri Hustvedt
+          "Focus on doing the right things\ninstead of a bunch of things",  -- Mike Krieger
+          "If you want to survive\nthe zombie apocalypse,\nyou need to focus on\nincreasing your stamina",  -- Tom Payne
+          "Who cares about winning?\nWe should focus on serving",  -- Justin Trudeau
+          "The more you focus,\nthe more that focus becomes a habit",  -- Charles Duhigg
+          "There's nothing like desperation\nto sharpen your sense of focus",  -- Thomas Newman
+          "Our focus is on outputs\nrather than inputs",  -- Stephen Cambone
+          "Shoot a few scenes out of focus.\nI want to win the foreign film award",  -- Billy Wilder
+          "Selective amnesia is a good thing to have.\nSo is good focus",  -- Adam Vinatieri
+          -- "Each feature I make is my focus at that time",  -- Richard King
         }
         local randQuote = math.random(#quotes)
         local showSecs = 2.718
