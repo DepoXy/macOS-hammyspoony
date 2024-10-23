@@ -189,6 +189,10 @@ minimizeAndHideWindows:bindHotkeys({
 
 frillsAlacrittyAndTerminal = hs.loadSpoon("FrillsAlacrittyAndTerminal")
 
+-- Make <Cmd-1> through <Cmd-9> accelerators togglable, e.g., so an
+-- accelerator twice will bring a terminal front, then minimize it.
+frillsAlacrittyAndTerminal.togglable = true
+
 frillsAlacrittyAndTerminal:bindHotkeys({
   -- BNDNG: <Shift-Ctrl-Cmd-0>
   unminimzeAllAlacrittyWindows={{"shift", "ctrl", "cmd"}, "0"},

@@ -25,6 +25,9 @@ obj.logger = hs.logger.new('AlacrittyAndTerminalConveniences')
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
+--- USAGE: Use this boolean to control window fronters 1 through 9 togglability.
+obj.togglable = true
+
 --- Internal variable: Key binding for unminimze all Alacritty windows.
 obj.keyUnminimzeAllAlacrittyWindows = nil
 
@@ -216,8 +219,13 @@ end
 -- not found by hs.window.filter or AppleScript (see the two previous
 -- (commented) functions).
 
-function obj:terminal_by_number_using_post_filter(win_num, win_hint)
+function obj:terminal_by_number_using_post_filter(win_num, win_hint, toggle)
   local found_win
+
+  if type(win_hint) == "boolean" then
+    toggle = win_hint
+    win_hint = nil
+  end
 
   -- Or if user provided a hint, look for a matching window
   if win_hint then
@@ -242,18 +250,30 @@ function obj:terminal_by_number_using_post_filter(win_num, win_hint)
       local app_title = win:application():title()
       -- hs.alert.show("win — " .. win:title() .. " / app — " .. app_title)
       if term_apps[app_title] then
-        win:raise():focus()
+        found_win = win
 
-        return true
+        break
       end
     end
 
     -- If no terminal window matched, use any application window that matches.
-    found_win = wins and wins[1]
+    if not found_win then
+      found_win = wins and wins[1]
+    end
   end
 
   if found_win then
-    found_win:raise():focus()
+    local front_win = nil
+
+    if toggle then
+      front_win = hs.window.frontmostWindow()
+    end
+
+    if front_win ~= found_win then
+      found_win:raise():focus()
+    else
+      front_win:minimize()
+    end
 
     return true
   end
@@ -263,8 +283,8 @@ end
 
 -- The win_hint arg lets user override these bindings in their
 -- own private config, using a backup window title pattern.
-function obj:alacritty_by_window_number_prefix(win_num, win_hint)
-  return self:terminal_by_number_using_post_filter(win_num, win_hint)
+function obj:alacritty_by_window_number_prefix(win_num, win_hint, toggle)
+  return self:terminal_by_number_using_post_filter(win_num, win_hint, toggle)
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -356,7 +376,7 @@ function obj:bindHotkeysAlacrittyWindowFronters1Through9(mapping)
         mapping["alacrittyWindowFronters1Through9Prefix"],
         tostring(key),
         function()
-          self:alacritty_by_window_number_prefix(key)
+          self:alacritty_by_window_number_prefix(key, obj.togglable)
         end
       )
     )
