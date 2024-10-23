@@ -104,7 +104,8 @@ obj.trace = false
 --     obj.logger.d(msg)
 function obj:debug(msg, force)
   if (self.trace or force) then
-    hs.alert.show(msg)
+    -- You could also/instead show an overlay alert:
+    --  hs.alert.show(msg)
     print(msg)
   end
 end
