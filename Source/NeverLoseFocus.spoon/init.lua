@@ -112,6 +112,12 @@ end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
+--- USAGE: Set true to see a[n] (inspirational?) quote when nothing focused
+--- (when the last visible window is closed/minimized/hidden).
+obj.inspireMe = false
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
 -- Ensure user is never (when possible) without focus!
 --
 -- - This window filter ensures (or at least tries to ensure) that
@@ -244,16 +250,19 @@ function obj:mruAppsTrackUnfocusedCallback(win, app_name, event)
       hs.application.get(mru_app):setFrontmost()
     else
       self:debug("- Nothing to focus")
-      local quotes = {
-        "You have no focus!",
-        "Clarity affords focus",  -- Thomas Leonard [who?]
-        "Never lose focus",
-        "If you're going through hell, keep going.",  -- Winston Churchill
-      }
-      local randQuote = math.random(#quotes)
-      local showSecs = 2.718
 
-      hs.alert.show(quotes[randQuote], showSecs)
+      if obj.inspireMe then
+        local quotes = {
+          "You have no focus!",
+          "Clarity affords focus",  -- Thomas Leonard [who?]
+          "Never lose focus",
+          "If you're going through hell, keep going.",  -- Winston Churchill
+        }
+        local randQuote = math.random(#quotes)
+        local showSecs = 2.718
+
+        hs.alert.show(quotes[randQuote], showSecs)
+      end
     end
   end
 end

@@ -567,7 +567,11 @@ end
 -- CXREF:
 -- ~/.kit/mOS/macOS-Hammyspoony/Source/NeverLoseFocus.spoon/init.lua
 
-hs.loadSpoon("NeverLoseFocus"):start()
+local neverLoseFocus = hs.loadSpoon("NeverLoseFocus")
+
+neverLoseFocus.inspireMe = true
+
+neverLoseFocus:start()
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
