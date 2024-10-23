@@ -25,6 +25,30 @@ obj.logger = hs.logger.new('AppTapAttach')
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
+obj.trace = false
+-- USAGE: Enable obj.trace for popup messaging.
+--
+--   obj.trace = true
+--- Log trace messages to the Hammerspoon Console.
+--- - Hints and whatnot:
+---   - Callers can use hs.inspect() to convert tables and more
+---     complex objects to text.
+---   - We use print and not the logger b/c the logger adds a
+---     lot of indentation.
+---     - To see for yourself, try, e.g.:
+---         obj.logger.setLogLevel("debug")
+---         obj.logger.d("I'm indented oh so much!")
+---       Then in Console you'll see:
+---         2024-10-23 18:41:05:          AppTapAtta:     I'm indented oh so much!
+---       (There might be a way to adjust this, but author hasn't checked.)
+function obj:debug(msg, force)
+  if (self.trace or force) then
+    print(msg)
+  end
+end
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
 obj.appEventtaps = {}
 
 function obj:registerApptap(appName, getEventtap)
