@@ -84,7 +84,7 @@ obj.timerDelaySecs = 0.2
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
--- REFER: Posisible event types:
+-- REFER: Possible event types:
 --   0 — hs.application.watcher.launching
 --   1 — hs.application.watcher.launched
 --   2 — hs.application.watcher.terminated
