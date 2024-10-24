@@ -92,7 +92,7 @@ obj.timerDelaySecs = 0.2
 --   4 — hs.application.watcher.unhidden
 --   5 — hs.application.watcher.activated
 --   6 — hs.application.watcher.deactivated
---
+
 obj.eventTypeName = {
   [hs.application.watcher.launching]    = "launching  ",
   [hs.application.watcher.launched]     = "launched   ",
