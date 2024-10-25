@@ -77,10 +77,15 @@ end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
+--- The eventtap for the foreground app, if your Hammerspoon config has
+--- registered an eventtap for the app.
 obj.activeEventtap = nil
 
+--- When switching apps, wait for both events (activated and deactivated),
+--- before changing taps.
 obj.pendingEventtap = nil
 
+--- For confidence checking this Spoon's state machine.
 obj.previousEventType = nil
 
 -- Just being nosy: Use a timer to alert if the *deactivated* event
