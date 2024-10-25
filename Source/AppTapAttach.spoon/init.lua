@@ -75,6 +75,8 @@ end
 ---   searched for known issues or anything. Fortunately this
 ---   approach seems to work, so we'll just go with it.)
 
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
 obj.activeEventtap = nil
 
 obj.pendingEventtap = nil
@@ -114,6 +116,8 @@ obj.appActivatedOrDeactivated = {
   [hs.application.watcher.activated] = true,
   [hs.application.watcher.deactivated] = true,
 }
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 function obj:appWatcherWatch(appName, eventType, theApp)
   -- Guard clause aka short circuit.
@@ -176,12 +180,16 @@ end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
 function obj:stopTimer()
   if self.activateDeactiveTimer then
     self.activateDeactiveTimer:stop()
     self.activateDeactiveTimer = nil
   end
 end
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 function obj:changeEventtapsAndAlertIfFollowUpEventNotReceivedSoon(appName)
   -- This is an unexpected path.
