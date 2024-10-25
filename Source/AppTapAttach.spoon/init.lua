@@ -75,18 +75,63 @@ end
 ---   searched for known issues or anything. Fortunately this
 ---   approach seems to work, so we'll just go with it.)
 
+--- EXTRA: The plot thickens!
+---
+--- - When you run Meld, the event sequence is normal.
+---
+--- - But when you Quit Meld, it's very special:
+---
+---   - hs.application.watcher signals *deactivated*, but:
+---
+---     - appName is nil
+---     - print(hs.inspect(theApp)) shows "(null)" instead of a name
+---     - theApp:title() is nil
+---     - theApp:bundleID() is nil
+---
+---   - Next you'll see 'loginwindow' activated
+---
+---   - Then 'python3' is terminated
+---
+---   - Then the next app is *activated*
+---
+---   - And finally 'loginwindow' is *deactivated*
+---
+--- - If you enabled trace (before this kluge), you might have seen, e.g.,
+---
+---     2024-10-24 18:45:26: APPTAP: deactivated / 1st event / (unnamed app?)
+---     2024-10-24 18:45:26: APPTAP: activated   / 2nd event / loginwindow
+---     2024-10-24 18:45:26: APPTAP: terminated  / dont care / python3
+---     2024-10-24 18:45:26: APPTAP: activated   / 1st event / MacVim
+---     2024-10-24 18:45:26: APPTAP: deactivated / 2nd event / loginwindow
+---
+--- - Also, you might see the *activated* event first for the named app,
+---   then the nameless app deactivated and terminated, without either
+---   'loginwindow' event. I know, right.
+---
+--- - Note that switching from Meld to another app (and not quitting) is
+---   normal (albeit the appName is 'python3').
+---
+--- As such, if *deactivated* doesn't have a name, we'll wait for a third
+--- event, *terminated*.
+---
+--- - We'll also throw an alert if the *terminated* app is *not* 'python3',
+---   out of curiosity if this issue afflicts any other app.
+
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 --- The eventtap for the foreground app, if your Hammerspoon config has
 --- registered an eventtap for the app.
 obj.activeEventtap = nil
 
---- When switching apps, wait for both events (activated and deactivated),
---- before changing taps.
+--- When switching apps, wait for both events (activated and deactivated;
+--- or activated and terminated, as discussed above), before changing taps.
 obj.pendingEventtap = nil
 
 --- For confidence checking this Spoon's state machine.
 obj.previousEventType = nil
+
+--- To handle the special Meld/python3 state transition (see "EXTRA", above).
+obj.namelessAppWasDeactivated = false
 
 -- Just being nosy: Use a timer to alert if the *deactivated* event
 -- and the *activated* event are not within timerDelaysSecs secs. of
@@ -125,10 +170,24 @@ obj.appActivatedOrDeactivated = {
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 function obj:appWatcherWatch(appName, eventType, theApp)
-  -- Guard clause aka short circuit.
-  if not self.appActivatedOrDeactivated[eventType] then
-    self:debug("APPTAP: " .. self.eventTypeName[eventType] .. " / dont care / " .. appName)
+  local appNameStr = appName or "(nameless!)"
 
+  --- See "EXTRA" comment above re: Meld/python3 behavior.
+  if not appName and eventType == hs.application.watcher.deactivated then
+    self:debug("APPTAP: " .. self.eventTypeName[eventType] .. " / --- event / (nameless!)")
+
+    -- This is a *deactivated* event for an unnamed app.
+    -- - Wait for its *terminated* event.
+    self.namelessAppWasDeactivated = true
+
+    return
+  end
+
+  -- Guard clause aka short circuit.
+  if not (self.namelessAppWasDeactivated and eventType == hs.application.watcher.terminated)
+    and not self.appActivatedOrDeactivated[eventType]
+  then
+    self:debug("APPTAP: " .. self.eventTypeName[eventType] .. " / dont care / " .. appNameStr)
 
     return
   end
@@ -136,16 +195,16 @@ function obj:appWatcherWatch(appName, eventType, theApp)
   self:stopTimer()
 
   if not self.previousEventType then
-    self:beginStateTransition(appName, eventType)
+    self:beginStateTransition(appName, eventType, appNameStr)
   else
-    self:changeEventtaps()
+    self:completeStateTransition(eventType, appNameStr)
   end
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
-function obj:beginStateTransition(appName, eventType)
-  self:debug("APPTAP: " .. self.eventTypeName[eventType] .. " / 1st event / " .. appName)
+function obj:beginStateTransition(appName, eventType, appNameStr)
+  self:debug("APPTAP: " .. self.eventTypeName[eventType] .. " / 1st event / " .. appNameStr)
 
   -- More often than not, the previous event is activated, but sometimes
   -- it's the deactivated event. Though in either case, we don't care.
@@ -161,16 +220,30 @@ function obj:beginStateTransition(appName, eventType)
   self.activateDeactiveTimer = hs.timer.doAfter(
     self.timerDelaySecs,
     function()
-      self:changeEventtapsAndAlertIfFollowUpEventNotReceivedSoon(appName)
+      local eventType = nil
+
+      self:changeEventtapsAndAlertIfFollowUpEventNotReceivedSoon(eventType, appNameStr)
     end
   )
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
-function obj:changeEventtaps()
+function obj:completeStateTransition(eventType, appNameStr)
+  local eventTypeName = self.eventTypeName[eventType] or "timed out!!"
+
+  self:debug("APPTAP: " .. eventTypeName .. " / 2nd event / " .. appNameStr)
+
   self.previousEventType = nil
 
+  self:resetNamelessAppWasDeactivated(appNameStr)
+
+  self:changeEventtaps()
+end
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+function obj:changeEventtaps()
   if self.activeEventtap then
     self.activeEventtap:stop()
     self.activeEventtap = nil
@@ -185,6 +258,23 @@ end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
+function obj:resetNamelessAppWasDeactivated(appNameStr)
+  if not self.namelessAppWasDeactivated then
+
+    return
+  end
+
+  self.namelessAppWasDeactivated = false
+
+  if appNameStr ~= "python3" then
+    local alertMsg = "APPTAP: GAFFE: Expected \"python3\", not \"" .. appNameStr .. "\""
+
+    self:debug(alertMsg)
+
+    hs.alert.show(alertMsg)
+  end
+end
+
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 function obj:stopTimer()
@@ -196,7 +286,7 @@ end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
-function obj:changeEventtapsAndAlertIfFollowUpEventNotReceivedSoon(appName)
+function obj:changeEventtapsAndAlertIfFollowUpEventNotReceivedSoon(eventType, appNameStr)
   -- This is an unexpected path.
   local previousEventName = string.gsub(
     self.eventTypeName[self.previousEventType] or "(no prev. event)",
@@ -207,7 +297,7 @@ function obj:changeEventtapsAndAlertIfFollowUpEventNotReceivedSoon(appName)
   local message = ("APPTAP: ALERT: Got "
       .. previousEventName
       .. " but not its follow-up"
-      .. " / App: " .. appName
+      .. " / App: " .. appNameStr
       .. " / Delay: " .. self.timerDelaySecs .. " mins."
   )
 
