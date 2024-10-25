@@ -185,15 +185,14 @@ end
 
 function obj:changeEventtapsAndAlertIfFollowUpEventNotReceivedSoon(appName)
   -- This is an unexpected path.
-
-  -- Seems like we should do this anyway... or maybe not,
-  -- since this path never happens to the author? (Though
-  -- if that's the answer, maybe we should at least stop
-  -- the old eventtap, but not start the new one?)
-  obj:changeEventtaps()
+  local previousEventName = string.gsub(
+    self.eventTypeName[self.previousEventType] or "(no prev. event)",
+    "%s+$",
+    ""
+  )
 
   local message = ("APPTAP: ALERT: Got "
-      .. self.eventTypeName[obj.previousEventType]
+      .. previousEventName
       .. " but not its follow-up"
       .. " / App: " .. appName
       .. " / Delay: " .. self.timerDelaySecs .. " mins."
@@ -204,6 +203,12 @@ function obj:changeEventtapsAndAlertIfFollowUpEventNotReceivedSoon(appName)
   local timeoutSecs = 5  -- Defaults 2 secs.
 
   hs.alert.show(message, timeoutSecs)
+
+  -- Seems like we should do this anyway... or maybe not,
+  -- since this path never happens to the author? (Though
+  -- if that's the answer, maybe we should at least stop
+  -- the old eventtap, but not start the new one?)
+  obj:completeStateTransition(eventType, appNameStr)
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
