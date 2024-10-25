@@ -127,29 +127,37 @@ function obj:appWatcherWatch(appName, eventType, theApp)
   self:stopTimer()
 
   if not self.previousEventType then
-    self:debug("APPTAP: " .. self.eventTypeName[eventType] .. " / 1st event / " .. appName)
-
-    -- More often than not, the previous event is activated, but sometimes
-    -- it's the deactivated event. Though in either case, we don't care.
-    self.previousEventType = eventType
-
-    -- Start the eventtap on the subsequent activated/deactivated.
-    self.pendingEventtap = self.appEventtaps[appName]
-
-    -- But don't wait for another event to happen, in case it doesn't
-    -- (though author has never seen it not happen).
-    self.activateDeactiveTimer = hs.timer.doAfter(
-      self.timerDelaySecs,
-      function()
-        self:changeEventtapsAndAlertIfFollowUpEventNotReceivedSoon(appName)
-      end
-    )
+    self:beginStateTransition(appName, eventType)
   else
-    self:debug("APPTAP: " .. self.eventTypeName[eventType] .. " / 2nd event / " .. appName)
-
     self:changeEventtaps()
   end
 end
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+function obj:beginStateTransition(appName, eventType)
+  self:debug("APPTAP: " .. self.eventTypeName[eventType] .. " / 1st event / " .. appName)
+
+  -- More often than not, the previous event is activated, but sometimes
+  -- it's the deactivated event. Though in either case, we don't care.
+  self.previousEventType = eventType
+
+  -- Start the eventtap on the subsequent activated/deactivated.
+  if appName then
+    self.pendingEventtap = self.appEventtaps[appName]
+  end
+
+  -- But don't wait for another event to happen, in case it doesn't
+  -- (though author has never seen it not happen).
+  self.activateDeactiveTimer = hs.timer.doAfter(
+    self.timerDelaySecs,
+    function()
+      self:changeEventtapsAndAlertIfFollowUpEventNotReceivedSoon(appName)
+    end
+  )
+end
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 function obj:changeEventtaps()
   self.previousEventType = nil
