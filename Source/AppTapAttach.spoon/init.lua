@@ -130,6 +130,9 @@ obj.pendingEventtap = nil
 --- For confidence checking this Spoon's state machine.
 obj.previousEventType = nil
 
+-- For when deactivated signaled with nil application
+obj.previousActivatedAppName = nil
+
 --- To handle the special Meld/python3 state transition (see "EXTRA", above).
 obj.namelessAppWasDeactivated = false
 
@@ -176,11 +179,26 @@ function obj:appWatcherWatch(appName, eventType, _theApp)
   if not appName and eventType == hs.application.watcher.deactivated then
     self:debug("APPTAP: " .. self.eventTypeName[eventType] .. " / --- event / (nameless!)")
 
-    -- This is a *deactivated* event for an unnamed app.
-    -- - Wait for its *terminated* event.
-    self.namelessAppWasDeactivated = true
+    if self.previousActivatedAppName == "pinentry-mac" then
+      -- SAVVY: Not sure what 'loginwindow' app is, or why it happens like this,
+      -- but running `pass` using popup pinentry creates the following sequence:
+      --
+      --   APPTAP: activated   / 1st event / pinentry-mac
+      --   APPTAP: deactivated / 2nd event / Alacritty
+      --
+      --   APPTAP: deactivated / 1st event / pinentry-mac [inferred]
+      --   APPTAP: activated   / 2nd event / loginwindow
+      --
+      --   APPTAP: activated   / 1st event / Alacritty
+      --   APPTAP: deactivated / 2nd event / loginwindow
+      appName = self.previousActivatedAppName
+    else
+      -- This is a *deactivated* event for an unnamed app.
+      -- - Wait for its *terminated* event.
+      self.namelessAppWasDeactivated = true
 
-    return
+      return
+    end
   end
 
   -- Guard clause aka short circuit.
@@ -193,6 +211,15 @@ function obj:appWatcherWatch(appName, eventType, _theApp)
   end
 
   self:stopTimer()
+
+  if eventType == hs.application.watcher.activated then
+    if not appName then
+      -- Unreachable path (or at least author has never seen this happen)
+      self:debug("GAFFE: Got nameless activated event!")
+    end
+
+    self.previousActivatedAppName = appName
+  end
 
   if not self.previousEventType then
     self:beginStateTransition(appName, eventType, appNameStr)
