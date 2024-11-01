@@ -169,7 +169,7 @@ obj.appActivatedOrDeactivated = {
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
-function obj:appWatcherWatch(appName, eventType, theApp)
+function obj:appWatcherWatch(appName, eventType, _theApp)
   local appNameStr = appName or "(nameless!)"
 
   --- See "EXTRA" comment above re: Meld/python3 behavior.
