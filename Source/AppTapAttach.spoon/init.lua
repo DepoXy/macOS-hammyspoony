@@ -130,8 +130,9 @@ obj.pendingEventtap = nil
 --- For confidence checking this Spoon's state machine.
 obj.previousEventType = nil
 
--- For when deactivated signaled with nil application
+-- State variables for when deactivated signaled with nil application.
 obj.previousActivatedAppName = nil
+obj.previousActivatedAppNameWaitForIt = nil
 
 --- To handle the special Meld/python3 state transition (see "EXTRA", above).
 obj.namelessAppWasDeactivated = false
@@ -179,23 +180,29 @@ function obj:appWatcherWatch(appName, eventType, _theApp)
   if not appName and eventType == hs.application.watcher.deactivated then
     self:debug("APPTAP: " .. self.eventTypeName[eventType] .. " / --- event / (nameless!)")
 
-    if self.previousActivatedAppName == "pinentry-mac" then
+    if self.previousActivatedAppName then
       -- SAVVY: Not sure what 'loginwindow' app is, or why it happens like this,
       -- but running `pass` using popup pinentry creates the following sequence:
       --
       --   APPTAP: activated   / 1st event / pinentry-mac
       --   APPTAP: deactivated / 2nd event / Alacritty
       --
-      --   APPTAP: deactivated / 1st event / pinentry-mac [inferred]
+      --   APPTAP: deactivated / 1st event / pinentry-mac (inferred!)
       --   APPTAP: activated   / 2nd event / loginwindow
       --
       --   APPTAP: activated   / 1st event / Alacritty
       --   APPTAP: deactivated / 2nd event / loginwindow
       appName = self.previousActivatedAppName
+
+      self:debug("APPTAP: deactivated / --- event / " .. appName .. " (inferred!)")
     else
       -- This is a *deactivated* event for an unnamed app.
       -- - Wait for its *terminated* event.
+      -- - Note this should only happen when Hammerspoon is restarted, before
+      --   self.previousActivatedAppName is set for the first time.
       self.namelessAppWasDeactivated = true
+
+      self:debug("APPTAP: deactivated / --- event / (nameless!)")
 
       return
     end
@@ -218,12 +225,26 @@ function obj:appWatcherWatch(appName, eventType, _theApp)
       self:debug("GAFFE: Got nameless activated event!")
     end
 
-    self.previousActivatedAppName = appName
+    -- Check previousEventType in case 'activated' for new app received
+    -- before 'deactivated' for old app.
+    if not self.previousEventType then
+      -- 1st half of state transition (will next call beginStateTransition).
+      self.previousActivatedAppNameWaitForIt = appName
+    else
+      -- 2nd half of state transition (will next call completeStateTransition).
+      self.previousActivatedAppName = appName
+      self.previousActivatedAppNameWaitForIt = nil
+    end
   end
 
   if not self.previousEventType then
     self:beginStateTransition(appName, eventType, appNameStr)
   else
+    if self.previousActivatedAppNameWaitForIt then
+      self.previousActivatedAppName = self.previousActivatedAppNameWaitForIt
+      self.previousActivatedAppNameWaitForIt = nil
+    end
+
     self:completeStateTransition(eventType, appNameStr)
   end
 end
@@ -318,6 +339,13 @@ end
 --   APPTAP: activated   / 1st event / Google Chrome
 --   APPTAP: deactivated / --- event / (nameless!)
 --   APPTAP: terminated  / 2nd event / Google Chrome
+--
+-- SAVVY/2024-11-03: Note we've since added obj.previousActivatedAppName
+-- so we can infer the app name when 'deactivated' is received without an
+-- app name.
+--
+-- - As such, this fcn. will likely only run after Hammerspoon is restarted,
+--   before obj.namelessAppWasDeactivated is set for the first time.
 
 obj.namelessDeactivatedOkay = {
   ["python3"] = true,
