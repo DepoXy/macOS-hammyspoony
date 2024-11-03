@@ -93,11 +93,28 @@ function obj:chromeRwdFwdGetEventtapCallback(e)
       end
     end
 
-    -- BWARE: Return quickly, lest character events run out-of-order!
-    -- - E.g., if user types faster than this code can process the
-    --   events, characters might be swapped (emitted out of sequence).
-    --   - Or sometimes author has seen the accent character picker pop up!
-    -- - SAVVY: This is b/c the AppleScript call in sussRoleOfElement().
+    -- Google Sheets has its own bindings, which you cannot customize.
+    -- - So rather than rely on System Settings Keyboard Shortcuts for
+    --   Chrome, e.g.,
+    --     defaults write com.google.Chrome NSUserKeyEquivalents '{ ... }'
+    --   we'll use the event tap for those Google Sheets bindings that we
+    --   care about, and that won't interfere with normal Chrome bindings.
+    if eventFlags:containExactly({"ctrl"}) then
+      if false then
+
+      -- Edit > Undo
+      elseif keyCode == hs.keycodes.map["z"] then
+        return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["z"], true)}
+
+        -- Edit > Redo
+      elseif keyCode == hs.keycodes.map["y"] then
+        return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["y"], true)}
+
+      end
+    end
+
+    -- Short-circuit now if we know we don't care about the event,
+    -- just to be expeditious.
     if not eventFlags["fn"] then
       -- We know that special character has *not* been pressed.
 
