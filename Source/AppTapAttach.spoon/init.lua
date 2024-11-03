@@ -258,6 +258,45 @@ end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
+-- SAVVY/2024-11-01: Some apps are reported without their name when
+-- deactivated, e.g., here's changing from to Chrome from MacVim,
+-- and note that these events all had the same timestamp (i.e.,
+-- they were all received sequentially after author AltTabbed),
+-- also I'm not sure why Chrome was activated, then deactived,
+-- then activated again!:
+--
+--   APPTAP: launching   / dont care / Google Chrome
+--   APPTAP: activated   / 1st event / Google Chrome
+--   APPTAP: deactivated / 2nd event / MacVim
+--   APPTAP: launched    / dont care / Google Chrome
+--
+--   APPTAP: activated   / 1st event / MacVim
+--   APPTAP: deactivated / --- event / (nameless!)
+--   APPTAP: terminated  / 2nd event / Google Chrome
+--
+--   APPTAP: activated   / 1st event / Google Chrome
+--   APPTAP: deactivated / 2nd event / MacVim
+--
+-- Author has also observed similar event sequence opening Chrome window
+-- from terminal, e.g.,
+--
+--   APPTAP: activated   / 1st event / Google Chrome
+--   APPTAP: deactivated / 2nd event / Alacritty
+--   APPTAP: launching   / dont care / Google Chrome
+--   
+--   APPTAP: activated   / 1st event / Google Chrome
+--   APPTAP: deactivated / 2nd event / Google Chrome
+--   APPTAP: launched    / dont care / Google Chrome
+--   
+--   APPTAP: activated   / 1st event / Google Chrome
+--   APPTAP: deactivated / --- event / (nameless!)
+--   APPTAP: terminated  / 2nd event / Google Chrome
+
+obj.namelessDeactivatedOkay = {
+  ["python3"] = true,
+  ["Google Chrome"] = true,
+}
+
 function obj:resetNamelessAppWasDeactivated(appNameStr)
   if not self.namelessAppWasDeactivated then
 
@@ -266,8 +305,8 @@ function obj:resetNamelessAppWasDeactivated(appNameStr)
 
   self.namelessAppWasDeactivated = false
 
-  if appNameStr ~= "python3" then
-    local alertMsg = "APPTAP: GAFFE: Expected \"python3\", not \"" .. appNameStr .. "\""
+  if not self.namelessDeactivatedOkay[appNameStr] then
+    local alertMsg = "APPTAP: GAFFE: Unexpected nameless app deactivated: \"" .. appNameStr .. "\""
 
     self:debug(alertMsg)
 
