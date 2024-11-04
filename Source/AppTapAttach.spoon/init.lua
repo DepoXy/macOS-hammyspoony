@@ -222,7 +222,11 @@ function obj:appWatcherWatch(appName, eventType, _theApp)
   if eventType == hs.application.watcher.activated then
     if not appName then
       -- Unreachable path (or at least author has never seen this happen)
-      self:debug("GAFFE: Got nameless activated event!")
+      self:debug("GAFFE: APPTAP: Got nameless activated event!")
+
+      -- Author wouldn't normally alert so agressively, but for unreachable
+      -- path, let's, just in case it actually *is* reachable.
+      hs.alert.show("GAFFE: APPTAP: Unreachable path! — activated and not appName")
     end
 
     -- Check previousEventType in case 'activated' for new app received
