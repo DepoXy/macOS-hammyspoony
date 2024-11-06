@@ -38,6 +38,7 @@ function obj:slackShortcutsGetEventtap()
       --   hs.alert.show("KEYCD: " .. e:getKeyCode())
       -- For each menu item, returns true to delete original event,
       -- followed by the new event.
+      local keyCode = e:getKeyCode()
       local eventFlags = e:getFlags()
 
       if eventFlags:containExactly({"ctrl"}) then
@@ -46,19 +47,19 @@ function obj:slackShortcutsGetEventtap()
         -- *** Slack
 
         -- Slack > Quit Slack
-        elseif e:getKeyCode() == hs.keycodes.map["q"] then
+        elseif keyCode == hs.keycodes.map["q"] then
           return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["q"], true)}
 
         -- *** File
 
         -- File > New Message
-        elseif e:getKeyCode() == hs.keycodes.map["n"] then
+        elseif keyCode == hs.keycodes.map["n"] then
           return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["n"], true)}
 
         -- *** Edit
 
         -- Edit > Undo
-        elseif e:getKeyCode() == hs.keycodes.map["z"] then
+        elseif keyCode == hs.keycodes.map["z"] then
           return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["z"], true)}
 
         -- CXREF: Cut/Copy/Paste/Select All done via KE:
@@ -66,66 +67,66 @@ function obj:slackShortcutsGetEventtap()
         --     ~/.kit/mOS/Karabiner-Elephants/complex_modifications/0150-system-cmd-2-ctl-cxva.json
         --
         -- -- Edit > Cut
-        -- elseif e:getKeyCode() == hs.keycodes.map["x"] then
+        -- elseif keyCode == hs.keycodes.map["x"] then
         --   return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["x"], true)}
         --
         -- -- Edit > Copy
-        -- elseif e:getKeyCode() == hs.keycodes.map["c"] then
+        -- elseif keyCode == hs.keycodes.map["c"] then
         --   return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["c"], true)}
         --
         -- -- Edit > Paste
-        -- elseif e:getKeyCode() == hs.keycodes.map["v"] then
+        -- elseif keyCode == hs.keycodes.map["v"] then
         --   return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["v"], true)}
         --
         -- -- Edit > Select All
-        -- elseif e:getKeyCode() == hs.keycodes.map["a"] then
+        -- elseif keyCode == hs.keycodes.map["a"] then
         --   return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["a"], true)}
 
         -- Edit > Search
-        elseif e:getKeyCode() == hs.keycodes.map["g"] then
+        elseif keyCode == hs.keycodes.map["g"] then
           return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["g"], true)}
 
         -- Edit > Find...
-        elseif e:getKeyCode() == hs.keycodes.map["f"] then
+        elseif keyCode == hs.keycodes.map["f"] then
           return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["f"], true)}
 
         -- *** View
 
         -- View > Reload
-        elseif e:getKeyCode() == hs.keycodes.map["r"] then
+        elseif keyCode == hs.keycodes.map["r"] then
           return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["r"], true)}
 
         -- View > Actual Size
-        elseif e:getKeyCode() == hs.keycodes.map["0"] then
+        elseif keyCode == hs.keycodes.map["0"] then
           return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["0"], true)}
 
         -- View > Zoom In
-        elseif e:getKeyCode() == hs.keycodes.map["="] then
+        elseif keyCode == hs.keycodes.map["="] then
           return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["="], true)}
 
         -- View > Zoom Out
         -- - Note the Slack binding is Shift-Cmd-_, which we send as shift+cmd+-.
-        elseif e:getKeyCode() == hs.keycodes.map["-"] then
+        elseif keyCode == hs.keycodes.map["-"] then
           return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["-"], true)}
 
         -- *** Go
 
         -- Go > Switch to Channel
-        elseif e:getKeyCode() == hs.keycodes.map["k"] then
+        elseif keyCode == hs.keycodes.map["k"] then
           return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["k"], true)}
 
         -- Go > History > Back
-        elseif e:getKeyCode() == hs.keycodes.map["["] then
+        elseif keyCode == hs.keycodes.map["["] then
           return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["["], true)}
 
         -- Go > History > Forward
-        elseif e:getKeyCode() == hs.keycodes.map["]"] then
+        elseif keyCode == hs.keycodes.map["]"] then
           return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["]"], true)}
 
         -- *** Author Special
 
         -- "Delete Back-Word like readline" (Cmd-w)
-        elseif e:getKeyCode() == hs.keycodes.map["w"] then
+        elseif keyCode == hs.keycodes.map["w"] then
           return true, {hs.eventtap.event.newKeyEvent({"alt"}, hs.keycodes.map["delete"], true)}
 
         end
@@ -135,7 +136,7 @@ function obj:slackShortcutsGetEventtap()
         -- *** File
 
         -- File > Close Window
-        elseif e:getKeyCode() == hs.keycodes.map["w"] then
+        elseif keyCode == hs.keycodes.map["w"] then
           return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["w"], true)}
 
         end
@@ -145,69 +146,69 @@ function obj:slackShortcutsGetEventtap()
         -- *** File
 
         -- File > New Canvas
-        elseif e:getKeyCode() == hs.keycodes.map["n"] then
+        elseif keyCode == hs.keycodes.map["n"] then
           return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["n"], true)}
 
         -- File > Workspace > Select Next Workspace
-        elseif e:getKeyCode() == hs.keycodes.map["]"] then
+        elseif keyCode == hs.keycodes.map["]"] then
           return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["]"], true)}
 
         -- File > Workspace > Select Previous Workspace
-        elseif e:getKeyCode() == hs.keycodes.map["["] then
+        elseif keyCode == hs.keycodes.map["["] then
           return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["["], true)}
 
         -- *** Edit
 
         -- Edit > Redo
-        elseif e:getKeyCode() == hs.keycodes.map["z"] then
+        elseif keyCode == hs.keycodes.map["z"] then
           return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["z"], true)}
 
         -- Edit > Paste and Match Style
-        elseif e:getKeyCode() == hs.keycodes.map["v"] then
+        elseif keyCode == hs.keycodes.map["v"] then
           return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["v"], true)}
 
         -- *** View
 
         -- View > Force Reload
-        elseif e:getKeyCode() == hs.keycodes.map["r"] then
+        elseif keyCode == hs.keycodes.map["r"] then
           return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["r"], true)}
 
         -- View > Toggle Full Screen
-        elseif e:getKeyCode() == hs.keycodes.map["f"] then
+        elseif keyCode == hs.keycodes.map["f"] then
           return true, {hs.eventtap.event.newKeyEvent({"ctrl", "cmd"}, hs.keycodes.map["f"], true)}
 
         -- View > Hide Sidebar
-        elseif e:getKeyCode() == hs.keycodes.map["d"] then
+        elseif keyCode == hs.keycodes.map["d"] then
           return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["d"], true)}
 
         -- *** Go
 
         -- Go > All Unreads
-        elseif e:getKeyCode() == hs.keycodes.map["a"] then
+        elseif keyCode == hs.keycodes.map["a"] then
           return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["a"], true)}
 
         -- Go > Threads
-        elseif e:getKeyCode() == hs.keycodes.map["t"] then
+        elseif keyCode == hs.keycodes.map["t"] then
           return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["t"], true)}
 
         -- Go > All DMs
-        elseif e:getKeyCode() == hs.keycodes.map["k"] then
+        elseif keyCode == hs.keycodes.map["k"] then
           return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["k"], true)}
 
         -- Go > Activity
-        elseif e:getKeyCode() == hs.keycodes.map["m"] then
+        elseif keyCode == hs.keycodes.map["m"] then
           return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["m"], true)}
 
         -- Go > Channel Browser
-        elseif e:getKeyCode() == hs.keycodes.map["l"] then
+        elseif keyCode == hs.keycodes.map["l"] then
           return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["l"], true)}
 
         -- Go > People & User Groups
-        elseif e:getKeyCode() == hs.keycodes.map["e"] then
+        elseif keyCode == hs.keycodes.map["e"] then
           return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["e"], true)}
 
         -- Go > Downloads
-        elseif e:getKeyCode() == hs.keycodes.map["j"] then
+        elseif keyCode == hs.keycodes.map["j"] then
           return true, {hs.eventtap.event.newKeyEvent({"shift", "cmd"}, hs.keycodes.map["j"], true)}
 
         end
