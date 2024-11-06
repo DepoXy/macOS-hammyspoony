@@ -549,7 +549,7 @@ appTapChrome.enable["DeleteBackwardUsingCtrlW"] = true
 appTapChrome.enable["ReloadThisPageUsingF5"] = true
 appTapChrome.enable["AlwaysOnBackForwardUsingCmdLeftRight"] = true
 appTapChrome.enable["LinuxlikeLeftRightMotions"] = true
-appTapChrome.enable["LinuxlikeHomeEndMotions"] = true
+appTapChrome.enable["LinuxlikeHomeEndMotions"] = false
 appTapChrome.enable["SometimesOnBackForwardUsingAltLeftRight"] = true
 appTapChrome.enable["OpenLinkInNewTabUsingCtrlClick"] = true
 

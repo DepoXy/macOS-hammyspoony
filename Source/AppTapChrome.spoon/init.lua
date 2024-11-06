@@ -42,7 +42,12 @@ obj.enable["DeleteBackwardUsingCtrlW"] = true
 obj.enable["ReloadThisPageUsingF5"] = true
 obj.enable["AlwaysOnBackForwardUsingCmdLeftRight"] = true
 obj.enable["LinuxlikeLeftRightMotions"] = true
-obj.enable["LinuxlikeHomeEndMotions"] = true
+-- ISOFF: The AppleScript (sussRoleOfElement) takes a half-second or second
+-- to run, which is annoying. So suggesting to leave this off and to rewire
+-- your brain to use <Alt-Left>/<Alt-Right> instead of <Home>/<End>, to jump
+-- to line beg/end; and to use <Cmd-Up>/<Cmd-Down>, not <Ctrl-Home>/<Ctrl-End>,
+-- to jump to doc beg/eng.
+obj.enable["LinuxlikeHomeEndMotions"] = false
 obj.enable["SometimesOnBackForwardUsingAltLeftRight"] = true
 obj.enable["OpenLinkInNewTabUsingCtrlClick"] = true
 
