@@ -41,7 +41,29 @@ function obj:slackShortcutsGetEventtap()
       local keyCode = e:getKeyCode()
       local eventFlags = e:getFlags()
 
-      if eventFlags:containExactly({"ctrl"}) then
+      if false
+        or keyCode == hs.keycodes.map["left"]
+        or keyCode == hs.keycodes.map["right"]
+        or keyCode == hs.keycodes.map["home"]
+        or keyCode == hs.keycodes.map["end"]
+      then
+        local deleteEvent
+        local newEvents
+
+        -- CXREF: ~/.kit/mOS/macOS-Hammyspoony/Source/MotionUtils.spoon/init.lua
+        deleteEvent, newEvents = motionUtils:newKeyEventForLeftRight(keyCode, eventFlags)
+        if deleteEvent then
+
+          return deleteEvent, newEvents
+        end
+
+        -- CXREF: ~/.kit/mOS/macOS-Hammyspoony/Source/MotionUtils.spoon/init.lua
+        deleteEvent, newEvents = motionUtils:newKeyEventForHomeEnd(keyCode, eventFlags)
+        if deleteEvent then
+
+          return deleteEvent, newEvents
+        end
+      elseif eventFlags:containExactly({"ctrl"}) then
         if false then
 
         -- *** Slack
