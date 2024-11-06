@@ -38,7 +38,9 @@ function obj:slackShortcutsGetEventtap()
       --   hs.alert.show("KEYCD: " .. e:getKeyCode())
       -- For each menu item, returns true to delete original event,
       -- followed by the new event.
-      if e:getFlags():containExactly({"ctrl"}) then
+      local eventFlags = e:getFlags()
+
+      if eventFlags:containExactly({"ctrl"}) then
         if false then
 
         -- *** Slack
@@ -127,7 +129,7 @@ function obj:slackShortcutsGetEventtap()
           return true, {hs.eventtap.event.newKeyEvent({"alt"}, hs.keycodes.map["delete"], true)}
 
         end
-      elseif e:getFlags():containExactly({"alt"}) then
+      elseif eventFlags:containExactly({"alt"}) then
         if false then
 
         -- *** File
@@ -137,7 +139,7 @@ function obj:slackShortcutsGetEventtap()
           return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["w"], true)}
 
         end
-      elseif e:getFlags():containExactly({"shift", "ctrl"}) then
+      elseif eventFlags:containExactly({"shift", "ctrl"}) then
         if false then
 
         -- *** File
