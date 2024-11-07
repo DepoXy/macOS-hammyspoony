@@ -61,12 +61,12 @@ function obj:chromeRwdFwdGetEventtap()
       hs.eventtap.event.types.leftMouseUp,
     },
     function(e)
-      return self:chromeRwdFwdGetEventtapCallback(e)
+      return self:chromeGetEventtapCallback(e)
     end
   )
 end
 
-function obj:chromeRwdFwdGetEventtapCallback(e)
+function obj:chromeGetEventtapCallback(e)
   local eventType = e:getType()
   -- SAVVY: Flags contain "fn" when non-character pressed.
   -- - E.g., <Left>, <Right>, <Home>, <End>, etc.
