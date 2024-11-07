@@ -111,7 +111,7 @@ function obj:chromeGetEventtapCallback(e)
       elseif keyCode == hs.keycodes.map["z"] then
         return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["z"], true)}
 
-        -- Edit > Redo
+      -- Edit > Redo
       elseif keyCode == hs.keycodes.map["y"] then
         return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["y"], true)}
 
