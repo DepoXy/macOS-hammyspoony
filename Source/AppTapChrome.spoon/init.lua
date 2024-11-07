@@ -53,7 +53,7 @@ obj.enable["OpenLinkInNewTabUsingCtrlClick"] = true
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
-function obj:chromeRwdFwdGetEventtap()
+function obj:chromeGetEventtap()
   return hs.eventtap.new(
     {
       hs.eventtap.event.types.keyDown,
@@ -330,7 +330,7 @@ function obj:start(appTapAttach)
   appTapAttach:registerApptap(
     "Google Chrome",
     function()
-      return self:chromeRwdFwdGetEventtap()
+      return self:chromeGetEventtap()
     end
   )
 end
