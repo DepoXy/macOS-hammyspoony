@@ -565,6 +565,24 @@ end
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- CXREF:
+-- ~/.kit/mOS/macOS-Hammyspoony/Source/AppTapFirefox.spoon/init.lua
+
+local appTapFirefox = hs.loadSpoon("AppTapFirefox")
+
+appTapFirefox.enable["DeleteBackwardUsingCtrlW"] = true
+
+appTapFirefox:start(appTapAttach)
+
+firefoxWindowFilter = hs.window.filter.new("Firefox")
+
+-- Not used herein, but defined for client usage.
+ignore_hotkey_firefox = function(hotkey)
+  filter_ignore_hotkey(firefoxWindowFilter, hotkey)
+end
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+-- CXREF:
 -- ~/.kit/mOS/macOS-Hammyspoony/Source/NeverLoseFocus.spoon/init.lua
 
 local neverLoseFocus = hs.loadSpoon("NeverLoseFocus")
