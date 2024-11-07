@@ -74,13 +74,20 @@ function obj:firefoxGetEventtapCallback(e)
 
     -- Delete backward on <Ctrl-W>
     if keyCode == hs.keycodes.map["w"] then
-      if self.enable["DeleteBackwardUsingCtrlW"]
-        and eventFlags:containExactly({"ctrl"})
-      then
-        -- Emit <Alt-Backspace> (command macOS delete back-word)
-        return true, {hs.eventtap.event.newKeyEvent({"alt"}, hs.keycodes.map["delete"], true)}
-      else
-        return false
+      if self.enable["DeleteBackwardUsingCtrlW"] then
+        if eventFlags:containExactly({"ctrl"}) then
+          -- Emit <Alt-Backspace> (common macOS delete back-word)
+          return true, {hs.eventtap.event.newKeyEvent({"alt"}, hs.keycodes.map["delete"], true)}
+        elseif eventFlags:containExactly({"alt"}) then
+          -- Emit <Cmd-W>
+          -- SAVVY: Using NSUserKeyEquivalents doesn't totally work to rebind
+          -- "Close Window" — When an input control has focus (e.g., the location
+          -- bar), <Alt-W> enters "∑". So we use an eventtap here instead of
+          -- using `defaults write org.mozilla.firefox NSUserKeyEquivalents`.
+          return true, {hs.eventtap.event.newKeyEvent({"cmd"}, hs.keycodes.map["w"], true)}
+        else
+          return false
+        end
       end
     end
   end  -- eventType == hs.eventtap.event.types.keyDown
