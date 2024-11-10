@@ -582,6 +582,15 @@ end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
+inkscapeWindowFilter = hs.window.filter.new("Inkscape")
+
+-- Not used herein, but defined for client usage.
+ignore_hotkey_inkscape = function(hotkey)
+  filter_ignore_hotkey(inkscapeWindowFilter, hotkey)
+end
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
 -- CXREF:
 -- ~/.kit/mOS/macOS-Hammyspoony/Source/NeverLoseFocus.spoon/init.lua
 
