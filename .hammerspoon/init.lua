@@ -530,8 +530,19 @@ appWindowChooser.appName = "Google Chrome"
 --   bindings defined above.
 
 appWindowChooser:bindHotkeys({
-  -- BNDNG: <Ctrl-Space> (<Ctrl- >) (as inspired by Contexts)
-  show_chooser={{"ctrl"}, "Space"}
+  -- BNDNG: <Shift-Ctrl-Space> (<Shift-Ctrl- >).
+  -- - This was original <Ctrl-Space> (as inspired by Contexts),
+  --   but code editors (including CoC) generally use (suggest)
+  --   <Ctrl-Space> to conjure suggestions picker.
+  --   - So let's at <Shift-Ctrl-Space>, it's close, and not at
+  --     all awkward to press.
+  --   - Note I tried <Shift-Space>, but I find myself accidentally
+  --     invoking that binding when typing too fast (i.e., Shift is
+  --     still depressed while I'm hitting Space; it's happened 3
+  --     times while writing this comment).
+  --  show_chooser={{"ctrl"}, "Space"}
+  --  show_chooser={{"shift"}, "Space"}
+  show_chooser={{"shift", "ctrl"}, "Space"}
 })
 
 appWindowChooser:start()
