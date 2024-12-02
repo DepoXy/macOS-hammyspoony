@@ -542,9 +542,11 @@ dateTimeSnips:bindHotkeys({
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
--- pwgen23 to clippy
-
--- Using printf to avoid the newline.
+-- Copy `pwgen23`-like output (from Homefries) to the clipboard.
+-- - Use printf to avoid final newline.
+-- - Don't use punctuation for first 2 or final 2 characters so you
+--   can double-click one of the ends and drag to easily select the
+--   whole "word".
 -- BNDNG: <Cmd-Alt-P>
 local cmd_alt_p = hs.hotkey.bind({"cmd", "alt"}, "P", function()
   local task = hs.task.new(
