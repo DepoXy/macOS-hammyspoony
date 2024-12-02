@@ -542,6 +542,22 @@ dateTimeSnips:bindHotkeys({
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
+-- pwgen23 to clippy
+
+-- Using printf to avoid the newline.
+-- BNDNG: <Cmd-Alt-P>
+local cmd_alt_p = hs.hotkey.bind({"cmd", "alt"}, "P", function()
+  local task = hs.task.new(
+    "/bin/dash",
+    nil,
+    function() return false end,
+    { "-c", 'printf "%s" "$(/opt/homebrew/bin/pwgen 2 1 | tr -d "\n" ; /opt/homebrew/bin/pwgen -n 21 -s -N 1 -y | tr -d "\n" ; /opt/homebrew/bin/pwgen 2 1)" | pbcopy' }
+  )
+  task:start()
+end)
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
 -- CXREF:
 -- ~/.kit/mOS/macOS-Hammyspoony/Source/AppWindowChooser.spoon/init.lua
 
@@ -720,9 +736,11 @@ local allHotkeys = {
   dateTimeSnips.keySnipISODateToday,
   dateTimeSnips.keySnipISODateTimeNormal,
   dateTimeSnips.keySnipISODateTimeDashed,
+  -- (More) Individual hs.hotkey.bind() objects from above
+  cmd_alt_p,
   -- Spoon: AppWindowChooser
   appWindowChooser.key_show_chooser,
-  -- (More) Individual hs.hotkey.bind() objects from above
+  -- (Another) Individual hs.hotkey.bind() objects from above
   ctrl_alt_c,
   -- Spoon: KillTrepidation
   killTrepidation.keyKill,
