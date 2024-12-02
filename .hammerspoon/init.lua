@@ -418,6 +418,31 @@ ignore_hotkey_slack(cmd_0)
 
 ignore_hotkey_slack(shift_cmd_t)
 
+-------
+
+-- Prepare a Visual Studio Code (VS Code) window filter that we'll
+-- use for a global hotkey desubscriber.
+local vs_code_filter = hs.window.filter.new("Code")
+
+-- We'll disable all hotkeys for VS Code, because so many of our
+-- hotkey conflict with its bindings.
+-- - Also the author doesn't use VS Code often enough to want to
+--   be selective and to audit them all.
+-- - But rather than create individual window filters, e.g.:
+--
+--     ignore_hotkey_vs_code = function(hotkey)
+--       filter_ignore_hotkey(vs_code_filter, hotkey)
+--     end
+--
+--     ignore_hotkey_vs_code(someHotkey)
+--     ignore_hotkey_vs_code(anotherHotkey)
+--     -- etc.
+--
+--   We'll use AppTapDisableHotkeys instead.
+--
+-- - See below:
+--   appTapDisableHotkeysVSCode:registerHotkeys(allHotkeys)
+
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- CXREF:
@@ -454,7 +479,7 @@ ignore_hotkey_slack(cmd_f)
 -- MacVim foregrounder/opener
 
 -- BNDNG: <Cmd-Backtick> (<Cmd-`>)
-hs.hotkey.bind({"cmd"}, "`", function()
+local cmd_backtick = hs.hotkey.bind({"cmd"}, "`", function()
   hs.application.launchOrFocus("MacVim")
 end)
 
@@ -463,7 +488,7 @@ end)
 -- Slack foregrounder/opener
 
 -- BNDNG: <Shift-Ctrl-Cmd-F>
-hs.hotkey.bind({"shift", "ctrl", "cmd"}, "F", function()
+local shift_ctrl_cmd_f = hs.hotkey.bind({"shift", "ctrl", "cmd"}, "F", function()
   minimizeAndHideWindows:launchOrFocusOrMinimize("Slack")
 end)
 
@@ -472,7 +497,7 @@ end)
 -- GnuCash foregrounder/opener
 
 -- BNDNG: <Shift-Ctrl-Cmd-G>
-hs.hotkey.bind({"shift", "ctrl", "cmd"}, "G", function()
+local shift_ctrl_cmd_g = hs.hotkey.bind({"shift", "ctrl", "cmd"}, "G", function()
   hs.application.launchOrFocus("GnuCash")
 end)
 
@@ -481,7 +506,7 @@ end)
 -- Spotify foregrounder/๏קєภer
 
 -- BNDNG: <Shift-Ctrl-Cmd-X>
-hs.hotkey.bind({"shift", "ctrl", "cmd"}, "X", function()
+local shift_ctrl_cmd_x = hs.hotkey.bind({"shift", "ctrl", "cmd"}, "X", function()
   minimizeAndHideWindows:launchOrFocusOrMinimize("Spotify")
 end)
 
@@ -491,7 +516,7 @@ end)
 -- - Mnemonic: *Edit* (I know, "edit" could mean so many things! Esp. text "editor").
 
 -- BNDNG: <Shift-Ctrl-Cmd-E>
-hs.hotkey.bind({"shift", "ctrl", "cmd"}, "E", function()
+local shift_ctrl_cmd_e = hs.hotkey.bind({"shift", "ctrl", "cmd"}, "E", function()
   hs.application.launchOrFocus("LibreOffice")
 end)
 
@@ -623,7 +648,7 @@ aClock = hs.loadSpoon("AClock")
 -- BNDNG: <Ctrl-Alt-C>
 -- - Complements <Ctrl-Alt-D> Show Desktop, which might reveal GeekTool
 --   geeklet(s), if you put any there (as suggested by DepoXy setup docs).
-hs.hotkey.bind({"ctrl", "alt"}, "c", function()
+local ctrl_alt_c = hs.hotkey.bind({"ctrl", "alt"}, "c", function()
   -- ALTLY: spoon.AClock:toggleShow()
   aClock:toggleShow()
 end)
@@ -652,6 +677,63 @@ killTrepidation:bindHotkeys({
 
 -- BNDNGs: <Ctrl-X>, <Ctrl-C>, <Ctrl-V>, <Ctrl-A>
 hs.loadSpoon("LinuxlikeCutCopyPaste"):start()
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+-- Application blocklist: Blanket hotkey disablement for select apps.
+
+local allHotkeys = {
+  -- Sppon: MinimizeAndHideWindows
+  minimizeAndHideWindows.keyAllButFrontmost,
+  minimizeAndHideWindows.keyAllWindows,
+  -- Spoon: FrillsAlacrittyAndTerminal
+  frillsAlacrittyAndTerminal.keyUnminimzeAllAlacrittyWindows,
+  frillsAlacrittyAndTerminal.keysAlacrittyWindowFronters1Through9[1],
+  frillsAlacrittyAndTerminal.keysAlacrittyWindowFronters1Through9[2],
+  frillsAlacrittyAndTerminal.keysAlacrittyWindowFronters1Through9[3],
+  frillsAlacrittyAndTerminal.keysAlacrittyWindowFronters1Through9[4],
+  frillsAlacrittyAndTerminal.keysAlacrittyWindowFronters1Through9[5],
+  frillsAlacrittyAndTerminal.keysAlacrittyWindowFronters1Through9[6],
+  frillsAlacrittyAndTerminal.keysAlacrittyWindowFronters1Through9[7],
+  frillsAlacrittyAndTerminal.keysAlacrittyWindowFronters1Through9[8],
+  frillsAlacrittyAndTerminal.keysAlacrittyWindowFronters1Through9[9],
+  frillsAlacrittyAndTerminal.keyAlacrittyNewWindow,
+  frillsAlacrittyAndTerminal.keyAlacrittyForegrounderOpener,
+  frillsAlacrittyAndTerminal.keyTerminalNewWindow,
+  -- Spoon: FrillsChrome
+  frillsChrome.keyNewChromeWindow,
+  frillsChrome.keyFrontChromeWindow,
+  -- Spoon: BrowserWindowFronters
+  browserWindowFronters.keyFrontEmail,
+  browserWindowFronters.keyFrontChats,
+  browserWindowFronters.keyFrontPowerThesaurus,
+  browserWindowFronters.keyFrontRegexDict,
+  browserWindowFronters.keyFrontDevTools,
+  -- Individual hs.hotkey.bind() objects from above
+  cmd_f,
+  cmd_backtick,
+  shift_ctrl_cmd_f,
+  shift_ctrl_cmd_g,
+  shift_ctrl_cmd_x,
+  shift_ctrl_cmd_e,
+  -- Spoon: DateTimeSnips
+  dateTimeSnips.keySnipISODateToday,
+  dateTimeSnips.keySnipISODateTimeNormal,
+  dateTimeSnips.keySnipISODateTimeDashed,
+  -- Spoon: AppWindowChooser
+  appWindowChooser.key_show_chooser,
+  -- (More) Individual hs.hotkey.bind() objects from above
+  ctrl_alt_c,
+  -- Spoon: KillTrepidation
+  killTrepidation.keyKill,
+}
+
+appTapDisableHotkeys = hs.loadSpoon("AppTapDisableHotkeys")
+
+appTapDisableHotkeys:registerHotkeys(allHotkeys)
+
+-- Blocklist: Register apps here.
+appTapDisableHotkeys:disableAllHotkeysForApp(appTapAttach, "Code")
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
