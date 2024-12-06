@@ -465,14 +465,23 @@ appTapMeld:start(appTapAttach)
 
 -- Finder foregrounder/opener
 
--- BNDNG: <Cmd-F>
-local cmd_f = hs.hotkey.bind({"cmd"}, "F", function()
+-- BNDNG: <Shift-Alt-F>
+-- - HSTRY/2024-12-06: Previously <Cmd-F>, but once Github source
+--   view in Chrome has focus, it steals <Ctrl-F>, <Shift-Ctrl-F>,
+--   <Alt-F>, and <Shift-Alt-F>. So the macOS-onboarder `defaults`
+--   setting leaves Chrome Find at <Cmd-F>. (And <Cmd-F> was the
+--   author's traditional `caja` opener on Linux, which I later
+--   mapped to Finder-open on macOS. Ah, well, it had a good run.)
+--   - We'll regard <Cmd-F> as one of the "untouchables", along with
+--     <Cmd-Q>, <Cmd-W>, <Cmd-Y>, and <Cmd-Z>.
+--   - And we'll learn to live with <Shift-Alt-F> to open Finder.
+local shift_alt_f = hs.hotkey.bind({"shift", "alt"}, "F", function()
   hs.application.launchOrFocus("Finder")
 end)
 
-ignore_hotkey_gnucash(cmd_f)
-ignore_hotkey_meld(cmd_f)
-ignore_hotkey_slack(cmd_f)
+ignore_hotkey_gnucash(shift_alt_f)
+ignore_hotkey_meld(shift_alt_f)
+ignore_hotkey_slack(shift_alt_f)
 
 -------
 
@@ -728,7 +737,7 @@ local allHotkeys = {
   browserWindowFronters.keyFrontRegexDict,
   browserWindowFronters.keyFrontDevTools,
   -- Individual hs.hotkey.bind() objects from above
-  cmd_f,
+  shift_alt_f,
   cmd_backtick,
   shift_ctrl_cmd_f,
   shift_ctrl_cmd_g,
