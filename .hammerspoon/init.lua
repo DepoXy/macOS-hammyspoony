@@ -682,6 +682,20 @@ end)
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
+-- HSTRY/2024-12-27: Because I sometimes mash <Cmd-Alt-D> accidentally
+-- but then don't remember how to hide again (and I rarely, if ever,
+-- show the Dock this way).
+-- - MAYBE: Find a Spoon for this?
+local cmd_alt_d = hs.hotkey.bind({"cmd", "alt"}, "D", function()
+  local app = hs.application.frontmostApplication()
+
+  hs.eventtap.keyStroke({"cmd", "alt"}, "D", app)
+
+  hs.alert.show("Press <Cmd-Alt-D> again to toggle Dock visibilty")
+end)
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
 -- CXREF:
 -- ~/.kit/mOS/macOS-Hammyspoony/Source/KillTrepidly.spoon/init.lua
 
@@ -753,6 +767,7 @@ local allHotkeys = {
   appWindowChooser.key_show_chooser,
   -- (Another) Individual hs.hotkey.bind() objects from above
   ctrl_alt_c,
+  cmd_alt_d,
   -- Spoon: KillTrepidation
   killTrepidation.keyKill,
 }
