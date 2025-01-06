@@ -85,9 +85,9 @@ end
 --   e.g., suppose the current directory is user home, the title might be "1. ~".
 --   - CXREF: Homefries has a terminal window titler that numbers windows
 --     for Alacritty, mate-terminal, and iTerm2:
---       https://github.com/landonb/home-fries#🍟
---         https://github.com/landonb/home-fries/blob/release/lib/term/show-command-name-in-window-title.sh
---           ~/.kit/sh/home-fries/lib/term/show-command-name-in-window-title.sh
+--       https://github.com/DepoXy/sh-humble-prompt#🙇
+--         https://github.com/DepoXy/sh-humble-prompt/blob/release/lib/show-command-name-in-window-title.sh
+--           ~/.kit/sh/sh-humble-prompt/lib/show-command-name-in-window-title.sh
 
 -- SAVVY: Alacritty windows don't always behave properly
 --

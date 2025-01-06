@@ -93,12 +93,12 @@ You call that a knife? This is a Hammerspoon config
 
   `<Cmd-9>`: Bring to front any terminal window whose title starts with "9. "
 
-  - The [Homefries](https://github.com/landonb/home-fries) project
+  - The [`sh-humble-prompt`](https://github.com/DepoXy/sh-humble-prompt#🙇) project
     includes a `PS1` setup that numbers new terminal windows when
     they're opened. It works for Alacritty, mate-terminal, and iTerm2
     terminal windows. See:
 
-    https://github.com/landonb/home-fries/blob/release/lib/term/show-command-name-in-window-title.sh
+    https://github.com/DepoXy/sh-humble-prompt/blob/release/lib/show-command-name-in-window-title.sh
 
   `<Cmd-0>`: Open a new Alacritty window
 
@@ -206,11 +206,12 @@ You call that a knife? This is a Hammerspoon config
   - The `<Cmd-1>` through `<Cmd-9>` bindings expect terminal window titles
     to be numbered.
 
-    - See [Homefries](https://github.com/landonb/home-fries) for a
-      `PS1` prompt that titles window, specifically:
+    - See [`sh-humble-prompt`](https://github.com/DepoXy/sh-humble-prompt#🙇) for a
+      `PS1` prompt that titles window with sequential window numbers:
 
-      https://github.com/landonb/home-fries/blob/release/lib/term/set-shell-prompt-and-window-title.sh
-      https://github.com/landonb/home-fries/blob/release/lib/term/show-command-name-in-window-title.sh
+      https://github.com/DepoXy/sh-humble-prompt/blob/release/lib/set-shell-prompt-and-window-title.sh
+
+      https://github.com/DepoXy/sh-humble-prompt/blob/release/lib/show-command-name-in-window-title.sh
 
   - The Browser foregrounders specifically call `/Applications/Google Chrome.app`
     with the "Default" user profile.

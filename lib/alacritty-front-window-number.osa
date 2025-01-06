@@ -31,9 +31,9 @@
 #
 # - CXREF: See comment in a related project for more notes:
 # 
-#     https://github.com/landonb/home-fries/blob/release/lib/term/window-title--alacritty-number.osa
+#     https://github.com/DepoXy/sh-humble-prompt/blob/release/lib/window-title--alacritty-number.osa
 #
-#       ~/.kit/sh/home-fries/lib/term/window-title--alacritty-number.osa
+#       ~/.kit/sh/sh-humble-prompt/lib/window-title--alacritty-number.osa
 #
 # - HSTRY: Original approach `activate`d Alacritty to get its process object:
 #
